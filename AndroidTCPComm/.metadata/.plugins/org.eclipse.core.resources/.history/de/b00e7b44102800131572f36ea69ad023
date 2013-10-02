@@ -1,0 +1,104 @@
+package com.example.gamecontrollerdatatransfer;
+
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import com.example.gamecontrollerdatatransfer.ClientActivity.ClientThread;
+
+import android.app.Activity;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
+
+public class PlayActivity extends Activity {
+	
+	private TouchCoordinates tc;
+	 /* put this into your activity class */
+	private boolean connected= false;
+	private String ipAddress="";
+	  
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_play);
+        /* do this in onCreate */
+        
+        //clientConnection();
+		}
+
+	public void clientConnection() {
+
+			//StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+	        //StrictMode.setThreadPolicy(policy); 
+	        
+			Bundle extras = getIntent().getExtras(); 
+
+			if (extras != null) 
+				ipAddress = extras.getString("ipAddress");
+			
+			
+			//pointer count||X||Y
+			//textIn.setText(dataInputStream.readUTF());
+			
+			
+			if (!connected) {
+                if (!ipAddress.equals("")) {
+                    Thread cThread = new Thread(new ClientThread());
+                    cThread.start();
+                }
+			}
+		
+	}
+
+		public void setCoordinates(TouchCoordinates tc){
+			this.tc=tc;
+			System.out.println("Play activity"+tc.getPointerCount());
+			clientConnection();
+		}
+		public TouchCoordinates getCoordinates(){
+			System.out.println("CHECKKKK at getCoordinates"+tc.getX()+" "+tc.getY()+" "+tc.getPointerCount());
+			return tc;
+		}
+		  
+		  
+		  public class ClientThread implements Runnable {
+			  
+		        public void run() {
+		            try {
+		                InetAddress serverAddr = InetAddress.getByName(ipAddress);
+		                Log.d("ClientActivity", "C: Connecting...");
+		                Socket socket = new Socket(serverAddr, 8888);
+		                connected = true;
+		                while (connected) {
+		                    try {
+		                        Log.d("ClientActivity", "C: Sending command.");
+		                        PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket
+		                                    .getOutputStream())), true);
+		                            // WHERE YOU ISSUE THE COMMANDS
+		                            out.println(getCoordinates().getPointerCount()+"||"+getCoordinates().getX()+"||"+getCoordinates().getY());
+		                            Log.d("ClientActivity", "C: Sent.");
+		                    } catch (Exception e) {
+		                        Log.e("ClientActivity", "S: Error", e);
+		                    }
+		                }
+		                socket.close();
+		                Log.d("ClientActivity", "C: Closed.");
+		            } catch (Exception e) {
+		                Log.e("ClientActivity", "C: Error", e);
+		                connected = false;
+		            }
+		        }
+		    }
+}

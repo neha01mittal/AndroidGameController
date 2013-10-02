@@ -1,0 +1,58 @@
+package com.example.gamecontrollerdatatransfer;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import com.example.gamecontrollerdatatransfer.ClientActivity.ClientThread;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.StrictMode;
+
+public class PlayActivity extends Activity {
+	
+	private TouchCoordinates tc;
+	 /* put this into your activity class */
+	private String ipAddress;
+	private boolean connected=false;
+	private Socket socket = null;
+	private DataOutputStream dataOutputStream = null;
+	private DataInputStream dataInputStream = null;
+	  
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_play);
+        /* do this in onCreate */
+        Bundle extras = getIntent().getExtras(); 
+		if (extras != null) {
+			ipAddress = extras.getString("ipAddress");
+        //clientConnection();
+		}
+		}
+
+	public void clientConnection() {
+		
+		
+		if (!connected) {
+           
+            if (!ipAddress.equals("")) {
+                Thread cThread = new Thread(new ClientThread());
+                cThread.start();
+            }
+        }
+	}
+
+		public void setCoordinates(TouchCoordinates tc){
+			this.tc=tc;
+			clientConnection();
+		}
+		public TouchCoordinates getCoordinates(){
+			//System.out.println("CHECKKKK at getCoordinates"+tc.getX()+" "+tc.getY()+" "+tc.getPointerCount());
+			return tc;
+		}
+		
+}

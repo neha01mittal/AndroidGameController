@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="android.app.Activity"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.ClientActivity"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.PlayActivity"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.MultiTouchView"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.TouchCoordinates"/>
+<fullyQualifiedTypeName name="android.util.Log"/>
+<fullyQualifiedTypeName name="android.view.View.OnClickListener"/>
+<fullyQualifiedTypeName name="android.os.Handler"/>
+</qualifiedTypeNameHistroy>
