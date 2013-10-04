@@ -1,5 +1,6 @@
 package com.example.gamecontrollerdatatransfer;
 
+import android.R.color;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,12 +14,12 @@ import android.view.View;
 public class MultiTouchView extends View {
 
   private static final int SIZE = 60;
+  private static final int THRESHHOLD = 300;
   private String arrowKey="";
   private float temp_x;
   private float temp_y;
   private Context m_context;
   private SparseArray<PointF> mActivePointers;
-  private SparseArray<PointF> initPointers;
   private Paint mPaint;
   private int[] colors = { Color.BLUE, Color.GREEN, Color.MAGENTA,
       Color.BLACK, Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY,
@@ -35,7 +36,6 @@ public class MultiTouchView extends View {
 
   private void initView() {
     mActivePointers = new SparseArray<PointF>();
-    initPointers = new SparseArray<PointF>();
     mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     // set painter color to a color you like
     mPaint.setColor(Color.BLUE);
@@ -77,24 +77,14 @@ public class MultiTouchView extends View {
         if (point != null) {
           point.x = event.getX(i);
           point.y = event.getY(i);
-          System.out.println("FDFD"+temp_x+"fdfd"+point.x);
-          if(temp_x==point.x && temp_y==point.y){
-        	  //back to centre
-        	  temp_x=0;
-        	  temp_y=0;
-          } 
-          else if(temp_x-point.x>2){
+          //System.out.println("FDFD"+temp_x+"fdfd"+point.x);
+          if(Math.sqrt(Math.pow(point.x-temp_x, 2)+Math.pow(point.y-temp_y, 2))>THRESHHOLD){
 	        	  arrowKey="RIGHT";
+	        	  System.out.println("OUTSIDE THE CIRCLE"+Math.sqrt(Math.pow(point.x-temp_x, 2)+Math.pow(point.y-temp_y, 2)));
+	        	  Vector vec = new Vector(point.x-temp_x, point.y-temp_y);
+	        	  vec.normalise();
+	        	  //send it to fuzzzzzzzzzy logic 
 	          }
-          else if(temp_x-point.x<2){
-        	  arrowKey="LEFT";
-          }
-          else if(temp_y-point.y<2){
-        	  arrowKey="DOWN";
-          }
-          else if(temp_y-point.y>2){
-        	  arrowKey="UP";
-          }
         }
         
       }
@@ -123,8 +113,13 @@ public class MultiTouchView extends View {
     for (int size = mActivePointers.size(), i = 0; i < size; i++) {
       PointF point = mActivePointers.valueAt(i);
       if (point != null)
+    	mPaint.setColor(Color.RED);
+        canvas.drawCircle(temp_x, temp_y, THRESHHOLD,mPaint);
+        mPaint.setColor(Color.BLACK);
+        canvas.drawLine(point.x, point.y, temp_x, temp_y, mPaint);
         mPaint.setColor(colors[i % 9]);
       	canvas.drawCircle(point.x, point.y, SIZE, mPaint);
+      	
       	wrapCoordinates(point.x,point.y,i);
     }
     canvas.drawText("Total pointers: " + mActivePointers.size(), 10, 40 , textPaint);
@@ -132,7 +127,7 @@ public class MultiTouchView extends View {
 
   public void wrapCoordinates(float x, float y, int pointCount){
 	  TouchCoordinates tc = new TouchCoordinates(x, y, pointCount);
-	  System.out.println("CHECKKKK at wrapCoord"+tc.getX()+" "+tc.getY()+" "+tc.getPointerCount()+"ARROWKEY"+arrowKey);
+	  //System.out.println("CHECKKKK at wrapCoord"+tc.getX()+" "+tc.getY()+" "+tc.getPointerCount()+"ARROWKEY"+arrowKey);
 		
 	  if(m_context instanceof PlayActivity)
 	  {
