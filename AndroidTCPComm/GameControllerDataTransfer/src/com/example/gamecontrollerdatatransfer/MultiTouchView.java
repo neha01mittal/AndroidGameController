@@ -78,11 +78,17 @@ public class MultiTouchView extends View {
           point.x = event.getX(i);
           point.y = event.getY(i);
           //System.out.println("FDFD"+temp_x+"fdfd"+point.x);
-          if(Math.sqrt(Math.pow(point.x-temp_x, 2)+Math.pow(point.y-temp_y, 2))>THRESHHOLD){
-	        	  arrowKey="RIGHT";
-	        	  System.out.println("OUTSIDE THE CIRCLE"+Math.sqrt(Math.pow(point.x-temp_x, 2)+Math.pow(point.y-temp_y, 2)));
+          double netMovement= Math.sqrt(Math.pow(point.x-temp_x, 2)+Math.pow(point.y-temp_y, 2));
+          if(netMovement>THRESHHOLD){
+	        	  //System.out.println("OUTSIDE THE CIRCLE"+netMovement);
 	        	  Vector vec = new Vector(point.x-temp_x, point.y-temp_y);
 	        	  vec.normalise();
+	        	  try {
+	        		  arrowKey = MovementTracker.processVector(vec);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 	        	  //send it to fuzzzzzzzzzy logic 
 	          }
         }
