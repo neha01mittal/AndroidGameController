@@ -138,7 +138,7 @@ public class MultiTouchView extends View {
 	  if(m_context instanceof PlayActivity)
 	  {
 	      PlayActivity activity = (PlayActivity)m_context;
-	      activity.setCoordinates(tc,arrowKey);
+	      activity.updateCoordinates(tc, arrowKey);
 	      // Then call the method in the activity.
 	  }
 	  
