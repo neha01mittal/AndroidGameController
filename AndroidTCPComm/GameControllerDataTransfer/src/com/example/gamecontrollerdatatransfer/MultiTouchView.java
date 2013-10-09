@@ -1,6 +1,5 @@
 package com.example.gamecontrollerdatatransfer;
 
-import android.R.color;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,10 +13,11 @@ import android.view.View;
 public class MultiTouchView extends View {
 
   private static final int SIZE = 60;
-  private static final int THRESHHOLD = 300;
+  private static final int THRESHHOLD = 150;
   private String arrowKey="";
   private float temp_x;
   private float temp_y;
+  private long prevTime=0;
   private Context m_context;
   private SparseArray<PointF> mActivePointers;
   private Paint mPaint;
@@ -85,7 +85,14 @@ public class MultiTouchView extends View {
 	        	  vec.normalise();
 	        	  try {
 	        		  arrowKey = MovementTracker.processVector(vec);
-				} catch (InterruptedException e) {
+	        		  
+	        		  if(System.currentTimeMillis()-prevTime>500){
+	        			  wrapCoordinates(point.x,point.y,i);
+	        			  System.out.println("prev time"+prevTime);
+	        			  prevTime = System.currentTimeMillis();
+	        			  System.out.println("new prev time"+prevTime);
+	        		  }
+	        	  } catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -126,7 +133,7 @@ public class MultiTouchView extends View {
         mPaint.setColor(colors[i % 9]);
       	canvas.drawCircle(point.x, point.y, SIZE, mPaint);
       	
-      	wrapCoordinates(point.x,point.y,i);
+      	//wrapCoordinates(point.x,point.y,i);
     }
     canvas.drawText("Total pointers: " + mActivePointers.size(), 10, 40 , textPaint);
   }
