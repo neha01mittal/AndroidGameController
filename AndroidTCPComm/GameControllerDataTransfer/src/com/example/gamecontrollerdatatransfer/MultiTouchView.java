@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.MotionEvent;
@@ -14,16 +15,19 @@ public class MultiTouchView extends View {
 
   private static final int SIZE = 60;
   private static final int THRESHHOLD = 150;
+  private static final int SCREENCENTRE = 900;
   private String arrowKey="";
-  private float temp_x;
-  private float temp_y;
   private long prevTime=0;
   private Context m_context;
   private SparseArray<PointF> mActivePointers;
+  private TouchCoordinates[] startPoint = new TouchCoordinates[10];
   private Paint mPaint;
   private int[] colors = { Color.BLUE, Color.GREEN, Color.MAGENTA,
       Color.BLACK, Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY,
       Color.LTGRAY, Color.YELLOW };
+  
+  private int[] bigColors = { Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.MAGENTA,
+	      Color.BLACK, Color.LTGRAY};
 
   private Paint textPaint;
 
@@ -65,40 +69,50 @@ public class MultiTouchView extends View {
       PointF f = new PointF();
       f.x = event.getX(pointerIndex);
       f.y = event.getY(pointerIndex);
-      temp_x=f.x;
-      temp_y=f.y;
+
       mActivePointers.put(pointerId, f);
-      //initPointers.put(pointerId, f);
+      startPoint[pointerId]= new TouchCoordinates(f.x, f.y, pointerId);
       break;
     }
+    
     case MotionEvent.ACTION_MOVE: { // a pointer was moved
       for (int size = event.getPointerCount(), i = 0; i < size; i++) {
-        PointF point = mActivePointers.get(event.getPointerId(i));
+    	int pId=event.getPointerId(i);
+        PointF point = mActivePointers.get(pId);
         if (point != null) {
+        	
           point.x = event.getX(i);
           point.y = event.getY(i);
-          //System.out.println("FDFD"+temp_x+"fdfd"+point.x);
-          double netMovement= Math.sqrt(Math.pow(point.x-temp_x, 2)+Math.pow(point.y-temp_y, 2));
+          float displacementX=point.x-startPoint[pId].getX();
+          float displacementY=point.y-startPoint[pId].getY();
+          
+          double netMovement= Math.sqrt(Math.pow(displacementX, 2)+Math.pow(displacementY, 2));
           if(netMovement>THRESHHOLD){
-	        	  //System.out.println("OUTSIDE THE CIRCLE"+netMovement);
-	        	  Vector vec = new Vector(point.x-temp_x, point.y-temp_y);
+        	  //MOVEMENT
+        	  if(startPoint[pId].getY()>SCREENCENTRE) {
+	        	  Vector vec = new Vector(displacementX, displacementY);
 	        	  vec.normalise();
 	        	  try {
 	        		  arrowKey = MovementTracker.processVector(vec);
 	        		  
 	        		  if(System.currentTimeMillis()-prevTime>500){
 	        			  wrapCoordinates(point.x,point.y,i);
-	        			  System.out.println("prev time"+prevTime);
 	        			  prevTime = System.currentTimeMillis();
-	        			  System.out.println("new prev time"+prevTime);
 	        		  }
+	        		  
 	        	  } catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
+	        	  	}
 	        	  //send it to fuzzzzzzzzzy logic 
-	          }
-        }
+        	  }
+	      }
+         else {
+        	 //ACTION
+        	 //TODO send action to wrap
+        	 // after ENUM
+         }
+       }
         
       }
       break;
@@ -107,8 +121,7 @@ public class MultiTouchView extends View {
     case MotionEvent.ACTION_POINTER_UP:
     case MotionEvent.ACTION_CANCEL: {
       mActivePointers.remove(pointerId);
-      temp_x=0;
-      temp_y=0;
+      startPoint[pointerId]= new TouchCoordinates(0, 0, pointerId);
       arrowKey="";
       break;
     }
@@ -124,23 +137,30 @@ public class MultiTouchView extends View {
 
     // draw all pointers
     for (int size = mActivePointers.size(), i = 0; i < size; i++) {
+      
       PointF point = mActivePointers.valueAt(i);
-      if (point != null)
-    	mPaint.setColor(Color.RED);
-        canvas.drawCircle(temp_x, temp_y, THRESHHOLD,mPaint);
-        mPaint.setColor(Color.BLACK);
-        canvas.drawLine(point.x, point.y, temp_x, temp_y, mPaint);
-        mPaint.setColor(colors[i % 9]);
-      	canvas.drawCircle(point.x, point.y, SIZE, mPaint);
-      	
-      	//wrapCoordinates(point.x,point.y,i);
+      if(startPoint[i].getY()>SCREENCENTRE) {
+      
+	      if (point != null) {
+	    	mPaint.setColor(bigColors[i % 9]);
+	        canvas.drawCircle(startPoint[i].getX(), startPoint[i].getY(), THRESHHOLD,mPaint);
+	        mPaint.setColor(Color.BLACK);
+	        canvas.drawLine(point.x, point.y, startPoint[i].getX(), startPoint[i].getY(), mPaint);
+	        mPaint.setColor(colors[i % 9]);
+	      	canvas.drawCircle(point.x, point.y, SIZE, mPaint);
+	      }
+      }
+      else {
+    	  //ACTION
+
+    	   canvas.drawCircle(point.x, point.y, SIZE, mPaint);
+      }
     }
     canvas.drawText("Total pointers: " + mActivePointers.size(), 10, 40 , textPaint);
   }
 
   public void wrapCoordinates(float x, float y, int pointCount){
 	  TouchCoordinates tc = new TouchCoordinates(x, y, pointCount);
-	  //System.out.println("CHECKKKK at wrapCoord"+tc.getX()+" "+tc.getY()+" "+tc.getPointerCount()+"ARROWKEY"+arrowKey);
 		
 	  if(m_context instanceof PlayActivity)
 	  {
