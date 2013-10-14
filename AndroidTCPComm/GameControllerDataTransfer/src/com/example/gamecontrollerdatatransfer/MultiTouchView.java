@@ -95,7 +95,7 @@ public class MultiTouchView extends View {
 	        	  try {
 	        		  arrowKey = MovementTracker.processVector(vec);
 	        		  
-	        		  if(System.currentTimeMillis()-prevTime>500){
+	        		  if(System.currentTimeMillis()-prevTime>100){
 	        			  wrapCoordinates(point.x,point.y,i);
 	        			  prevTime = System.currentTimeMillis();
 	        		  }
