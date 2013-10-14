@@ -9,6 +9,8 @@ import java.net.UnknownHostException;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
+
 
 public class PlayActivity extends Activity {
 	
@@ -62,8 +64,7 @@ public class PlayActivity extends Activity {
 		        Socket socket = new Socket(ipAddress, 8888);
 		        dataOutputStream = new DataOutputStream(socket.getOutputStream());
 		        connected = true;
-	            i++;
-				try {		                
+	            try {		                
 		                synchronized(arrowKey) {
 		                	dataOutputStream.writeUTF(arrowKey);
 		                }

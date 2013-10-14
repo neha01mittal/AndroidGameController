@@ -29,7 +29,10 @@ public class MyServer {
 				dataInputStream = new DataInputStream(socket.getInputStream());
 				dataOutputStream = new DataOutputStream(socket.getOutputStream());
 				System.out.println("ip: " + socket.getInetAddress());
-				String userInput = dataInputStream.readUTF();
+				String userInput = "";
+				synchronized(dataInputStream) {
+					userInput = dataInputStream.readUTF();
+				}
 				keyTouch.identifyKey(userInput);
 				System.out.println("message: " + userInput);
 				
