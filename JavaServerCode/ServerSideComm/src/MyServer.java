@@ -3,15 +3,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import gc.common_resources.*;
 
 public class MyServer {
 	
 	public static void main(String[] args){
 		ServerSocket serverSocket = null;
 		Socket socket = null;
-		DataInputStream dataInputStream = null;
-		DataOutputStream dataOutputStream = null;
 		
 		try {
 			serverSocket = new ServerSocket(8888);
@@ -26,17 +24,28 @@ public class MyServer {
  
 			try {
 				socket = serverSocket.accept();
-				dataInputStream = new DataInputStream(socket.getInputStream());
-				dataOutputStream = new DataOutputStream(socket.getOutputStream());
-				System.out.println("ip: " + socket.getInetAddress());
-				String userInput = "";
-				synchronized(dataInputStream) {
-					userInput = dataInputStream.readUTF();
-				}
-				keyTouch.identifyKey(userInput);
-				System.out.println("message: " + userInput);
+				ObjectInputStream objInputStream = new ObjectInputStream(socket.getInputStream());
 				
-				dataOutputStream.writeUTF("Hello!");
+				System.out.println("ip: " + socket.getInetAddress());
+				CommandType commandFromClient = CommandType.DEFAULT;	//Init CommandType with Default type
+				
+				try {
+		        	commandFromClient = (CommandType) objInputStream.readObject();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				float X = objInputStream.readFloat();
+				float Y = objInputStream.readFloat();
+		        commandFromClient.setX(X);
+		        commandFromClient.setY(Y);
+
+		        keyTouch.identifyKey(commandFromClient);
+		      
+		        System.out.println("Message Received: "+commandFromClient+"  X: "+commandFromClient.getX()+"  Y: "+commandFromClient.getY());
+		        
+		        objInputStream.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -45,24 +54,6 @@ public class MyServer {
 				if( socket!= null){
 					try {
 						socket.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-				if( dataInputStream!= null){
-					try {
-						dataInputStream.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-				if( dataOutputStream!= null){
-					try {
-						dataOutputStream.close();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
