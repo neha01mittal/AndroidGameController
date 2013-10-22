@@ -10,13 +10,14 @@ import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
+import android.util.Log;
+import gc.common_resources.*;
 
 public class MultiTouchView extends View {
 
-  private static final int SIZE = 60;
-  private static final int THRESHHOLD = 150;
-  private static final int SCREENCENTRE = 900;
-  private String arrowKey="";
+  private static final int SIZE = 40;
+  private static final int THRESHHOLD = 100;
+  private static final int SCREENCENTRE = 600;
   private long prevTime=0;
   private Context m_context;
   private SparseArray<PointF> mActivePointers;
@@ -30,7 +31,6 @@ public class MultiTouchView extends View {
 	      Color.BLACK, Color.LTGRAY};
 
   private Paint textPaint;
-
 
   public MultiTouchView(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -92,11 +92,12 @@ public class MultiTouchView extends View {
         	  if(startPoint[pId].getY()>SCREENCENTRE) {
 	        	  Vector vec = new Vector(displacementX, displacementY);
 	        	  vec.normalise();
+	        	  CommandType touchCommand = CommandType.DEFAULT; //Init as default
 	        	  try {
-	        		  arrowKey = MovementTracker.processVector(vec);
+	        		  touchCommand = MovementTracker.processVector(vec);
 	        		  
 	        		  if(System.currentTimeMillis()-prevTime>100){
-	        			  wrapCoordinates(point.x,point.y,i);
+	        			  wrapCoordinates(point.x, point.y, i, touchCommand);
 	        			  prevTime = System.currentTimeMillis();
 	        		  }
 	        		  
@@ -159,16 +160,15 @@ public class MultiTouchView extends View {
     canvas.drawText("Total pointers: " + mActivePointers.size(), 10, 40 , textPaint);
   }
 
-  public void wrapCoordinates(float x, float y, int pointCount){
+  public void wrapCoordinates(float x, float y, int pointCount, CommandType touchCommand){
 	  TouchCoordinates tc = new TouchCoordinates(x, y, pointCount);
-		
+	  
 	  if(m_context instanceof PlayActivity)
 	  {
-	      PlayActivity activity = (PlayActivity)m_context;
-	      activity.updateCoordinates(tc, arrowKey);
 	      // Then call the method in the activity.
+		  PlayActivity activity = (PlayActivity)m_context;
+	      activity.updateCoordinates(tc, touchCommand);
 	  }
 	  
   }
-
 } 

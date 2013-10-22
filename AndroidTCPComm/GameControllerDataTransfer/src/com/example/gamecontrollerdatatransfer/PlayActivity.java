@@ -10,18 +10,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import gc.common_resources.*;
 
 
 public class PlayActivity extends Activity {
 	
-	private TouchCoordinates tc;
-	 /* put this into your activity class */
 	private String ipAddress;
-	private String arrowKey="";
 	Socket socket = null;
     private boolean connected = false;
-	DataOutputStream dataOutputStream = null;
-	DataInputStream dataInputStream = null;
 	  
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,49 +31,60 @@ public class PlayActivity extends Activity {
 		}
 	}
 	
-	public void updateCoordinates(TouchCoordinates tc,String arrowKey){
-		setCoordinates(tc,arrowKey);
-		sendPacketToServer();
+	public void updateCoordinates(TouchCoordinates tc, CommandType newCommand){
+		// We don't keep a set of tc and commandtype in this class anymore
+		// So this function only packs the command with fields and 
+		// passes the data to sendPacketToServer()
+		CommandType updateCommand = newCommand;
+		updateCommand.setX(tc.getX());
+		updateCommand.setY(tc.getY());
+		
+		sendPacketToServer(updateCommand);
 	}
 
-	public void sendPacketToServer(){
+	// Create the threads and pass the commands to them
+	public void sendPacketToServer(CommandType updateCommand){
 		if (!connected) {
-             Thread cThread = new Thread(new ClientSocketThread());
+             Thread cThread = new Thread(new ClientSocketThread(updateCommand));
              cThread.start();
 		}
 	}
 	
-	public synchronized void setCoordinates(TouchCoordinates tc,String arrowKey){
-		this.tc=tc;
-		this.arrowKey= arrowKey;
-	}
-	
-	public TouchCoordinates getCoordinates(){
-		System.out.println("CHECKKKK at getCoordinates"+tc.getX()+" "+tc.getY()+" "+tc.getPointerCount());
-		return tc;
-	}
-	
+	//Thread class to send commands to the Server
 	public class ClientSocketThread implements Runnable {
+		
+		private CommandType commandToSend;
+		
+		public ClientSocketThread(CommandType currCommand){
+			commandToSend = currCommand;
+			
+			Log.d("PlayActivity - ThreadConstructor", "commandToSend: "+commandToSend+" "+ commandToSend.getX() +" "+ commandToSend.getY());
+		}
 		 
 		public void run() {
 	        try {
-		        Socket socket = new Socket(ipAddress, 8888);
-		        dataOutputStream = new DataOutputStream(socket.getOutputStream());
+				Socket socket = new Socket(ipAddress, 8888);
+		        ObjectOutputStream objOutputStream = new ObjectOutputStream(socket.getOutputStream());
 		        connected = true;
-	            try {		                
-		                synchronized(arrowKey) {
-		                	dataOutputStream.writeUTF(arrowKey);
-		                }
-	    				
-	                   	Log.d("ClientActivity", "C: Sent." + arrowKey);
+		      		        
+				try {		                
+					Log.d("PlayActivity", "Sending: "+commandToSend+" "+ commandToSend.getX() +" "+ commandToSend.getY());
+					
+					// Send the enum(commandToSend) and the fields(X and Y) separately
+					// as the serializing and deserializing of enum through ObjectOutputStream
+					// and ObjectInputStream will not save the fields in the enum
+					objOutputStream.writeObject(commandToSend);
+					objOutputStream.writeFloat(commandToSend.getX());
+					objOutputStream.writeFloat(commandToSend.getY());
 	            } catch (Exception e) {
-	                Log.e("ClientActivity", "S: Error", e);
+	                Log.e("PlayActivity", "S: Error", e);
 	            }
-				dataOutputStream.close();
+				//Close outputstream and socket
+				objOutputStream.close();
 		        socket.close();
 		        connected = false;
 		    } catch (Exception e) {
-		        Log.e("ClientActivity", "C: Error", e);
+		        Log.e("PlayActivity", "C: Error", e);
 		    }
 		}
 	}			

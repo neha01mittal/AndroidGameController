@@ -1,32 +1,35 @@
 package com.example.gamecontrollerdatatransfer;
 
+import gc.common_resources.*;
+
 public class MovementTracker {
 	
-	public static String processVector(Vector vector) throws InterruptedException {
+	public static CommandType processVector(Vector vector) throws InterruptedException {
 		
-		//Thread.sleep(1000);
 		double angle = vector.angle(false);
-		String direction="";
-		System.out.println("ANGLE"+angle);
-		if(Math.abs(angle)>(135+22.5))
-			direction="UP";
-		else if(angle>(-22.5-135)&&angle<(-90-22.5))
-			direction="UP RIGHT";
-		else if(angle>(-90-22.5)&&angle<(-45-22.5))
-			direction="RIGHT";
-		else if(angle>(-45-22.5)&&angle<(-22.5))
-			direction="DOWN RIGHT";
-		else if(Math.abs(angle)<22.5)
-			direction="DOWN";
-		else if(angle>(22.5)&&angle<(45+22.5))
-			direction="DOWN LEFT";
-		else if(angle>(45+22.5)&&angle<(90+22.5))
-			direction="LEFT";
-		else if(angle>(90+22.5)&&angle<(135+22.5))
-			direction="TOP LEFT";
+		double threshold = 22.5;
+		CommandType command = CommandType.DEFAULT;
 		
-		System.out.println("DIRECTION="+direction);
-		return direction;
+		System.out.println("ANGLE"+angle);
+		
+		if(Math.abs(angle)>(135+threshold))
+			command = CommandType.KEYBOARD_UP;
+		else if(angle>(-135-threshold)&&angle<(-90-threshold))
+			command = CommandType.KEYBOARD_UP_RIGHT;
+		else if(angle>(-90-threshold)&&angle<(-45-threshold))
+			command = CommandType.KEYBOARD_RIGHT;
+		else if(angle>(-45-threshold)&&angle<(-threshold))
+			command = CommandType.KEYBOARD_DOWN_RIGHT;
+		else if(Math.abs(angle)<threshold)
+			command = CommandType.KEYBOARD_DOWN;
+		else if(angle>(threshold)&&angle<(45+threshold))
+			command = CommandType.KEYBOARD_DOWN_LEFT;
+		else if(angle>(45+threshold)&&angle<(90+threshold))
+			command = CommandType.KEYBOARD_LEFT;
+		else if(angle>(90+threshold)&&angle<(135+threshold))
+			command = CommandType.KEYBOARD_UP_LEFT;
+		
+		return command;
 	}
 
 }
