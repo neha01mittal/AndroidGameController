@@ -4,8 +4,10 @@ public class TouchCoordinates {
 	
 	private float x;
 	private float y;
+	private float z;
 	private float init_x;
 	private float init_y;
+	private float init_z;
 	
 	private int pointerCount;
 	
@@ -14,6 +16,19 @@ public class TouchCoordinates {
 		this.x= x;
 		this.y=y;
 		this.pointerCount=pointerCount;
+	}
+	
+	public TouchCoordinates(float x,float y){
+		
+		this.x= x;
+		this.y=y;
+	}
+	
+	public TouchCoordinates(float x,float y, float z){
+		
+		this.x= x;
+		this.y=y;
+		this.z=z;
 	}
 	
 	public TouchCoordinates() {
@@ -26,6 +41,10 @@ public class TouchCoordinates {
 	
 	public void setY(float y) {
 		this.y=y;
+	}
+	
+	public void setZ(float z) {
+		this.z=z;
 	}
 	
 	public void setInit_X(float init_x) {
@@ -48,6 +67,10 @@ public class TouchCoordinates {
 		return this.y;
 	}
 	
+	public float getZ() {
+		return this.z;
+	}
+	
 	public float getInit_X() {
 		return this.init_x;
 	}
@@ -55,6 +78,7 @@ public class TouchCoordinates {
 	public float getInit_Y() {
 		return this.init_y;
 	}
+	
 	
 	public int getPointerCount() {
 		return this.pointerCount;

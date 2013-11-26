@@ -23,11 +23,11 @@ public class MultiTouchView extends View {
   private SparseArray<PointF> mActivePointers;
   private TouchCoordinates[] startPoint = new TouchCoordinates[10];
   private Paint mPaint;
-  private int[] colors = { Color.BLUE, Color.GREEN, Color.MAGENTA,
-      Color.BLACK, Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY,
+  private int[] colors = { Color.DKGRAY, Color.BLUE, Color.GREEN, Color.MAGENTA,
+      Color.BLACK, Color.CYAN, Color.GRAY, Color.RED,
       Color.LTGRAY, Color.YELLOW };
   
-  private int[] bigColors = { Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.MAGENTA,
+  private int[] bigColors = { Color.rgb(122, 200, 255) , Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.MAGENTA,
 	      Color.BLACK, Color.LTGRAY};
 
   private Paint textPaint;
@@ -108,7 +108,12 @@ public class MultiTouchView extends View {
 	        	  //send it to fuzzzzzzzzzy logic 
         	  }
 	      }
-         else {
+         else if(startPoint[pId].getY()<SCREENCENTRE) {
+        	 CommandType touchCommand = CommandType.ACTION;
+        	 if(System.currentTimeMillis()-prevTime>70){
+	   			  wrapCoordinates(-1,-1,-1, touchCommand);
+	   			  prevTime = System.currentTimeMillis();
+   		  	 }
         	 //ACTION
         	 //TODO send action to wrap
         	 // after ENUM
@@ -123,7 +128,6 @@ public class MultiTouchView extends View {
     case MotionEvent.ACTION_CANCEL: {
       mActivePointers.remove(pointerId);
       startPoint[pointerId]= new TouchCoordinates(0, 0, pointerId);
-      arrowKey="";
       break;
     }
     }

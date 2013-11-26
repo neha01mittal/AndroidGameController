@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:orientation="vertical"    
+    android:gravity="center_vertical"
+    android:background="@drawable/background1"
     >
 <TextView  
-    android:layout_width="fill_parent" 
+    android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
-    android:text="@string/enter_ipaddress"
+    android:text="@string/game_controller"
+    android:textSize="40sp"
+    android:layout_gravity="center"
     />
+
 <EditText  
     android:id="@+id/user_input"
-    android:layout_width="fill_parent" 
-    android:hint="@string/IPV4"
+    android:layout_width="250dp" 
+    android:hint="@string/enter_ipaddress"
+    android:layout_gravity="center"
     android:layout_height="wrap_content" 
     />
 <Button
     android:id="@+id/play"
-    android:layout_width="fill_parent" 
+    android:layout_width="wrap_content" 
     android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:text="@string/play" 
     />
 
