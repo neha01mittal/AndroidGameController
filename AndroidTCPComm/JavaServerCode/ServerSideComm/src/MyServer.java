@@ -1,9 +1,16 @@
+<<<<<<< HEAD:AndroidTCPComm/JavaServerCode/ServerSideComm/src/MyServer.java
 import gc.common_resources.CommandType;
 
+=======
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.ObjectInputStream;
+>>>>>>> 92478ffe591936c0b248eb772cacf8106841e73d:JavaServerCode/ServerSideComm/src/MyServer.java
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 
 public class MyServer {
 	
