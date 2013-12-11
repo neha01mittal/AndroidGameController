@@ -10,9 +10,10 @@ import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-import javax.xml.datatype.Duration;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,25 +21,24 @@ import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlayActivity extends Activity {
 
 	private String ipAddress;
-	private final float NOISE = (float) 2;
+	private final float NOISE = (float) 2.0;
 	Socket socket = null;
 	private boolean connected = false;
-	private GLSurfaceView mGLSurfaceView;
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
-	private long prevTime = 0;
-	private final double THRESHHOLD = 0.3;
-	private final double LR_THRESHHOLD = 0.8;
 	private boolean isStartPositionRegistered;
 	private float startX = 0;
 	private float startY = 0;
 	private float startZ = 0;
+	private boolean flag = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -49,9 +49,6 @@ public class PlayActivity extends Activity {
 		// Create our Preview view and set it as the content of our
 		// Activity
 		mRenderer = new MyRenderer();
-		mGLSurfaceView = new GLSurfaceView(this);
-		mGLSurfaceView.setRenderer(mRenderer);
-
 		isStartPositionRegistered = false;
 		setContentView(R.layout.activity_play);
 		/* do this in onCreate */
@@ -62,27 +59,39 @@ public class PlayActivity extends Activity {
 		}
 
 		// record initial coordinates
-		/*
-		 * AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		 * builder.setTitle("Choose your position");
-		 * builder.setMessage(R.string.
-		 * get_rest_position_message).setPositiveButton(R.string.ok, new
-		 * DialogInterface.OnClickListener() {
-		 * 
-		 * @Override public void onClick(DialogInterface dialog, int id) { //
-		 * User clicked OK, so save the mSelectedItems results somewhere // or
-		 * return them to the component that opened the dialog
-		 * System.out.println("Register x and y here");
-		 * isStartPositionRegistered= true;
-		 * System.out.println("START VALUES"+startX+" "+startY); }
-		 * }).setNegativeButton(R.string.cancel, new
-		 * DialogInterface.OnClickListener() {
-		 * 
-		 * @Override public void onClick(DialogInterface dialog, int id) { //NOP
-		 * } });
-		 * 
-		 * builder.show();
-		 */
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Choose your position");
+		builder.setMessage(R.string.get_rest_position_message)
+				.setPositiveButton(R.string.ok,
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int id) { //
+								// User clicked OK, so save the mSelectedItems
+								// results somewhere // or
+								// return them to the component that opened the
+								// dialog
+
+								System.out.println("Register x and y here");
+								flag = true;
+								System.out.println("START VALUES" + startX
+										+ " " + startY);
+							}
+						})
+				.setNegativeButton(R.string.cancel,
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								Toast.makeText(getApplicationContext(),
+										"Tilt Detection disabled",
+										Toast.LENGTH_SHORT).show();
+							}
+						});
+
+		builder.show();
+
 	}
 
 	public void updateCoordinates(TouchCoordinates tc, CommandType newCommand) {
@@ -158,7 +167,6 @@ public class PlayActivity extends Activity {
 		// to take appropriate action when the activity looses focus
 		super.onResume();
 		mRenderer.start();
-		mGLSurfaceView.onResume();
 	}
 
 	@Override
@@ -167,25 +175,15 @@ public class PlayActivity extends Activity {
 		// to take appropriate action when the activity looses focus
 		super.onPause();
 		mRenderer.stop();
-		mGLSurfaceView.onPause();
 	}
 
-	class MyRenderer implements GLSurfaceView.Renderer, SensorEventListener {
-		private Cube mCube;
+	class MyRenderer implements SensorEventListener {
 		private Sensor mRotationVectorSensor;
-		private final float[] mRotationMatrix = new float[16];
-
 		public MyRenderer() {
 			// find the rotation-vector sensor
 			mRotationVectorSensor = mSensorManager
 					.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-			mCube = new Cube();
-			// initialize the rotation matrix to identity
-			mRotationMatrix[0] = 1;
-			mRotationMatrix[4] = 1;
-			mRotationMatrix[8] = 1;
-			mRotationMatrix[12] = 1;
 		}
 
 		public void start() {
@@ -200,45 +198,21 @@ public class PlayActivity extends Activity {
 		}
 
 		public void onSensorChanged(SensorEvent event) {
-			// we received a sensor event. it is a good practice to check
-			// that we received the proper event
-			/*System.out.println("INSIDE SENSOR");
-			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-				System.out.println("INSIDE SENSOR");*/
-				// convert the rotation-vector to a 4x4 matrix. the matrix
-				// is interpreted by Open GL as the inverse of the
-				// rotation-vector, which is what we want.
-				TextView tvX = (TextView) findViewById(R.id.x_axis);
-				TextView tvY = (TextView) findViewById(R.id.y_axis);
-				TextView tvZ = (TextView) findViewById(R.id.z_axis);
 
-				//SensorManager.getRotationMatrixFromVector(mRotationMatrix,
-					//	event.values);
-				float values[] = event.values.clone();
-				float x = event.values[0];
-				float y = event.values[1];
-				float z = event.values[2];
-				
-				double norm_Of_g = Math.sqrt(x * x + y*y + z * z);
+			ImageView iv = (ImageView) findViewById(R.id.image);
+			TextView tvX = (TextView) findViewById(R.id.x_axis);
+			TextView tvY = (TextView) findViewById(R.id.y_axis);
+			TextView tvZ = (TextView) findViewById(R.id.z_axis);
 
-				// Normalize the accelerometer vector
-				x = x / (float)norm_Of_g;
-				y = y / (float)norm_Of_g;
-				z = z / (float)norm_Of_g;
-				int inclination = (int) Math.round(Math.toDegrees(Math.acos(z)));
-				if (inclination < 25 || inclination > 155)
-				{
-				    // device is flat
-					System.out.println("FLAT"+inclination);
-				}
-				else
-				{
-					System.out.println("NOT FLAT"+inclination);
-				    // device is not flat
-				}
+			float x = event.values[0];
+			float y = event.values[1];
+			float z = event.values[2];
 
-				System.out.println("X= " + values[0] + " Y= " + values[1]
-						+ " Z= " + values[2]);
+			/*
+			 * System.out.println("X= " + values[0] + " Y= " + values[1] +
+			 * " Z= " + values[2]);
+			 */
+			if (flag) {
 				if (!isStartPositionRegistered) {
 					tvX.setText("0.0");
 					tvY.setText("0.0");
@@ -253,7 +227,8 @@ public class PlayActivity extends Activity {
 					float deltaX = Math.abs(startX - x);
 					float deltaY = Math.abs(startY - y);
 					float deltaZ = Math.abs(startZ - z);
-					System.out.println("Delta 1="+deltaX+" Delta 2="+deltaY+" Delta 3="+deltaZ);
+					System.out.println("Delta 1=" + deltaX + " Delta 2="
+							+ deltaY + " Delta 3=" + deltaZ);
 
 					if (deltaX < NOISE)
 						deltaX = (float) 0.0;
@@ -262,118 +237,32 @@ public class PlayActivity extends Activity {
 					if (deltaZ < NOISE)
 						deltaZ = (float) 0.0;
 
-					startX = x;
-					startY = y;
-					startZ = z;
 					tvX.setText(Float.toString(deltaX));
 					tvY.setText(Float.toString(deltaY));
 					tvZ.setText(Float.toString(deltaZ));
-
-					if (deltaZ > deltaY) {
+					iv.setVisibility(View.VISIBLE);
+/*					if (deltaZ > deltaX && deltaZ > deltaY) {
 						Toast.makeText(getApplicationContext(),
-								"Left right movement", Toast.LENGTH_SHORT)
-								.show();
-					} else if (deltaZ < deltaY) {
-						Toast.makeText(getApplicationContext(),
-								"Up Down movement", Toast.LENGTH_SHORT).show();
-					} else {
-						// NOP
-					}
-					
-						// Z is for left right and Y is for up and down
-					// if(values[2]>0.5||values[2]<0.3||values[1]<0.3||values[1]>0.5){
-
-					/*
-					 * System.out.println("SEnding-" + values[2] + " " +
-					 * values[1]); if (System.currentTimeMillis() - prevTime >
-					 * 70) { updateCoordinates(new TouchCoordinates(values[2],
-					 * values[1], startX, startY), CommandType.ACCELEROMETER);
-					 * prevTime = System.currentTimeMillis(); }
-					 */
-
-					// }
+								"Z axis movement", Toast.LENGTH_SHORT).show();
+						iv.setImageResource(R.drawable.ic_launcher);
+					} else {*/
+						if (deltaX > deltaY) {
+							Toast.makeText(getApplicationContext(),
+									"X axis movement", Toast.LENGTH_SHORT)
+									.show();
+							iv.setImageResource(R.drawable.horizontal);
+						} else if (deltaX < deltaY) {
+							Toast.makeText(getApplicationContext(),
+									"Y axis movement", Toast.LENGTH_SHORT)
+									.show();
+							iv.setImageResource(R.drawable.vertical);
+						} else {
+							// NOP
+							iv.setVisibility(View.INVISIBLE);
+						}
 				}
 			}
-		//}
 
-		public void onDrawFrame(GL10 gl) {
-			// clear screen
-			gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-
-			// set-up modelview matrix
-			gl.glMatrixMode(GL10.GL_MODELVIEW);
-			gl.glLoadIdentity();
-			gl.glTranslatef(0, 0, -3.0f);
-			gl.glMultMatrixf(mRotationMatrix, 0);
-
-			// draw our object
-			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-			gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
-
-			mCube.draw(gl);
-		}
-
-		public void onSurfaceChanged(GL10 gl, int width, int height) {
-			// set view-port
-			gl.glViewport(0, 0, width, height);
-			// set projection matrix
-			float ratio = (float) width / height;
-			gl.glMatrixMode(GL10.GL_PROJECTION);
-			gl.glLoadIdentity();
-			gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
-		}
-
-		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-			// dither is enabled by default, we don't need it
-			gl.glDisable(GL10.GL_DITHER);
-			// clear screen in white
-			gl.glClearColor(1, 1, 1, 1);
-		}
-
-		class Cube {
-			// initialize our cube
-			private FloatBuffer mVertexBuffer;
-			private FloatBuffer mColorBuffer;
-			private ByteBuffer mIndexBuffer;
-
-			public Cube() {
-				final float vertices[] = { -1, -1, -1, 1, -1, -1, 1, 1, -1, -1,
-						1, -1, -1, -1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, };
-
-				final float colors[] = { 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0,
-						1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
-						1, };
-
-				final byte indices[] = { 0, 4, 5, 0, 5, 1, 1, 5, 6, 1, 6, 2, 2,
-						6, 7, 2, 7, 3, 3, 7, 4, 3, 4, 0, 4, 7, 6, 4, 6, 5, 3,
-						0, 1, 3, 1, 2 };
-
-				ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4);
-				vbb.order(ByteOrder.nativeOrder());
-				mVertexBuffer = vbb.asFloatBuffer();
-				mVertexBuffer.put(vertices);
-				mVertexBuffer.position(0);
-
-				ByteBuffer cbb = ByteBuffer.allocateDirect(colors.length * 4);
-				cbb.order(ByteOrder.nativeOrder());
-				mColorBuffer = cbb.asFloatBuffer();
-				mColorBuffer.put(colors);
-				mColorBuffer.position(0);
-
-				mIndexBuffer = ByteBuffer.allocateDirect(indices.length);
-				mIndexBuffer.put(indices);
-				mIndexBuffer.position(0);
-			}
-
-			public void draw(GL10 gl) {
-				gl.glEnable(GL10.GL_CULL_FACE);
-				gl.glFrontFace(GL10.GL_CW);
-				gl.glShadeModel(GL10.GL_SMOOTH);
-				gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mVertexBuffer);
-				gl.glColorPointer(4, GL10.GL_FLOAT, 0, mColorBuffer);
-				gl.glDrawElements(GL10.GL_TRIANGLES, 36, GL10.GL_UNSIGNED_BYTE,
-						mIndexBuffer);
-			}
 		}
 
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
