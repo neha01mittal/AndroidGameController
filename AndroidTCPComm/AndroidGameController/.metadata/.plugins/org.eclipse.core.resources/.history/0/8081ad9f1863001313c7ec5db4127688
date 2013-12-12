@@ -114,7 +114,7 @@ public class WifiConnectActivity extends ListActivity {
 
 			for (String element : temp) {
 				listItems.remove(element);
-				editor.remove(element).commit();
+				editor.remove(element);
 			}
 			adapter.notifyDataSetChanged();
 			setListToDefault();
@@ -200,7 +200,7 @@ public class WifiConnectActivity extends ListActivity {
 
 	public void clearlistview() {
 		listItems.clear();
-		editor.clear().commit();
+		editor.clear();
 		adapter.notifyDataSetChanged();
 	}
 
