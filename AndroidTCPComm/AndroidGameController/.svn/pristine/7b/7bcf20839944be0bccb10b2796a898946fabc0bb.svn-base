@@ -1,0 +1,98 @@
+import gc.common_resources.CommandType;
+
+import java.awt.AWTException;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Robot;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+
+public class MyServer {
+	
+	private static final int PORT = 8888;
+	private ServerUI serverui;
+	
+	public static void main(String[] args){
+		MyServer myserver = new MyServer();	
+		myserver.startConnection();
+	}
+
+	private void startConnection() {
+		// TODO Auto-generated method stub
+		try {
+			serverui = new ServerUI();
+			serverui.createServerUI();
+			connectToServer();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void connectToServer() {
+		ServerSocket serverSocket = null;
+		Socket socket = null;
+		
+		try {
+			serverSocket = new ServerSocket(PORT);
+			System.out.println("Listening :"+PORT);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		KeyTouch keyTouch = new KeyTouch();
+		while(true){
+ 
+			try {
+				socket = serverSocket.accept();
+				ObjectInputStream objInputStream = new ObjectInputStream(socket.getInputStream());
+				serverui.updateStatus(true);
+				
+				System.out.println("ip: " + socket.getInetAddress());
+				CommandType commandFromClient = CommandType.DEFAULT;	//Init CommandType with Default type
+				
+				try {
+		        	commandFromClient = (CommandType) objInputStream.readObject();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					serverui.updateStatus(false);
+					e.printStackTrace();
+				}
+				
+				float X = objInputStream.readFloat();
+				float Y = objInputStream.readFloat();
+				
+		        commandFromClient.setX(X);
+		        commandFromClient.setY(Y);
+		        
+		        keyTouch.identifyKey(commandFromClient);
+		      
+		        System.out.println("Message Received: "+commandFromClient+"  X: "+commandFromClient.getX()+"  Y: "+commandFromClient.getY());
+		        
+		        objInputStream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				serverui.updateStatus(false);
+				e.printStackTrace();
+			}
+			finally{
+				if( socket!= null){
+					try {
+						socket.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						serverui.updateStatus(false);
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+	}
+}

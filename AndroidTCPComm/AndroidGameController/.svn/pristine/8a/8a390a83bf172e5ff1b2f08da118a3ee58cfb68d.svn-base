@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Game Controller</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello">Hello world!</string>
+    <string name="send">Send</string>
+	<string name="enter_ipaddress">Enter PC\'s IP Address:</string>
+	<string name="play">Play!</string>
+	<string name="ok">OK</string>
+	<string name="cancel">Cancel</string>
+	<string name="addToFavourites">Add To Favourites</string>
+	<string name="IPV4">IPV4</string>
+	<string name="game_controller">Game Controller</string>
+	<string name="get_rest_position_message">Hold your phone horizontally at a comfortable angle.\n Press OK while holding the phone in that position.</string>
+</resources>

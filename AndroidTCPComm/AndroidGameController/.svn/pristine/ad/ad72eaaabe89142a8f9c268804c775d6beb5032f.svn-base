@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"    
+    android:gravity="center_vertical"
+    android:background="@drawable/background1"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    >
+<TextView  
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" 
+    android:text="@string/game_controller"
+    android:textSize="40sp"
+    android:layout_gravity="center"
+    />
+
+<EditText  
+    android:id="@+id/user_input"
+    android:layout_width="250dp" 
+    android:hint="@string/enter_ipaddress"
+    android:layout_gravity="center"
+    android:layout_height="wrap_content" 
+    />
+
+<Button
+    android:id="@+id/addToFavourites"
+    android:background="@layout/button_background"
+    android:padding="5dp"
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:text="@string/addToFavourites" 
+    />
+<View
+  android:layout_width="1dp"
+  android:layout_height="10dp">
+</View>
+<Button
+    android:id="@+id/play"
+    android:background="@layout/button_background_red"
+    android:padding="5dp"
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:text="@string/play" 
+    />
+
+<!-- blank spaces -->
+<View
+  android:layout_width="1dp"
+  android:layout_height="30dp">
+</View>
+<TextView  
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" 
+    android:text="@string/ip_list"
+    android:textSize="20sp"
+    android:layout_gravity="center"
+    />
+<View
+  android:layout_width="1dp"
+  android:layout_height="5dp">
+</View>
+<ListView
+        android:id="@android:id/list" 
+        android:textFilterEnabled="true"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:divider="#00000000"
+		android:dividerHeight="10dp"
+        android:drawSelectorOnTop="true"
+        android:background="#E8E8E8"
+    />
+<View
+  android:layout_width="1dp"
+  android:layout_height="7dp">
+</View>
+<LinearLayout
+  android:id="@+id/linear_layout"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal"
+  >
+<Button
+    android:id="@+id/delete"
+    android:background="@layout/button_background"
+    android:padding="5dp"
+    android:textSize="15sp"
+    android:layout_width="wrap_content" 
+    android:layout_height="30dp"
+    android:layout_gravity="right"
+    android:layout_marginRight="117dp"
+    android:layout_marginLeft="30dp"
+    android:text="@string/delete" 
+    />
+<Button
+    android:id="@+id/clearList"
+    android:background="@layout/button_background"
+    android:padding="5dp"
+    android:textSize="15sp"	
+    android:layout_width="wrap_content" 
+    android:layout_height="30dp"
+    android:layout_gravity="left"
+    android:text="@string/clearList" 
+    android:layout_marginRight="10dp"
+    />
+</LinearLayout>
+</LinearLayout>

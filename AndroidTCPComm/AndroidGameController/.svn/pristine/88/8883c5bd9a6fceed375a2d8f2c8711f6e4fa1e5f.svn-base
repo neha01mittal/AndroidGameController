@@ -1,0 +1,96 @@
+package com.example.gamecontrollerdatatransfer;
+
+public class TouchCoordinates {
+	
+	private float x;
+	private float y;
+	private float z;
+	private float w;
+	private float init_x;
+	private float init_y;
+	private float init_z;
+	
+	private int pointerCount;
+	
+	public TouchCoordinates(float x,float y, int pointerCount){
+		
+		this.x= x;
+		this.y=y;
+		this.pointerCount=pointerCount;
+	}
+	
+	public TouchCoordinates(float x,float y){
+		
+		this.x= x;
+		this.y=y;
+	}
+	
+public TouchCoordinates(float x,float y, float z, float w){
+		
+		this.x= x;
+		this.y=y;
+		this.w=w;
+		this.z=z;
+	}
+	
+	public TouchCoordinates(float x,float y, float z){
+		
+		this.x= x;
+		this.y=y;
+		this.z=z;
+	}
+	
+	public TouchCoordinates() {
+		//NOP
+	}
+	
+	public void setX(float x) {
+		this.x=x;
+	}
+	
+	public void setY(float y) {
+		this.y=y;
+	}
+	
+	public void setZ(float z) {
+		this.z=z;
+	}
+	
+	public void setInit_X(float init_x) {
+		this.init_x=init_x;
+	}
+	
+	public void setInit_Y(float init_y) {
+		this.init_y=init_y;
+	}
+	
+	public void setPointerCount(int pointerCount) {
+		this.pointerCount=pointerCount;
+	}
+	
+	public float getX() {
+		return this.x;
+	}
+	
+	public float getY() {
+		return this.y;
+	}
+	
+	public float getZ() {
+		return this.z;
+	}
+	
+	public float getInit_X() {
+		return this.init_x;
+	}
+	
+	public float getInit_Y() {
+		return this.init_y;
+	}
+	
+	
+	public int getPointerCount() {
+		return this.pointerCount;
+	}
+
+}
