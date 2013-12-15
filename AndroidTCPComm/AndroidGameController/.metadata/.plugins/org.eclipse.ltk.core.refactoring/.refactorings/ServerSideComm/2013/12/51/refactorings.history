@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Extract method &apos;public void populateTabs(JTabbedPane innerTabbedPane)&apos; from &apos;ServerUI.buildInnerTabs()&apos; to &apos;ServerUI&apos;&#x0D;&#x0A;- Original project: &apos;ServerSideComm&apos;&#x0D;&#x0A;- Method name: &apos;populateTabs&apos;&#x0D;&#x0A;- Destination type: &apos;ServerUI&apos;&#x0D;&#x0A;- Declared visibility: &apos;public&apos;" comments="false" description="Extract method &apos;populateTabs&apos;" destination="0" exceptions="false" flags="786434" id="org.eclipse.jdt.ui.extract.method" input="/src&lt;{ServerUI.java" name="populateTabs" replace="false" selection="8475 260" stamp="1387107084574" version="1.0" visibility="1"/>
+</session>

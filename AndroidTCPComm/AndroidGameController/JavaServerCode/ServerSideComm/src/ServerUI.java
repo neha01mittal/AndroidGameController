@@ -31,22 +31,22 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class ServerUI extends JFrame {
-	
+
 	/**
-	 * TODOS
-	 * check for user input- only letters/ specific keywords
-	 * restore to default button
-	 * switch to layout 2 button
+	 * TODOS check for user input- only letters specific keywords 
+	 * switch to layout 2 button 
 	 * better image for phone, arrows?
 	 */
-	
+
 	/**
 	 * Use values from save button's actionlistener
 	 */
 
+	private JTabbedPane innerTabbedPane;
 	private static final int PORT = 8888;
 	private static final int FPS_MIN = 0;
 	private static final int FPS_MAX = 30;
+	private JComboBox<String> comboBox;
 	private static final int FPS_INIT = 15; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 	private String directionKeys[] = { "^ v < >", "W A S D" };
@@ -59,6 +59,8 @@ public class ServerUI extends JFrame {
 			{ "Swipe Left", "None" }, { "Swipe Down", "None" },
 			{ "Swipe Right", "None" } };
 
+	private String[] columnNames = { "Touch Controls", "PC Controls" };
+
 	private JTabbedPane tabbedPane;
 	private JPanel generalPane;
 	private JPanel keySettingsPane;
@@ -69,14 +71,15 @@ public class ServerUI extends JFrame {
 	private JPanel tiltRightPane;
 	private JPanel tiltLeftPane;
 	private JTable table1 = new JTable();
-	private JTable table2= new JTable();
-	private JTable table3= new JTable();
-	private JTable table4= new JTable();
-	private JTable table5= new JTable();
-	private JTable[] tables = { table1, table2, table3, table3, table4, table5 };
+	private JTable table2 = new JTable();
+	private JTable table3 = new JTable();
+	private JTable table4 = new JTable();
+	private JTable table5 = new JTable();
+	private JTable[] tables = { table1, table2, table3, table4, table5 };
 
-	private HashMap<String, HashMap<String, String>> keyControls = new HashMap<String, HashMap<String, String>>(); // Tilt->
-																													// (TouchControl->PCControl)
+	private HashMap<String, HashMap<String, String>> keyControls = new HashMap<String, HashMap<String, String>>(); // Touch
+																													// Control->
+																													// (tilt->PCControl)
 	private static JLabel status;
 
 	public void createServerUI() throws UnknownHostException {
@@ -108,7 +111,21 @@ public class ServerUI extends JFrame {
 		tabbedPane.addTab("Key Settings", keySettingsPane);
 		tabbedPane.addTab("Test Keys", testKeysPane);
 		topPanel.add(tabbedPane, BorderLayout.CENTER);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+	}
+
+	private void resetOriginalValues() {
+
+		Object[][] originalDefaultData = { { "Tap", "Mouse Left Button" },
+				{ "Swipe Up", "X" }, { "Swipe Left", "B" },
+				{ "Swipe Down", "C" }, { "Swipe Right", "V" } };
+
+		Object[][] originalEmptyData = { { "Tap", "None" },
+				{ "Swipe Up", "None" }, { "Swipe Left", "None" },
+				{ "Swipe Down", "None" }, { "Swipe Right", "None" } };
+		defaultData = originalDefaultData;
+		emptyData = originalEmptyData;
 	}
 
 	private void createSettingsTab() {
@@ -131,7 +148,7 @@ public class ServerUI extends JFrame {
 		for (String value : directionKeys) {
 			model.addElement(value);
 		}
-		final JComboBox<String> comboBox = new JComboBox<String>(model);
+		comboBox = new JComboBox<String>(model);
 		comboBox.setSize(1, 1);
 		keySettingsPane.add(comboBox);
 
@@ -152,32 +169,41 @@ public class ServerUI extends JFrame {
 		DefaultComboBoxModel<String> mouseModel = new DefaultComboBoxModel<String>();
 		mouseModel.addElement("Hold and Drag");
 
-		final JComboBox<String> comboBoxMouse = new JComboBox<String>(mouseModel);
+		final JComboBox<String> comboBoxMouse = new JComboBox<String>(
+				mouseModel);
 		comboBoxMouse.setSize(1, 1);
 		keySettingsPane.add(comboBoxMouse);
 
 		buildInnerTabs();
-		
+
 		JButton switchToLayout2 = new JButton("Switch to Layout 2");
 		switchToLayout2.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 		keySettingsPane.add(switchToLayout2);
 
 		JButton restoreToDefault = new JButton("Restore to default settings");
 		restoreToDefault.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				innerTabbedPane.removeAll();
+				resetOriginalValues();
+				setDefaultSettings();
+				populateTabs(innerTabbedPane);
+				
+				//direction keys
+				comboBox.setSelectedIndex(0);
 				
 			}
 		});
+
 		keySettingsPane.add(restoreToDefault);
 
 		JButton save = new JButton("Save changes");
@@ -185,26 +211,27 @@ public class ServerUI extends JFrame {
 			public void actionPerformed(ActionEvent evt) {
 				// ... called when button clicked
 				String directionKeys = comboBox.getSelectedItem().toString();
-				String mouseControl = comboBoxMouse.getSelectedItem().toString();
-				storeMappings(tables,0, "No Tilt");
-				storeMappings(tables,1, "Tilt Up");
-				storeMappings(tables,2, "Tilt Down");
-				storeMappings(tables,3, "Tilt Right");
-				storeMappings(tables,4, "Tilt Left");
+				String mouseControl = comboBoxMouse.getSelectedItem()
+						.toString();
+				storeMappings(tables, 0, "No Tilt");
+				storeMappings(tables, 1, "Tilt Up");
+				storeMappings(tables, 2, "Tilt Down");
+				storeMappings(tables, 3, "Tilt Right");
+				storeMappings(tables, 4, "Tilt Left");
 				for (Map.Entry entry : keyControls.entrySet()) {
-				    System.out.println("key controls "+entry.getKey() + ", " + entry.getValue());
+					System.out.println("key controls " + entry.getKey() + ", "
+							+ entry.getValue());
 				}
 				JOptionPane.showMessageDialog(null, "Direction keys: "
 						+ directionKeys + "  Mouse control: " + mouseControl
-						+ "\nAll changes saved successfully." );
-					}
-						});
+						+ "\nAll changes saved successfully.");
+			}
+		});
 		keySettingsPane.add(save);
 
 	}
 
-	public void storeMappings(JTable[] tables,int index, String tabName) {
-		System.out.println("CLICKED");
+	public void storeMappings(JTable[] tables, int index, String tabName) {
 
 		for (int i = 0; i < tables[index].getRowCount(); i++) {
 			String touchControl = tables[index].getValueAt(i, 0).toString();
@@ -213,32 +240,36 @@ public class ServerUI extends JFrame {
 				HashMap<String, String> hm = new HashMap<String, String>();
 				hm.put(tabName, touchControl);
 				keyControls.put(pcControl, hm);
-				System.out.println("PRINT"+tabName+" "+pcControl+" "+touchControl+" "+keyControls.size());
+				System.out.println("PRINT" + tabName + " " + pcControl + " "
+						+ touchControl + " " + keyControls.size());
 			}
 		}
 	}
 
 	private void buildInnerTabs() {
 		// TODO Auto-generated method stub
-		JTabbedPane innerTabbedPane = new JTabbedPane();
+		innerTabbedPane = new JTabbedPane();
 		innerTabbedPane.setPreferredSize(new Dimension(450, 150));
 		setDefaultSettings();
 
+		populateTabs(innerTabbedPane);
+		keySettingsPane.add(innerTabbedPane, BorderLayout.CENTER);
+	}
+
+	public void populateTabs(JTabbedPane innerTabbedPane) {
 		innerTabbedPane.addTab("No Tilt", noTiltPane);
 		innerTabbedPane.addTab("Tilt up", tiltUpPane);
 		innerTabbedPane.addTab("Tilt down", tiltDownPane);
 		innerTabbedPane.addTab("Tilt right", tiltRightPane);
 		innerTabbedPane.addTab("Tilt left", tiltLeftPane);
-
-		keySettingsPane.add(innerTabbedPane, BorderLayout.CENTER);
 	}
 
 	public void setDefaultSettings() {
-		noTiltPane = createTiltTab(defaultData, tables,0);
-		tiltUpPane = createTiltTab(emptyData, tables,1);
-		tiltDownPane = createTiltTab(emptyData, tables,2);
-		tiltRightPane = createTiltTab(emptyData, tables,3);
-		tiltLeftPane = createTiltTab(emptyData, tables,4);
+		noTiltPane = createTiltTab(defaultData, tables, 0);
+		tiltUpPane = createTiltTab(emptyData, tables, 1);
+		tiltDownPane = createTiltTab(emptyData, tables, 2);
+		tiltRightPane = createTiltTab(emptyData, tables, 3);
+		tiltLeftPane = createTiltTab(emptyData, tables, 4);
 	}
 
 	private JPanel createTiltTab(Object[][] data, JTable[] tables, int index) {
@@ -247,8 +278,11 @@ public class ServerUI extends JFrame {
 		// noTiltPane.setLayout(new GridBagLayout());
 		// noTiltPane.setBorder(new EmptyBorder(2,2,2,2));
 
-		String[] columnNames = { "Touch Controls", "PC Controls" };
-
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 2; j++) {
+				System.out.println(data[i][j]);
+			}
+		}
 		tables[index] = new JTable(data, columnNames) {
 			@Override
 			public boolean getScrollableTracksViewportWidth() {
@@ -269,9 +303,11 @@ public class ServerUI extends JFrame {
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		tables[index].setRowHeight(20);
-		tables[index].setPreferredScrollableViewportSize(tables[index].getPreferredSize());
+		tables[index].setPreferredScrollableViewportSize(tables[index]
+				.getPreferredSize());
 		pane.add(jsp);
 
+		resetOriginalValues();
 		return pane;
 	}
 
