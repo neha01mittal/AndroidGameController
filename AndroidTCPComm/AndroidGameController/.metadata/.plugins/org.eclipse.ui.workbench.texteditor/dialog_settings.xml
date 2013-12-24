@@ -13,18 +13,20 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="Swt" key="selection"/>
+		<item value="restore" key="selection"/>
 		<list key="findhistory">
-			<item value="sw"/>
-			<item value="swt"/>
-			<item value="rest"/>
 			<item value="restore"/>
-			<item value="18"/>
-			<item value="button"/>
-			<item value="register"/>
-			<item value="default"/>
+			<item value="res"/>
+			<item value="remove"/>
+			<item value="jspane"/>
+			<item value="tableHolder"/>
+			<item value="rest"/>
+			<item value="keyT"/>
+			<item value="setDefaultSettings"/>
 		</list>
 		<list key="replacehistory">
+			<item value="layout2"/>
+			<item value="layout"/>
 			<item value=""/>
 			<item value="0.5"/>
 			<item value="-0.5"/>

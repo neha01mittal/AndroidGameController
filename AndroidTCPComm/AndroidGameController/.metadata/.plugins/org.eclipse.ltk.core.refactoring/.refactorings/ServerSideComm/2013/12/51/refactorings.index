@@ -1,1 +1,3 @@
 1387107084574	Extract method 'populateTabs'
+1387474664420	Extract method 'buildComponentsInKeySettings'
+1387549519530	Extract method 'buildLayout2Table'

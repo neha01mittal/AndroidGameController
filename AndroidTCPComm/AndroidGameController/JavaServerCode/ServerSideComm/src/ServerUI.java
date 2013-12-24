@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -33,9 +34,7 @@ import javax.swing.event.ChangeListener;
 public class ServerUI extends JFrame {
 
 	/**
-	 * TODOS check for user input- only letters specific keywords 
-	 * switch to layout 2 button 
-	 * better image for phone, arrows?
+	 * TODOS check for user input- only letters specific keywords, sbetter image for phone, arrows?
 	 */
 
 	/**
@@ -43,10 +42,13 @@ public class ServerUI extends JFrame {
 	 */
 
 	private JTabbedPane innerTabbedPane;
+	private JPanel tableHolder;
 	private static final int PORT = 8888;
 	private static final int FPS_MIN = 0;
 	private static final int FPS_MAX = 30;
 	private JComboBox<String> comboBox;
+	private JComboBox<String> comboBoxMouse;
+	private JTable keyTable;
 	private static final int FPS_INIT = 15; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 	private String directionKeys[] = { "^ v < >", "W A S D" };
@@ -59,12 +61,19 @@ public class ServerUI extends JFrame {
 			{ "Swipe Left", "None" }, { "Swipe Down", "None" },
 			{ "Swipe Right", "None" } };
 
+	private Object[][] layout2defaultData = { { "Tap", "Mouse Left Button" },
+			{ "Swipe Up", "X" }, { "Swipe Down", "C" }, { "Swipe Left", "V" },
+			{ "Swipe Right", "B" } };
+
 	private String[] columnNames = { "Touch Controls", "PC Controls" };
 
 	private JTabbedPane tabbedPane;
+	private JTabbedPane keySettingsTabbedPane;
 	private JPanel generalPane;
 	private JPanel keySettingsPane;
 	private JPanel testKeysPane;
+	private JPanel layout1;
+	private JPanel layout2;
 	private JPanel noTiltPane;
 	private JPanel tiltUpPane;
 	private JPanel tiltDownPane;
@@ -77,9 +86,7 @@ public class ServerUI extends JFrame {
 	private JTable table5 = new JTable();
 	private JTable[] tables = { table1, table2, table3, table4, table5 };
 
-	private HashMap<String, HashMap<String, String>> keyControls = new HashMap<String, HashMap<String, String>>(); // Touch
-																													// Control->
-																													// (tilt->PCControl)
+	private HashMap<String, HashMap<String, String>> keyControls = new HashMap<String, HashMap<String, String>>(); // TouchControl->(tilt->PCControl)
 	private static JLabel status;
 
 	public void createServerUI() throws UnknownHostException {
@@ -95,12 +102,11 @@ public class ServerUI extends JFrame {
 		// TODO Auto-generated method stub
 
 		setTitle("Game Controller Server");
-		setSize(750, 450);
+		setSize(750, 500);
 
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
 		getContentPane().add(topPanel);
-
 		createGeneralTab();
 		createSettingsTab();
 		createTestKeysTab();
@@ -130,27 +136,134 @@ public class ServerUI extends JFrame {
 
 	private void createSettingsTab() {
 		// TODO Auto-generated method stub
-		/*
-		 * keySettingsPane = new ImagePanel(new
-		 * File("Images/androidphone.jpg")); keySettingsPane.setLayout(new
-		 * GridLayout(8, 1)); keySettingsPane.setBorder(new EmptyBorder(10, 10,
-		 * 10, 10));
-		 */
 
-		keySettingsPane = new JPanel(new BorderLayout());
-		keySettingsPane.setLayout(new FlowLayout(FlowLayout.LEADING));
-		keySettingsPane.setBorder(new EmptyBorder(2, 2, 2, 2));
+		keySettingsPane = new JPanel();
+		keySettingsPane.setLayout(new BorderLayout());
+		keySettingsPane.setBackground(Color.green);
+		createLayout1();
+		createLayout2();
 
+		keySettingsTabbedPane = new JTabbedPane();
+		keySettingsTabbedPane.addTab("Layout 1", layout1);
+		keySettingsTabbedPane.addTab("Layout 2", layout2);
+		keySettingsPane.add(keySettingsTabbedPane, BorderLayout.CENTER);
+
+	}
+
+	private void createLayout2() {
+		// TODO Auto-generated method stub
+		layout2 = new JPanel(new BorderLayout());
+		layout2.setLayout(new FlowLayout(FlowLayout.LEADING));
+		layout2.setBorder(new EmptyBorder(2, 2, 2, 2));
+
+		buildComponentsInKeySettings(layout2, "Phone Tilt");
+
+		buildLayout2Table(layout2defaultData);
+
+		JButton switchToLayout2 = new JButton("Switch to Layout 1");
+		switchToLayout2.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				keySettingsTabbedPane.setSelectedIndex(0);
+			}
+		});
+		layout2.add(switchToLayout2);
+
+		JButton restoreToDefault = new JButton("Restore to default settings");
+		restoreToDefault.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				// TODO TABLE
+
+				// direction keys
+				comboBox.setSelectedIndex(0);
+				Object[][] originalData = { { "Tap", "Mouse Left Button" },
+						{ "Swipe Up", "X" }, { "Swipe Down", "C" },
+						{ "Swipe Left", "V" }, { "Swipe Right", "B" } };
+				layout2defaultData= originalData;
+				tableHolder.removeAll();
+
+				keyTable = new JTable(layout2defaultData, columnNames) {
+					@Override
+					// left column is not editable
+					public boolean isCellEditable(int row, int column) {
+						if (column == 0) {
+							return false;
+						} else {
+							return true;
+						}
+					}
+				};
+				JScrollPane jspane = new JScrollPane(keyTable,
+						ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+						ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				keyTable.setRowHeight(20);
+				keyTable.setPreferredScrollableViewportSize(new Dimension(450,100));
+				tableHolder.add(jspane);
+				keySettingsTabbedPane.setSelectedIndex(0);
+				keySettingsTabbedPane.setSelectedIndex(1);
+			}
+		});
+
+		layout2.add(restoreToDefault);
+
+		JButton save = new JButton("Save changes");
+		save.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				// ... called when button clicked
+				String directionKeys = comboBox.getSelectedItem().toString();
+				String mouseControl = comboBoxMouse.getSelectedItem()
+						.toString();
+				for (int i = 0; i < layout2defaultData.length; i++)
+					// use these values
+					System.out.println("Command: " + layout2defaultData[i][0]
+							+ " Key " + layout2defaultData[i][1]);
+				JOptionPane.showMessageDialog(null, "Direction keys: "
+						+ directionKeys + "  Mouse control: " + mouseControl
+						+ "\nAll changes saved successfully.");
+			}
+		});
+		layout2.add(save);
+
+	}
+
+	public void buildLayout2Table(Object[][] data) {
+
+		tableHolder = new JPanel();
+		keyTable = new JTable(data, columnNames) {
+			@Override
+			// left column is not editable
+			public boolean isCellEditable(int row, int column) {
+				if (column == 0) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		};
+		JScrollPane jspane = new JScrollPane(keyTable,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		keyTable.setRowHeight(20);
+		keyTable.setPreferredScrollableViewportSize(new Dimension(450,100));
+		tableHolder.add(jspane);
+		layout2.add(tableHolder);
+	}
+
+	public void buildComponentsInKeySettings(JPanel layout, String mouseElement) {
 		JLabel dirControl = new JLabel("Direction Keys");
-		keySettingsPane.add(dirControl);
-
+		layout.add(dirControl);
 		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
 		for (String value : directionKeys) {
 			model.addElement(value);
 		}
 		comboBox = new JComboBox<String>(model);
 		comboBox.setSize(1, 1);
-		keySettingsPane.add(comboBox);
+		layout.add(comboBox);
 
 		Image img = new ImageIcon("src/Images/androidphone.jpg").getImage();
 		Image newimg = img.getScaledInstance(300, 150,
@@ -161,18 +274,26 @@ public class ServerUI extends JFrame {
 
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setBorder(new EmptyBorder(10, 10, 10, 10));
-		keySettingsPane.add(label); // default center section
+		layout.add(label); // default center section
 
 		JLabel mouseMove = new JLabel("Mouse Control");
-		keySettingsPane.add(mouseMove);
+		layout.add(mouseMove);
 
 		DefaultComboBoxModel<String> mouseModel = new DefaultComboBoxModel<String>();
-		mouseModel.addElement("Hold and Drag");
+		mouseModel.addElement(mouseElement);
 
-		final JComboBox<String> comboBoxMouse = new JComboBox<String>(
-				mouseModel);
+		comboBoxMouse = new JComboBox<String>(mouseModel);
 		comboBoxMouse.setSize(1, 1);
-		keySettingsPane.add(comboBoxMouse);
+		layout.add(comboBoxMouse);
+	}
+
+	private void createLayout1() {
+		// TODO Auto-generated method stub
+		layout1 = new JPanel(new BorderLayout());
+		layout1.setLayout(new FlowLayout(FlowLayout.LEADING));
+		layout1.setBorder(new EmptyBorder(2, 2, 2, 2));
+
+		buildComponentsInKeySettings(layout1, "Hold and Drag");
 
 		buildInnerTabs();
 
@@ -182,10 +303,10 @@ public class ServerUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-
+				keySettingsTabbedPane.setSelectedIndex(1);
 			}
 		});
-		keySettingsPane.add(switchToLayout2);
+		layout1.add(switchToLayout2);
 
 		JButton restoreToDefault = new JButton("Restore to default settings");
 		restoreToDefault.addActionListener(new ActionListener() {
@@ -197,14 +318,14 @@ public class ServerUI extends JFrame {
 				resetOriginalValues();
 				setDefaultSettings();
 				populateTabs(innerTabbedPane);
-				
-				//direction keys
+
+				// direction keys
 				comboBox.setSelectedIndex(0);
-				
+
 			}
 		});
 
-		keySettingsPane.add(restoreToDefault);
+		layout1.add(restoreToDefault);
 
 		JButton save = new JButton("Save changes");
 		save.addActionListener(new ActionListener() {
@@ -227,7 +348,7 @@ public class ServerUI extends JFrame {
 						+ "\nAll changes saved successfully.");
 			}
 		});
-		keySettingsPane.add(save);
+		layout1.add(save);
 
 	}
 
@@ -253,7 +374,7 @@ public class ServerUI extends JFrame {
 		setDefaultSettings();
 
 		populateTabs(innerTabbedPane);
-		keySettingsPane.add(innerTabbedPane, BorderLayout.CENTER);
+		layout1.add(innerTabbedPane, BorderLayout.CENTER);
 	}
 
 	public void populateTabs(JTabbedPane innerTabbedPane) {
@@ -275,14 +396,7 @@ public class ServerUI extends JFrame {
 	private JPanel createTiltTab(Object[][] data, JTable[] tables, int index) {
 		// TODO Auto-generated method stub
 		JPanel pane = new JPanel(new BorderLayout());
-		// noTiltPane.setLayout(new GridBagLayout());
-		// noTiltPane.setBorder(new EmptyBorder(2,2,2,2));
 
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 2; j++) {
-				System.out.println(data[i][j]);
-			}
-		}
 		tables[index] = new JTable(data, columnNames) {
 			@Override
 			public boolean getScrollableTracksViewportWidth() {
