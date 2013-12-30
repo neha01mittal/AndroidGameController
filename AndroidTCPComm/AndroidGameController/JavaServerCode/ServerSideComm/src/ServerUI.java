@@ -34,7 +34,8 @@ import javax.swing.event.ChangeListener;
 public class ServerUI extends JFrame {
 
 	/**
-	 * TODOS check for user input- only letters specific keywords, sbetter image for phone, arrows?
+	 * TODOS check for user input- only letters specific keywords, better image
+	 * for phone, arrows?
 	 */
 
 	/**
@@ -53,15 +54,15 @@ public class ServerUI extends JFrame {
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 	private String directionKeys[] = { "^ v < >", "W A S D" };
 
-	private Object[][] defaultData = { { "Tap", "Mouse Left Button" },
-			{ "Swipe Up", "X" }, { "Swipe Left", "B" }, { "Swipe Down", "C" },
+	private Object[][] defaultData = { { "Tap", "LMB" }, { "Swipe Up", "X" },
+			{ "Swipe Left", "B" }, { "Swipe Down", "C" },
 			{ "Swipe Right", "V" } };
 
 	private Object[][] emptyData = { { "Tap", "None" }, { "Swipe Up", "None" },
 			{ "Swipe Left", "None" }, { "Swipe Down", "None" },
 			{ "Swipe Right", "None" } };
 
-	private Object[][] layout2defaultData = { { "Tap", "Mouse Left Button" },
+	private Object[][] layout2defaultData = { { "Tap", "LMB" },
 			{ "Swipe Up", "X" }, { "Swipe Down", "C" }, { "Swipe Left", "V" },
 			{ "Swipe Right", "B" } };
 
@@ -123,7 +124,7 @@ public class ServerUI extends JFrame {
 
 	private void resetOriginalValues() {
 
-		Object[][] originalDefaultData = { { "Tap", "Mouse Left Button" },
+		Object[][] originalDefaultData = { { "Tap", "LMB" },
 				{ "Swipe Up", "X" }, { "Swipe Left", "B" },
 				{ "Swipe Down", "C" }, { "Swipe Right", "V" } };
 
@@ -139,7 +140,6 @@ public class ServerUI extends JFrame {
 
 		keySettingsPane = new JPanel();
 		keySettingsPane.setLayout(new BorderLayout());
-		keySettingsPane.setBackground(Color.green);
 		createLayout1();
 		createLayout2();
 
@@ -181,10 +181,10 @@ public class ServerUI extends JFrame {
 
 				// direction keys
 				comboBox.setSelectedIndex(0);
-				Object[][] originalData = { { "Tap", "Mouse Left Button" },
+				Object[][] originalData = { { "Tap", "LMB" },
 						{ "Swipe Up", "X" }, { "Swipe Down", "C" },
 						{ "Swipe Left", "V" }, { "Swipe Right", "B" } };
-				layout2defaultData= originalData;
+				layout2defaultData = originalData;
 				tableHolder.removeAll();
 
 				keyTable = new JTable(layout2defaultData, columnNames) {
@@ -202,7 +202,8 @@ public class ServerUI extends JFrame {
 						ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 						ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 				keyTable.setRowHeight(20);
-				keyTable.setPreferredScrollableViewportSize(new Dimension(450,100));
+				keyTable.setPreferredScrollableViewportSize(new Dimension(450,
+						100));
 				tableHolder.add(jspane);
 				keySettingsTabbedPane.setSelectedIndex(0);
 				keySettingsTabbedPane.setSelectedIndex(1);
@@ -218,17 +219,62 @@ public class ServerUI extends JFrame {
 				String directionKeys = comboBox.getSelectedItem().toString();
 				String mouseControl = comboBoxMouse.getSelectedItem()
 						.toString();
-				for (int i = 0; i < layout2defaultData.length; i++)
-					// use these values
+
+				boolean flag = false;
+				for (int i = 0; i < layout2defaultData.length; i++) {
+					// use these values (only unique ones) 
 					System.out.println("Command: " + layout2defaultData[i][0]
 							+ " Key " + layout2defaultData[i][1]);
-				JOptionPane.showMessageDialog(null, "Direction keys: "
-						+ directionKeys + "  Mouse control: " + mouseControl
-						+ "\nAll changes saved successfully.");
+					if (!validateKey(layout2defaultData[i][1])) {
+						JOptionPane
+								.showMessageDialog(
+										null,
+										"Only A-Z, 0-9, LMB, RMB, Ctrl, Space, Alt and Shift keys are allowed.\nPlease use 'None' to delete a button mapping");
+						flag = true;
+						break;
+					}
+				}
+				if (flag == false) // save the mappings // if flag is true then
+									// dont save
+					JOptionPane.showMessageDialog(null, "Direction keys: "
+							+ directionKeys + "  Mouse control: "
+							+ mouseControl
+							+ "\nAll changes saved successfully.");
 			}
+
 		});
 		layout2.add(save);
 
+		JLabel abbreviations = new JLabel(
+				"** LMB= Left Mouse Button RMB= Right Mouse Button");
+		layout2.add(abbreviations);
+		JLabel warning = new JLabel("Warning: In case of duplicate entries, only the FIRST one will be mapped.");
+		layout2.add(warning);
+
+	}
+
+	private boolean validateKey(Object object) {
+		// TODO Auto-generated method stub
+		String input = object.toString().trim();
+		System.out.println("keu" + input);
+		if (input.length() > 1) {
+			if (input.equalsIgnoreCase("CTRL")
+					|| input.equalsIgnoreCase("SHIFT")
+					|| input.equalsIgnoreCase("SPACE")
+					|| input.equalsIgnoreCase("ALT")
+					|| input.equalsIgnoreCase("LMB")
+					|| input.equalsIgnoreCase("RMB")
+					|| input.equalsIgnoreCase("None"))
+				return true;
+			else
+				return false;
+		} else {
+			char character = input.charAt(0);
+			if (Character.isDigit(character) || Character.isLetter(character))
+				return true;
+			else
+				return false;
+		}
 	}
 
 	public void buildLayout2Table(Object[][] data) {
@@ -249,7 +295,7 @@ public class ServerUI extends JFrame {
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		keyTable.setRowHeight(20);
-		keyTable.setPreferredScrollableViewportSize(new Dimension(450,100));
+		keyTable.setPreferredScrollableViewportSize(new Dimension(450, 100));
 		tableHolder.add(jspane);
 		layout2.add(tableHolder);
 	}
@@ -334,21 +380,40 @@ public class ServerUI extends JFrame {
 				String directionKeys = comboBox.getSelectedItem().toString();
 				String mouseControl = comboBoxMouse.getSelectedItem()
 						.toString();
+				keyControls = new HashMap<String, HashMap<String, String>>();
 				storeMappings(tables, 0, "No Tilt");
 				storeMappings(tables, 1, "Tilt Up");
 				storeMappings(tables, 2, "Tilt Down");
 				storeMappings(tables, 3, "Tilt Right");
 				storeMappings(tables, 4, "Tilt Left");
+				boolean flag = false;
 				for (Map.Entry entry : keyControls.entrySet()) {
-					System.out.println("key controls " + entry.getKey() + ", "
-							+ entry.getValue());
+
+					if (!validateKey(entry.getKey())) {
+						JOptionPane.showMessageDialog(
+										null,
+										"Only A-Z, 0-9, LMB, RMB, Ctrl, Space, Alt and Shift keys are allowed.\nPlease use 'None' to delete a button mapping");
+						flag = true;
+						System.out.println("key controls " + entry.getKey()
+								+ ", " + entry.getValue());
+						break;
+					}
 				}
-				JOptionPane.showMessageDialog(null, "Direction keys: "
-						+ directionKeys + "  Mouse control: " + mouseControl
-						+ "\nAll changes saved successfully.");
+
+				if (flag == false)
+					JOptionPane.showMessageDialog(null, "Direction keys: "
+							+ directionKeys + "  Mouse control: "
+							+ mouseControl
+							+ "\nAll changes saved successfully.");
 			}
 		});
 		layout1.add(save);
+
+		JLabel abbreviations = new JLabel(
+				"** LMB= Left Mouse Button   RMB= Right Mouse Button");
+		layout1.add(abbreviations);
+		JLabel warning = new JLabel("Warning: In case of duplicate entries, only the FIRST one will be mapped.");
+		layout1.add(warning);
 
 	}
 
