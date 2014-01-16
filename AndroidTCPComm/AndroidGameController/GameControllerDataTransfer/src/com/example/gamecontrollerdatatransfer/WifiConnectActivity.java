@@ -2,9 +2,7 @@ package com.example.gamecontrollerdatatransfer;
 
 import gc.common_resources.IPAddressFormatValidator;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -60,6 +59,8 @@ public class WifiConnectActivity extends ListActivity {
 		editor = preferences.edit();
 		userInput = (EditText) findViewById(R.id.user_input);
 
+		
+		//userInput.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
 		// to display as a list
 		adapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_multiple_choice, listItems);

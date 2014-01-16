@@ -19,7 +19,7 @@ import android.view.WindowManager;
 
 public class MultiTouchView extends View {
 
-  private static final int THRESHOLD = 50;
+  private static final int THRESHOLD = 70;
   private static final int MOUSETHRESHOLD = 5;
   private static final int MOUSEBOXTHRESHOLD = 100;
   private final int SIZE;
@@ -56,8 +56,8 @@ public class MultiTouchView extends View {
       Color.BLACK, Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY,
       Color.LTGRAY, Color.YELLOW };
   
-  private int[] bigColors = { Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.MAGENTA,
-	      Color.BLACK, Color.LTGRAY};
+  private int[] bigColors = { Color.BLACK, Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.MAGENTA,
+	      Color.CYAN, Color.LTGRAY};
 
   private Paint textPaint;
 
@@ -437,6 +437,8 @@ public void doRightScreenProcess(float x, float y, int operation) {
 	    	  //ACTION
 	    	  //	canvas.drawCircle(point.x, point.y, SIZE, mPaint);
 		      mPaint.setStyle(Paint.Style.FILL);
+		      i++;
+		      mPaint.setColor(colors[i % 9]);
 	    	  canvas.drawCircle(point.x, point.y, SIZE, mPaint);
 		  }
     }
