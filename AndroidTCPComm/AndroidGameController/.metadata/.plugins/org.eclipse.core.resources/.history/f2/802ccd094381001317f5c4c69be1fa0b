@@ -1,0 +1,101 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background1"
+    android:gravity="center_horizontal" >
+
+    <!--
+    <android.opengl.GLSurfaceView android:id="@+id/surfaceviewclass"
+android:layout_width="match_parent"
+android:layout_height="match_parent"/>
+    -->
+
+    <com.example.gamecontrollerdatatransfer.MultiTouchView
+        android:id="@+id/multi_touch_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dip"
+        android:stretchColumns="*" >
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="X-Axis"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Y-Axis"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Z-Axis"
+                android:textSize="14sp" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/x_axis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/y_axis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/z_axis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+        </TableRow>
+    </TableLayout>
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingTop="10dip"
+        android:visibility="invisible" />
+    
+    <ImageButton
+        android:id="@+id/buttoncloseicon"
+        android:layout_gravity="top|left"
+        android:layout_width="30dip" 
+        android:layout_height="30dip"
+        android:src="@drawable/closebutton"
+        />
+
+    <ImageButton
+        android:id="@+id/buttonplaypause"
+        android:layout_gravity="bottom|right"
+        android:layout_width="30dip" 
+        android:layout_height="30dip"
+        android:src="@drawable/pausebutton"
+        />
+    <ImageButton
+        android:id="@+id/buttonreset"
+        android:layout_gravity="bottom|right"
+        android:layout_width="30dip" 
+        android:layout_height="30dip"
+        android:src="@drawable/resetbutton"
+        />
+    
+</FrameLayout>

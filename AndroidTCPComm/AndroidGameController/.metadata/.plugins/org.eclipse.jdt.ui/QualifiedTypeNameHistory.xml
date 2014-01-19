@@ -5,7 +5,6 @@
 <fullyQualifiedTypeName name="android.view.View.OnClickListener"/>
 <fullyQualifiedTypeName name="android.os.Handler"/>
 <fullyQualifiedTypeName name="gc.common_resources.CommandType"/>
-<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.PlayActivity"/>
 <fullyQualifiedTypeName name="android.app.ActionBar.LayoutParams"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.MultiTouchView"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.layout"/>
@@ -18,7 +17,6 @@
 <fullyQualifiedTypeName name="gc.common_resources.IPAddressFormatValidator"/>
 <fullyQualifiedTypeName name="android.app.AlertDialog.Builder"/>
 <fullyQualifiedTypeName name="android.widget.ListView"/>
-<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.id"/>
 <fullyQualifiedTypeName name="android.widget.EditText"/>
 <fullyQualifiedTypeName name="android.widget.AdapterViewFlipper"/>
 <fullyQualifiedTypeName name="android.widget.AdapterView.OnItemLongClickListener"/>
@@ -45,4 +43,8 @@
 <fullyQualifiedTypeName name="javax.swing.plaf.basic.BasicInternalFrameTitlePane.RestoreAction"/>
 <fullyQualifiedTypeName name="java.awt.Color"/>
 <fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
+<fullyQualifiedTypeName name="android.text.InputType"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.WifiConnectActivity"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.id"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.PlayActivity"/>
 </qualifiedTypeNameHistroy>

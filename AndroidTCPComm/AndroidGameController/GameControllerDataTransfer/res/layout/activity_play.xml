@@ -74,5 +74,29 @@ android:layout_height="match_parent"/>
         android:layout_gravity="center"
         android:paddingTop="10dip"
         android:visibility="invisible" />
+    
+    <ImageButton
+        android:id="@+id/buttoncloseicon"
+        android:layout_gravity="top|left"
+        android:layout_width="30dip" 
+        android:layout_height="30dip"
+        android:src="@drawable/closebutton"
+        />
 
+    <ImageButton
+        android:id="@+id/buttonplaypause"
+        android:layout_gravity="bottom|right"
+        android:layout_width="30dip" 
+        android:layout_height="30dip"
+        android:src="@drawable/pausebutton" />
+
+    <ImageButton
+        android:id="@+id/buttonreset"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="40dip"
+        android:layout_width="30dip" 
+        android:layout_height="30dip"
+        android:src="@drawable/resetbutton"
+        />
+    
 </FrameLayout>
