@@ -20,6 +20,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.example.gamecontrollerdatatransfer.WifiConnectActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" >
         </activity>
         <activity
@@ -31,18 +32,22 @@
         <activity
             android:name="com.example.gamecontrollerdatatransfer.ShakeActivity"
             android:label="@string/app_name" >
+            android:screenOrientation="portrait"
         </activity>
         <activity
             android:name="com.example.gamecontrollerdatatransfer.BluetoothConnectActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>
         <activity
             android:name="com.example.gamecontrollerdatatransfer.UsbConnectActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" >
         </activity>
         <activity
             android:name="com.example.gamecontrollerdatatransfer.MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

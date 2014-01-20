@@ -56,7 +56,7 @@ public class MultiTouchView extends View {
       Color.BLACK, Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY,
       Color.LTGRAY, Color.YELLOW };
   
-  private int[] bigColors = { Color.BLACK, Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.MAGENTA,
+  private int[] bigColors = { Color.WHITE, Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.MAGENTA,
 	      Color.CYAN, Color.LTGRAY};
 
   private Paint textPaint;
