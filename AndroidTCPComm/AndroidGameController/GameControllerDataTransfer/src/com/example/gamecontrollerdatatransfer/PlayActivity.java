@@ -195,13 +195,14 @@ public class PlayActivity extends Activity {
 	// Create the threads and pass the commands to them
 	public void sendPacketToServer(CommandType updateCommand) {
 		if(connectType == "wifi") {
+			if(connectType.equals("wifi")) {
 			if (!connected) {
 				Thread cThread = new Thread(new ClientSocketThread(updateCommand));
 				cThread.start();
 			}
-			}else if(connectType == "bluetooth") {
-				SingletonBluetooth.getInstance().sendToDevice(updateCommand);
-			}
+		}else if(connectType.equals("bluetooth")) {
+			SingletonBluetooth.getInstance().sendToDevice(updateCommand);
+		}
 	}
 
 	// Thread class to send commands to the Server
