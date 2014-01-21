@@ -5,6 +5,7 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,7 +32,6 @@ public class MyServer {
 	LocalDevice BTlocal = null;
     StreamConnectionNotifier BTserver = null;
     StreamConnection BTconn = null;
-    DataInputStream BTdin  = null;
 
 	KeyTouch keyTouch = null;
 	
@@ -58,8 +58,8 @@ public class MyServer {
 						Socket socket = null;
 				
 					try {
-						serverSocket = new ServerSocket(PORT);
-						System.out.println("Listening :" + PORT);
+						serverSocket = new ServerSocket(WifiPORT);
+						System.out.println("Listening :" + WifiPORT);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
