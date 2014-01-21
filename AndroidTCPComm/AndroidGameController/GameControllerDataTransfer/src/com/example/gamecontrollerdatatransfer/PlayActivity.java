@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 public class PlayActivity extends Activity {
 
-	private String ipAddress;
+	private String ipAddress,  connectType;
 	private final float NOISE = (float) 2.0;
 	Socket socket = null;
 	private boolean connected = false;
@@ -54,9 +54,11 @@ public class PlayActivity extends Activity {
 		/* do this in onCreate */
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			ipAddress = extras.getString("ipAddress");
-			// clientConnection();
-		}	
+			connectType = extras.getString("connectType");
+			
+			if(connectType == "wifi")
+				ipAddress = extras.getString("ipAddress");
+		}
 
 		registerRestPosition();
 
@@ -192,10 +194,14 @@ public class PlayActivity extends Activity {
 
 	// Create the threads and pass the commands to them
 	public void sendPacketToServer(CommandType updateCommand) {
-		if (!connected) {
-			Thread cThread = new Thread(new ClientSocketThread(updateCommand));
-			cThread.start();
-		}
+		if(connectType == "wifi") {
+			if (!connected) {
+				Thread cThread = new Thread(new ClientSocketThread(updateCommand));
+				cThread.start();
+			}
+			}else if(connectType == "bluetooth") {
+				SingletonBluetooth.getInstance().sendToDevice(updateCommand);
+			}
 	}
 
 	// Thread class to send commands to the Server
