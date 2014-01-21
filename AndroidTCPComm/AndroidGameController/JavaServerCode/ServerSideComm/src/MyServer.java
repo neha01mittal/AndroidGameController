@@ -10,6 +10,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.bluetooth.*;
+import javax.microedition.io.*;
+
 public class MyServer {
 
 	// Server UI object
