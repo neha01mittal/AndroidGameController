@@ -56,7 +56,7 @@ public class PlayActivity extends Activity {
 		if (extras != null) {
 			connectType = extras.getString("connectType");
 			
-			if(connectType == "wifi")
+			if(connectType.equals("wifi"))
 				ipAddress = extras.getString("ipAddress");
 		}
 
@@ -194,12 +194,12 @@ public class PlayActivity extends Activity {
 
 	// Create the threads and pass the commands to them
 	public void sendPacketToServer(CommandType updateCommand) {
-		if(connectType == "wifi") {
+		if(connectType.equals("wifi")) {
 			if (!connected) {
 				Thread cThread = new Thread(new ClientSocketThread(updateCommand));
 				cThread.start();
 			}
-			}else if(connectType == "bluetooth") {
+			}else if(connectType.equals("bluetooth")) {
 				SingletonBluetooth.getInstance().sendToDevice(updateCommand);
 			}
 	}

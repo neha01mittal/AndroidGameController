@@ -1,5 +1,4 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -12,6 +11,8 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -20,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
@@ -44,12 +46,14 @@ public class ServerUI extends JFrame {
 
 	private JTabbedPane innerTabbedPane;
 	private JPanel tableHolder;
+	private int connectionType = 1;
 	private static final int PORT = 8888;
 	private static final int FPS_MIN = 0;
 	private static final int FPS_MAX = 30;
 	private JComboBox<String> comboBox;
 	private JComboBox<String> comboBoxMouse;
 	private JTable keyTable;
+	private static int userChoice=0;
 	private static final int FPS_INIT = 15; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 	private String directionKeys[] = { "^ v < >", "W A S D" };
@@ -91,17 +95,14 @@ public class ServerUI extends JFrame {
 	private static JLabel status;
 
 	public void createServerUI() throws UnknownHostException {
-
 		ServerUI sui = new ServerUI();
 		status = new JLabel(" Connection Status: Disconnected");
 		sui.createBasicUI();
 		sui.setVisible(true);
-
 	}
 
 	private void createBasicUI() throws UnknownHostException {
 		// TODO Auto-generated method stub
-
 		setTitle("Game Controller Server");
 		setSize(750, 500);
 
@@ -116,7 +117,7 @@ public class ServerUI extends JFrame {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("General", generalPane);
 		tabbedPane.addTab("Key Settings", keySettingsPane);
-		tabbedPane.addTab("Test Keys", testKeysPane);
+		//tabbedPane.addTab("Test Keys", testKeysPane);
 		topPanel.add(tabbedPane, BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -192,12 +193,16 @@ public class ServerUI extends JFrame {
 					// left column is not editable
 					public boolean isCellEditable(int row, int column) {
 						if (column == 0) {
+							//keyTable.setCellSelectionEnabled(false);
 							return false;
 						} else {
 							return true;
 						}
 					}
 				};
+				
+				keyTable.setFocusable(false);
+
 				JScrollPane jspane = new JScrollPane(keyTable,
 						ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 						ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -209,9 +214,9 @@ public class ServerUI extends JFrame {
 				keySettingsTabbedPane.setSelectedIndex(1);
 			}
 		});
-
+		
 		layout2.add(restoreToDefault);
-
+		
 		JButton save = new JButton("Save changes");
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -478,6 +483,7 @@ public class ServerUI extends JFrame {
 				}
 			}
 		};
+
 		JScrollPane jsp = new JScrollPane(tables[index],
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -500,12 +506,68 @@ public class ServerUI extends JFrame {
 	private void createGeneralTab() throws UnknownHostException {
 		// TODO Auto-generated method stub
 		generalPane = new JPanel(new BorderLayout());
-		generalPane.setLayout(new GridLayout(8, 1));
+		generalPane.setLayout(new GridLayout(10,1));
 		generalPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-
+		
 		JLabel heading = new JLabel(" Server Configuration ");
 		heading.setFont(new Font(heading.getName(), Font.BOLD, 20));
 		generalPane.add(heading);
+		
+		JLabel connectionMode= new JLabel(" Choose your preferred connection type: ");
+		generalPane.add(connectionMode);
+		
+		JRadioButton wifiButton = new JRadioButton("Wifi");
+	    wifiButton.setSelected(true);
+	    
+		JRadioButton bluetoothButton = new JRadioButton("Bluetooth");
+		final JButton connect = new JButton("Connect");
+		connect.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int reply= JOptionPane.showConfirmDialog(null,"Once confirmed, you will be not be able to change your choice!","Connect now?",JOptionPane.YES_NO_OPTION);
+				
+				if(reply==JOptionPane.YES_OPTION){
+					connect.setText("Choice confirmed");
+					userChoice= getConnectionType();
+					connect.setEnabled(false);
+				}
+			}
+		});
+		
+		ButtonGroup group = new ButtonGroup();
+        group.add(wifiButton);
+        group.add(bluetoothButton);
+        group.add(connect);
+
+        wifiButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				connectionType=1;
+				System.out.println(connectionType+"connectionType");
+			}
+		});
+              
+        bluetoothButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				connectionType=2;
+				System.out.println(connectionType+"connectionType");
+			}
+		});
+        
+        JPanel radioPanel = new JPanel();
+        radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.LINE_AXIS));
+        radioPanel.add(wifiButton);
+        radioPanel.add(bluetoothButton);
+        radioPanel.add(connect);
+        radioPanel.setVisible(true);
+        generalPane.add(radioPanel);
 
 		JLabel ipConfig = new JLabel(" Host Name/ IP Address: "
 				+ InetAddress.getLocalHost());
@@ -539,19 +601,24 @@ public class ServerUI extends JFrame {
 		generalPane.add(msgToUser);
 
 	}
-
+	
+	public int getConnectionType() {
+		return connectionType;
+	}
+ 
 	public void updateStatus(boolean value) {
 		// TODO
 		// call this function whenever a connection is made or broken
 		if (value) {
 			status.setText(" Connection Status: Connected");
-			// System.out.println("CONNECTED");
 		} else {
 			status.setText(" Connection Status: Disconnected");
-			// System.out.println("DISCONNECTED");
 		}
 	}
 
+	public int getUserChoice() {
+		return userChoice;
+	}
 }
 
 class SliderListener implements ChangeListener {

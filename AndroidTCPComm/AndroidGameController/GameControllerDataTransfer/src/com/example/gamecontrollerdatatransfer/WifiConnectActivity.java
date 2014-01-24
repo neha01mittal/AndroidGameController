@@ -130,6 +130,7 @@ public class WifiConnectActivity extends ListActivity {
 			IPAddressFormatValidator iadfv = new IPAddressFormatValidator();
 			if (iadfv.validate(userInput.getText().toString())) {
 				Intent k = new Intent(WifiConnectActivity.this, PlayActivity.class);
+				k.putExtra("connectType", "wifi");
 				k.putExtra("ipAddress", userInput.getText().toString());
 				startActivity(k);
 			} else {

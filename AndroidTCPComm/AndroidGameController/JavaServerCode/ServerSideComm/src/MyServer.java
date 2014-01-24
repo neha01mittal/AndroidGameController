@@ -1,27 +1,26 @@
 import gc.common_resources.CommandType;
 
-import java.awt.AWTException;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Robot;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import javax.bluetooth.*;
-import javax.microedition.io.*;
+import javax.bluetooth.DiscoveryAgent;
+import javax.bluetooth.LocalDevice;
+import javax.bluetooth.UUID;
+import javax.microedition.io.Connector;
+import javax.microedition.io.StreamConnection;
+import javax.microedition.io.StreamConnectionNotifier;
 
 public class MyServer {
 
 	// Server UI object
-	private ServerUI serverui;
+	private static ServerUI serverui;
+
 	
 	// Determines which connection type: wifi, bluetooth, usb
-	private int connectionType = 0;
-
 	// Wifi Port Number
 	private static final int WifiPORT = 8888;
 	
@@ -36,27 +35,23 @@ public class MyServer {
 	KeyTouch keyTouch = null;
 	
 	public static void main(String[] args) throws UnknownHostException {
-		MyServer myserver = new MyServer();
-		myserver.startConnection();
-	}
-
-	private void startConnection() throws UnknownHostException {
-		// TODO Auto-generated method stub
-
 		serverui = new ServerUI();
 		serverui.createServerUI();
-		
-		while (true) {
-
+		MyServer myServer= new MyServer();
+		myServer.startConnection(0);
+	}
+	
+	public void startConnection(int connectionType) throws UnknownHostException {
+		// TODO Auto-generated method stub
+		while(true) {
 			//get connectiontype from serverui here
-			connectionType = 2; 
-			
+			connectionType= serverui.getUserChoice();
+			System.out.println(connectionType);
 			switch(connectionType) {
 				case 1:
 						// Wifi Connection
 						ServerSocket serverSocket = null;
 						Socket socket = null;
-				
 					try {
 						serverSocket = new ServerSocket(WifiPORT);
 						System.out.println("Listening :" + WifiPORT);
@@ -67,7 +62,6 @@ public class MyServer {
 
 					KeyTouch keyTouch = new KeyTouch();
 					while (connectionType == 1) {
-					
 						try {
 							//Wait for client to connect
 							socket = serverSocket.accept();
@@ -160,6 +154,7 @@ public class MyServer {
 
 						while(connectionType == 2) {
 							
+							System.out.println("bluetoothbluetooth");
 							// Init CommandType  with  Default type
 							CommandType commandFromClient = CommandType.DEFAULT; 
 			

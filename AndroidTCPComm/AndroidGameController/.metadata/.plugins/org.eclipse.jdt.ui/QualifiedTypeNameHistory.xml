@@ -6,8 +6,6 @@
 <fullyQualifiedTypeName name="android.os.Handler"/>
 <fullyQualifiedTypeName name="gc.common_resources.CommandType"/>
 <fullyQualifiedTypeName name="android.app.ActionBar.LayoutParams"/>
-<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.MultiTouchView"/>
-<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.layout"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.TouchCoordinates"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.string"/>
 <fullyQualifiedTypeName name="java.util.ArrayList"/>
@@ -36,15 +34,23 @@
 <fullyQualifiedTypeName name="javax.swing.JScrollPane"/>
 <fullyQualifiedTypeName name="java.awt.BorderLayout"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
-<fullyQualifiedTypeName name="javax.swing.JButton"/>
 <fullyQualifiedTypeName name="javax.swing.JTable"/>
-<fullyQualifiedTypeName name="java.awt.event.ActionListener"/>
 <fullyQualifiedTypeName name="javax.swing.JTabbedPane"/>
 <fullyQualifiedTypeName name="javax.swing.plaf.basic.BasicInternalFrameTitlePane.RestoreAction"/>
-<fullyQualifiedTypeName name="java.awt.Color"/>
 <fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
 <fullyQualifiedTypeName name="android.text.InputType"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.WifiConnectActivity"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.id"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.PlayActivity"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.drawable"/>
+<fullyQualifiedTypeName name="android.graphics.Color"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.layout"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.MultiTouchView"/>
+<fullyQualifiedTypeName name="java.awt.RadialGradientPaint"/>
+<fullyQualifiedTypeName name="javax.swing.JButton"/>
+<fullyQualifiedTypeName name="java.awt.event.ActionListener"/>
+<fullyQualifiedTypeName name="ServerUI"/>
+<fullyQualifiedTypeName name="MyServer"/>
+<fullyQualifiedTypeName name="java.util.EventObject"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
 </qualifiedTypeNameHistroy>
