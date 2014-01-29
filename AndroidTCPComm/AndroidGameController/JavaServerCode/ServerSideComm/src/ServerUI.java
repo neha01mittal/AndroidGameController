@@ -6,6 +6,13 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -13,6 +20,7 @@ import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -32,6 +40,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 
 public class ServerUI extends JFrame {
 
@@ -53,7 +63,7 @@ public class ServerUI extends JFrame {
 	private JComboBox<String> comboBox;
 	private JComboBox<String> comboBoxMouse;
 	private JTable keyTable;
-	private static int userChoice=0;
+	private static int userChoice = 0;
 	private static final int FPS_INIT = 15; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 	private String directionKeys[] = { "^ v < >", "W A S D" };
@@ -117,7 +127,7 @@ public class ServerUI extends JFrame {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("General", generalPane);
 		tabbedPane.addTab("Key Settings", keySettingsPane);
-		//tabbedPane.addTab("Test Keys", testKeysPane);
+		// tabbedPane.addTab("Test Keys", testKeysPane);
 		topPanel.add(tabbedPane, BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -193,7 +203,7 @@ public class ServerUI extends JFrame {
 					// left column is not editable
 					public boolean isCellEditable(int row, int column) {
 						if (column == 0) {
-							//keyTable.setCellSelectionEnabled(false);
+							// keyTable.setCellSelectionEnabled(false);
 							return false;
 						} else {
 							return true;
@@ -201,7 +211,11 @@ public class ServerUI extends JFrame {
 					}
 				};
 				
-				keyTable.setFocusable(false);
+				TableColumn userChoice = keyTable.getColumnModel().getColumn(1);
+				JComboBox<String> comboBox = new JComboBox<String>();
+				comboBox.addItem("STH");
+				comboBox.addItem("FFF");
+				userChoice.setCellEditor(new DefaultCellEditor(comboBox));
 
 				JScrollPane jspane = new JScrollPane(keyTable,
 						ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -214,9 +228,9 @@ public class ServerUI extends JFrame {
 				keySettingsTabbedPane.setSelectedIndex(1);
 			}
 		});
-		
+
 		layout2.add(restoreToDefault);
-		
+
 		JButton save = new JButton("Save changes");
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -227,7 +241,7 @@ public class ServerUI extends JFrame {
 
 				boolean flag = false;
 				for (int i = 0; i < layout2defaultData.length; i++) {
-					// use these values (only unique ones) 
+					// use these values (only unique ones)
 					System.out.println("Command: " + layout2defaultData[i][0]
 							+ " Key " + layout2defaultData[i][1]);
 					if (!validateKey(layout2defaultData[i][1])) {
@@ -253,15 +267,17 @@ public class ServerUI extends JFrame {
 		JLabel abbreviations = new JLabel(
 				"** LMB= Left Mouse Button RMB= Right Mouse Button");
 		layout2.add(abbreviations);
-		JLabel warning = new JLabel("Warning: In case of duplicate entries, only the FIRST one will be mapped.");
+		JLabel warning = new JLabel(
+				"Warning: In case of duplicate entries, only the FIRST one will be mapped.");
 		layout2.add(warning);
-
 	}
 
 	private boolean validateKey(Object object) {
 		// TODO Auto-generated method stub
 		String input = object.toString().trim();
 		System.out.println("keu" + input);
+		if (input == null || input.length() == 0)
+			return false;
 		if (input.length() > 1) {
 			if (input.equalsIgnoreCase("CTRL")
 					|| input.equalsIgnoreCase("SHIFT")
@@ -386,16 +402,12 @@ public class ServerUI extends JFrame {
 				String mouseControl = comboBoxMouse.getSelectedItem()
 						.toString();
 				keyControls = new HashMap<String, HashMap<String, String>>();
-				storeMappings(tables, 0, "No Tilt");
-				storeMappings(tables, 1, "Tilt Up");
-				storeMappings(tables, 2, "Tilt Down");
-				storeMappings(tables, 3, "Tilt Right");
-				storeMappings(tables, 4, "Tilt Left");
 				boolean flag = false;
 				for (Map.Entry entry : keyControls.entrySet()) {
 
 					if (!validateKey(entry.getKey())) {
-						JOptionPane.showMessageDialog(
+						JOptionPane
+								.showMessageDialog(
 										null,
 										"Only A-Z, 0-9, LMB, RMB, Ctrl, Space, Alt and Shift keys are allowed.\nPlease use 'None' to delete a button mapping");
 						flag = true;
@@ -405,11 +417,31 @@ public class ServerUI extends JFrame {
 					}
 				}
 
-				if (flag == false)
+				if (flag == false) {
 					JOptionPane.showMessageDialog(null, "Direction keys: "
 							+ directionKeys + "  Mouse control: "
 							+ mouseControl
 							+ "\nAll changes saved successfully.");
+				} else {
+					File dataFile = createFile();
+					PrintWriter writer;
+					try {
+						writer = new PrintWriter(dataFile, "UTF-8");
+
+						storeMappings(writer, tables, 0, "No Tilt");
+						storeMappings(writer, tables, 1, "Tilt Up");
+						storeMappings(writer, tables, 2, "Tilt Down");
+						storeMappings(writer, tables, 3, "Tilt Right");
+						storeMappings(writer, tables, 4, "Tilt Left");
+						writer.close();
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 		});
 		layout1.add(save);
@@ -417,24 +449,44 @@ public class ServerUI extends JFrame {
 		JLabel abbreviations = new JLabel(
 				"** LMB= Left Mouse Button   RMB= Right Mouse Button");
 		layout1.add(abbreviations);
-		JLabel warning = new JLabel("Warning: In case of duplicate entries, only the FIRST one will be mapped.");
+		JLabel warning = new JLabel(
+				"Warning: In case of duplicate entries, only the FIRST one will be mapped.");
 		layout1.add(warning);
 
 	}
 
-	public void storeMappings(JTable[] tables, int index, String tabName) {
-
+	public void storeMappings(PrintWriter writer, JTable[] tables, int index,
+			String tabName) {
 		for (int i = 0; i < tables[index].getRowCount(); i++) {
 			String touchControl = tables[index].getValueAt(i, 0).toString();
 			String pcControl = tables[index].getValueAt(i, 1).toString();
-			if (!pcControl.equals("None")) {
-				HashMap<String, String> hm = new HashMap<String, String>();
-				hm.put(tabName, touchControl);
-				keyControls.put(pcControl, hm);
-				System.out.println("PRINT" + tabName + " " + pcControl + " "
-						+ touchControl + " " + keyControls.size());
-			}
+			// if (!pcControl.equals("None")) {
+			HashMap<String, String> hm = new HashMap<String, String>();
+			hm.put(tabName, touchControl);
+			keyControls.put(pcControl, hm);
+			System.out.println("PRINT" + tabName + " " + pcControl + " "
+					+ touchControl + " " + keyControls.size());
+			writer.print(pcControl + " ");
+			// }
 		}
+		writer.println();
+	}
+
+	public File createFile() {
+		File dir = new File("SmartController/Data");
+		dir.mkdirs();
+		File file = new File(dir, "keyMappings.txt");
+		System.out.println("File created: " + file.getAbsolutePath());
+		try {
+			if (!file.isFile() && !file.createNewFile()) {
+				throw new IOException("Error creating new file: "
+						+ file.getAbsolutePath());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return file;
 	}
 
 	private void buildInnerTabs() {
@@ -456,11 +508,75 @@ public class ServerUI extends JFrame {
 	}
 
 	public void setDefaultSettings() {
-		noTiltPane = createTiltTab(defaultData, tables, 0);
-		tiltUpPane = createTiltTab(emptyData, tables, 1);
-		tiltDownPane = createTiltTab(emptyData, tables, 2);
-		tiltRightPane = createTiltTab(emptyData, tables, 3);
-		tiltLeftPane = createTiltTab(emptyData, tables, 4);
+		// read from file here
+		BufferedReader br = null;
+		JPanel panels[] = new JPanel[5];
+		try {
+			String sCurrentLine;
+			File file = new File("SmartController/Data", "keyMappings.txt");
+			int count = 0;
+			if (!file.isFile() || getNumberOfLines(file) != 5) {
+				// create with default settings
+				for (int i = 0; i < 5; i++) {
+					if (i == 0)
+						panels[count] = createTiltTab(defaultData, tables, i);
+					else
+						panels[count] = createTiltTab(defaultData, tables, i);
+				}
+			} else {
+				br = new BufferedReader(new FileReader(file));
+				while ((sCurrentLine = br.readLine()) != null) {
+					String[] tokens = sCurrentLine.split("\\s+");
+					for (int i = 0; i < tokens.length; i++) {
+						if (validateKey(tokens[i])) {
+							if (count == 0)
+								defaultData[i][1] = tokens[i];
+							else
+								emptyData[i][1] = tokens[i];
+						}
+					}
+					if (count == 0)
+						panels[0] = createTiltTab(defaultData, tables, 0);
+					else
+						panels[count] = createTiltTab(emptyData, tables, count);
+					count++;
+				}
+			}
+
+			assignPanels(panels);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	public void assignPanels(JPanel[] panels) {
+		noTiltPane = panels[0];
+		tiltUpPane = panels[1];
+		tiltDownPane = panels[2];
+		tiltRightPane = panels[3];
+		tiltLeftPane = panels[4];
+	}
+
+	public int getNumberOfLines(File file) {
+		int count = 0;
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(file));
+			while ((br.readLine()) != null) {
+				count++;
+			}
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return count;
 	}
 
 	private JPanel createTiltTab(Object[][] data, JTable[] tables, int index) {
@@ -506,68 +622,73 @@ public class ServerUI extends JFrame {
 	private void createGeneralTab() throws UnknownHostException {
 		// TODO Auto-generated method stub
 		generalPane = new JPanel(new BorderLayout());
-		generalPane.setLayout(new GridLayout(10,1));
+		generalPane.setLayout(new GridLayout(10, 1));
 		generalPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-		
+
 		JLabel heading = new JLabel(" Server Configuration ");
 		heading.setFont(new Font(heading.getName(), Font.BOLD, 20));
 		generalPane.add(heading);
-		
-		JLabel connectionMode= new JLabel(" Choose your preferred connection type: ");
+
+		JLabel connectionMode = new JLabel(
+				" Choose your preferred connection type: ");
 		generalPane.add(connectionMode);
-		
+
 		JRadioButton wifiButton = new JRadioButton("Wifi");
-	    wifiButton.setSelected(true);
-	    
+		wifiButton.setSelected(true);
+
 		JRadioButton bluetoothButton = new JRadioButton("Bluetooth");
 		final JButton connect = new JButton("Connect");
 		connect.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				int reply= JOptionPane.showConfirmDialog(null,"Once confirmed, you will be not be able to change your choice!","Connect now?",JOptionPane.YES_NO_OPTION);
-				
-				if(reply==JOptionPane.YES_OPTION){
+				int reply = JOptionPane
+						.showConfirmDialog(
+								null,
+								"Once confirmed, you will be not be able to change your choice!",
+								"Connect now?", JOptionPane.YES_NO_OPTION);
+
+				if (reply == JOptionPane.YES_OPTION) {
 					connect.setText("Choice confirmed");
-					userChoice= getConnectionType();
+					userChoice = getConnectionType();
 					connect.setEnabled(false);
 				}
 			}
 		});
-		
+
 		ButtonGroup group = new ButtonGroup();
-        group.add(wifiButton);
-        group.add(bluetoothButton);
-        group.add(connect);
+		group.add(wifiButton);
+		group.add(bluetoothButton);
+		group.add(connect);
 
-        wifiButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				connectionType=1;
-				System.out.println(connectionType+"connectionType");
-			}
-		});
-              
-        bluetoothButton.addActionListener(new ActionListener() {
+		wifiButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				connectionType=2;
-				System.out.println(connectionType+"connectionType");
+				connectionType = 1;
+				System.out.println(connectionType + "connectionType");
 			}
 		});
-        
-        JPanel radioPanel = new JPanel();
-        radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.LINE_AXIS));
-        radioPanel.add(wifiButton);
-        radioPanel.add(bluetoothButton);
-        radioPanel.add(connect);
-        radioPanel.setVisible(true);
-        generalPane.add(radioPanel);
+
+		bluetoothButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				connectionType = 2;
+				System.out.println(connectionType + "connectionType");
+			}
+		});
+
+		JPanel radioPanel = new JPanel();
+		radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.LINE_AXIS));
+		radioPanel.add(wifiButton);
+		radioPanel.add(bluetoothButton);
+		radioPanel.add(connect);
+		radioPanel.setVisible(true);
+		generalPane.add(radioPanel);
 
 		JLabel ipConfig = new JLabel(" Host Name/ IP Address: "
 				+ InetAddress.getLocalHost());
@@ -601,11 +722,11 @@ public class ServerUI extends JFrame {
 		generalPane.add(msgToUser);
 
 	}
-	
+
 	public int getConnectionType() {
 		return connectionType;
 	}
- 
+
 	public void updateStatus(boolean value) {
 		// TODO
 		// call this function whenever a connection is made or broken

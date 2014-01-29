@@ -18,7 +18,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,7 +28,7 @@ public class PlayActivity extends Activity {
 
 	private String ipAddress,  connectType;
 	private final float NOISE = (float) 2.0;
-	Socket socket = null;
+	private static Socket socket = null;
 	private boolean connected = false;
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
@@ -39,6 +39,8 @@ public class PlayActivity extends Activity {
 	private boolean flag = false;
 	private final Context context = this;
 	private boolean isPaused= false;
+	private View commonView;
+	private static ObjectOutputStream objOutputStream;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class PlayActivity extends Activity {
 		mRenderer = new MyRenderer();
 		isStartPositionRegistered = false;
 		setContentView(R.layout.activity_play);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		/* do this in onCreate */
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -73,6 +76,7 @@ public class PlayActivity extends Activity {
 	        	flag=false;
 	        	isStartPositionRegistered=false;
 	        	registerRestPosition();
+	        	
 	        }
 	        });
 
@@ -121,17 +125,6 @@ public class PlayActivity extends Activity {
 										+ " " + startY);
 							}
 						});
-				/*.setNegativeButton(R.string.cancel,
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-								Toast.makeText(getApplicationContext(),
-										"Tilt Detection disabled",
-										Toast.LENGTH_SHORT).show();
-							}
-						});
-*/
 		builder.show();
 	}
 
@@ -150,9 +143,10 @@ public class PlayActivity extends Activity {
 								@Override
 								public void onClick(DialogInterface dialog,
 										int id) { //
-									Intent k = new Intent(PlayActivity.this,
-											MainActivity.class);
-									startActivity(k);
+									//connected= false;
+									//TODO
+									//
+									finish();
 								}
 							})
 					.setNegativeButton(R.string.cancel,
@@ -170,6 +164,13 @@ public class PlayActivity extends Activity {
 
 		}
 	};
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if(connectType.equals("bluetooth"))
+			SingletonBluetooth.getInstance().closeConnection();
+	}
 
 	@Override
 	public void onBackPressed() {
@@ -219,9 +220,9 @@ public class PlayActivity extends Activity {
 
 		public void run() {
 			try {
-				Socket socket = new Socket(ipAddress, 8888);
-				ObjectOutputStream objOutputStream = new ObjectOutputStream(
-						socket.getOutputStream());
+				socket = new Socket(ipAddress, 8888);
+			    objOutputStream = new ObjectOutputStream(
+				socket.getOutputStream());
 				connected = true;
 
 				try {
@@ -244,10 +245,12 @@ public class PlayActivity extends Activity {
 				objOutputStream.close();
 				socket.close();
 				connected = false;
+				
 			} catch (Exception e) {
 				Log.e("PlayActivity", "C: Error", e);
 			}
 		}
+
 	}
 
 	@Override
@@ -263,7 +266,9 @@ public class PlayActivity extends Activity {
 		// Ideally a game should implement onResume() and onPause()
 		// to take appropriate action when the activity looses focus
 		super.onPause();
-		mRenderer.stop();
+    	commonView.setBackgroundColor(Color.TRANSPARENT);
+    	System.out.println("Setting backround");
+    	mRenderer.stop();
 	}
 
 	class MyRenderer implements SensorEventListener {
@@ -294,7 +299,7 @@ public class PlayActivity extends Activity {
 			TextView tvY = (TextView) findViewById(R.id.y_axis);
 			TextView tvZ = (TextView) findViewById(R.id.z_axis);
 
-			View view = findViewById(R.id.playActivity);
+			commonView = findViewById(R.id.playActivity);
 			float x = event.values[0];
 			float y = event.values[1];
 			float z = event.values[2];
@@ -303,7 +308,7 @@ public class PlayActivity extends Activity {
 			 * System.out.println("X= " + values[0] + " Y= " + values[1] +
 			 * " Z= " + values[2]);
 			 */
-			if (flag) {
+			if (flag&& !isPaused) {
 				if (!isStartPositionRegistered) {
 					tvX.setText("0.0");
 					tvY.setText("0.0");
@@ -345,9 +350,9 @@ public class PlayActivity extends Activity {
 						
 						if((startX-x)<0)
 							//down tilt
-							view.setBackgroundColor(Color.RED);
+							commonView.setBackgroundColor(Color.RED);
 						else
-							view.setBackgroundColor(Color.GREEN);
+							commonView.setBackgroundColor(Color.GREEN);
 						
 						System.out.println("Delta 1=" + (startX - x) + " Delta 2="
 								+ (startY - y) );
@@ -361,9 +366,9 @@ public class PlayActivity extends Activity {
 						
 						if((startY-y)<0)
 							//down tilt
-							view.setBackgroundColor(Color.MAGENTA);
+							commonView.setBackgroundColor(Color.MAGENTA);
 						else
-							view.setBackgroundColor(Color.YELLOW);
+							commonView.setBackgroundColor(Color.YELLOW);
 						
 						System.out.println("Delta 1=" + (startX - x) + " Delta 2="
 								+ (startY - y) );
@@ -371,7 +376,7 @@ public class PlayActivity extends Activity {
 					} else {
 						// NOP
 						iv.setVisibility(View.INVISIBLE);
-						view.setBackgroundColor(Color.TRANSPARENT);
+						commonView.setBackgroundColor(Color.TRANSPARENT);
 					}
 				}
 			}

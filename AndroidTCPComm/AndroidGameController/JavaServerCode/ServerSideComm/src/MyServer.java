@@ -45,8 +45,10 @@ public class MyServer {
 		// TODO Auto-generated method stub
 		while(true) {
 			//get connectiontype from serverui here
+			
 			connectionType= serverui.getUserChoice();
-			System.out.println(connectionType);
+			// Print this variable to ensure the value is set properly
+			//System.out.println(connectionType);
 			switch(connectionType) {
 				case 1:
 						// Wifi Connection
@@ -56,8 +58,8 @@ public class MyServer {
 						serverSocket = new ServerSocket(WifiPORT);
 						System.out.println("Listening :" + WifiPORT);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+ 		     				// TODO Auto-generated catch bl ock
+					  	e.printStackTrace();
 					}
 
 					KeyTouch keyTouch = new KeyTouch();
@@ -70,11 +72,7 @@ public class MyServer {
 							serverui.updateStatus(true);
 
 							System.out.println("ip: " + socket.getInetAddress());
-							CommandType commandFromClient = CommandType.DEFAULT; // Init
-																		// CommandType
-																		// with
-																		// Default
-																		// type
+							CommandType commandFromClient = CommandType.DEFAULT; 
 
 						try {
 							commandFromClient = (CommandType) objInputStream

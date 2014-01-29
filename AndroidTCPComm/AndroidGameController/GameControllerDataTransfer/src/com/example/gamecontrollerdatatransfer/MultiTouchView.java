@@ -52,12 +52,12 @@ public class MultiTouchView extends View {
   private float mouseBoxCentreX = 0, mouseBoxCentreY = 0;
   
   private Paint mPaint;
-  private int[] colors = { Color.BLUE, Color.GREEN, Color.MAGENTA,
+  private int[] colors = { Color.BLUE, Color.YELLOW, Color.GREEN,
       Color.BLACK, Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY,
       Color.LTGRAY, Color.YELLOW };
   
-  private int[] bigColors = { Color.WHITE, Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.MAGENTA,
-	      Color.CYAN, Color.LTGRAY};
+  private int[] bigColors = { Color.LTGRAY, Color.WHITE, Color.GRAY, Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN, Color.GREEN,
+	      Color.CYAN};
 
   private Paint textPaint;
 
@@ -425,6 +425,7 @@ public void doRightScreenProcess(float x, float y, int operation) {
 		      if (point != null) {
 		    	mPaint.setColor(bigColors[i % 9]);
 		    	mPaint.setStyle(Paint.Style.STROKE);
+			      mPaint.setStrokeWidth(20);
 		        canvas.drawCircle(startPoint.getX(), startPoint.getY(), THRESHOLD,mPaint);
 		        mPaint.setColor(Color.BLACK);
 		        //canvas.drawLine(point.x, point.y, startPoint[i].getX(), startPoint[i].getY(), mPaint);

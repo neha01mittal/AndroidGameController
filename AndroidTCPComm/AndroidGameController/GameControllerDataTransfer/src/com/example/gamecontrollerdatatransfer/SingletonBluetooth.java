@@ -88,6 +88,11 @@ public class SingletonBluetooth {
     		mThread.commandToSend = commandToSend;
     	//}
     }
+    
+    public void closeConnection() {
+    	Log.d("BTManagement", "I set bRun false");
+		mThread.bRun = false;
+    }
         
     private class ConnectBTThread extends Thread {
         private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");

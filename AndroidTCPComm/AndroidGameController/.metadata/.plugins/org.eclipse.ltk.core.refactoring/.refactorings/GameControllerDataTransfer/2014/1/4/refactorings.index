@@ -1,2 +1,3 @@
 1390154091079	Rename resource 'buttoncloseicon.png'
 1390159300385	Extract method 'registerRestPosition'
+1390582996527	Extract method 'closeSocket'

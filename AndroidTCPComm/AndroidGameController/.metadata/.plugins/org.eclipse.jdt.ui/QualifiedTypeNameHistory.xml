@@ -37,11 +37,9 @@
 <fullyQualifiedTypeName name="javax.swing.JTable"/>
 <fullyQualifiedTypeName name="javax.swing.JTabbedPane"/>
 <fullyQualifiedTypeName name="javax.swing.plaf.basic.BasicInternalFrameTitlePane.RestoreAction"/>
-<fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
 <fullyQualifiedTypeName name="android.text.InputType"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.WifiConnectActivity"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.id"/>
-<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.PlayActivity"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.drawable"/>
 <fullyQualifiedTypeName name="android.graphics.Color"/>
 <fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.R.layout"/>
@@ -49,8 +47,13 @@
 <fullyQualifiedTypeName name="java.awt.RadialGradientPaint"/>
 <fullyQualifiedTypeName name="javax.swing.JButton"/>
 <fullyQualifiedTypeName name="java.awt.event.ActionListener"/>
-<fullyQualifiedTypeName name="ServerUI"/>
-<fullyQualifiedTypeName name="MyServer"/>
 <fullyQualifiedTypeName name="java.util.EventObject"/>
 <fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="MyServer"/>
+<fullyQualifiedTypeName name="ServerUI"/>
+<fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.PlayActivity.ClientSocketThread"/>
+<fullyQualifiedTypeName name="RXTable"/>
+<fullyQualifiedTypeName name="com.example.gamecontrollerdatatransfer.PlayActivity"/>
+<fullyQualifiedTypeName name="javax.swing.event.TableModelListener"/>
 </qualifiedTypeNameHistroy>
