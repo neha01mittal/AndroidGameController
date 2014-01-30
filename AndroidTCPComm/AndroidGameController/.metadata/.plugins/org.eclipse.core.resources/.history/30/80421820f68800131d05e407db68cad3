@@ -68,9 +68,9 @@ public class ServerUI extends JFrame {
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 	private String directionKeys[] = { "^ v < >", "W A S D" };
 
-	private Object[][] defaultData = { { "Tap", "Snowboarding" }, { "Swipe Up", "Snowboarding" },
-			{ "Swipe Left", "Snowboarding" }, { "Swipe Down", "Snowboarding" },
-			{ "Swipe Right", "Snowboarding" } };
+	private Object[][] defaultData = { { "Tap", "LMB" }, { "Swipe Up", "X" },
+			{ "Swipe Left", "B" }, { "Swipe Down", "C" },
+			{ "Swipe Right", "V" } };
 
 	private Object[][] emptyData = { { "Tap", "None" }, { "Swipe Up", "None" },
 			{ "Swipe Left", "None" }, { "Swipe Down", "None" },
@@ -211,6 +211,12 @@ public class ServerUI extends JFrame {
 					}
 				};
 				
+				TableColumn userChoice = keyTable.getColumnModel().getColumn(1);
+				JComboBox<String> comboBox = new JComboBox<String>();
+				comboBox.addItem("STH");
+				comboBox.addItem("FFF");
+				userChoice.setCellEditor(new DefaultCellEditor(comboBox));
+
 				JScrollPane jspane = new JScrollPane(keyTable,
 						ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 						ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -220,16 +226,6 @@ public class ServerUI extends JFrame {
 				tableHolder.add(jspane);
 				keySettingsTabbedPane.setSelectedIndex(0);
 				keySettingsTabbedPane.setSelectedIndex(1);
-				TableColumn userChoice = keyTable.getColumnModel().getColumn(1);
-				JComboBox<String> comboBox = new JComboBox<String>();
-				 comboBox.addItem("Snowboarding");
-			        comboBox.addItem("Rowing");
-			        comboBox.addItem("Knitting");
-			        comboBox.addItem("Speed reading");
-			        comboBox.addItem("Pool");
-			        comboBox.addItem("None of the above");
-				userChoice.setCellEditor(new DefaultCellEditor(comboBox));
-
 			}
 		});
 
