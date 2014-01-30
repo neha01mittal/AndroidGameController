@@ -41,6 +41,9 @@ public class PlayActivity extends Activity {
 	private boolean isPaused= false;
 	private View commonView;
 	private static ObjectOutputStream objOutputStream;
+	
+	public int tiltState = 0;
+	public float tiltX, tiltY;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -323,7 +326,8 @@ public class PlayActivity extends Activity {
 					float deltaX = Math.abs(startX - x);
 					float deltaY = Math.abs(startY - y);
 					float deltaZ = Math.abs(startZ - z);
-
+					tiltX = startX - x;
+					tiltY = startY - y;
 					if (deltaX < NOISE)
 						deltaX = (float) 0.0;
 					if (deltaY < NOISE)
@@ -348,11 +352,15 @@ public class PlayActivity extends Activity {
 						 */
 						iv.setImageResource(R.drawable.horizontal);
 						
-						if((startX-x)<0)
+						if((startX-x)<0) {
 							//down tilt
 							commonView.setBackgroundColor(Color.RED);
-						else
+							tiltState = 1; // TILT UP
+						}
+						else {
 							commonView.setBackgroundColor(Color.GREEN);
+							tiltState = 2; // TILT DOWN
+						}
 						
 						System.out.println("Delta 1=" + (startX - x) + " Delta 2="
 								+ (startY - y) );
@@ -364,11 +372,15 @@ public class PlayActivity extends Activity {
 						 */
 						iv.setImageResource(R.drawable.vertical);
 						
-						if((startY-y)<0)
+						if((startY-y)<0) {
 							//down tilt
 							commonView.setBackgroundColor(Color.MAGENTA);
-						else
+							tiltState = 3; // TILT LEFT
+						}
+						else {
 							commonView.setBackgroundColor(Color.YELLOW);
+							tiltState = 4; // TILT RIGHT
+						}
 						
 						System.out.println("Delta 1=" + (startX - x) + " Delta 2="
 								+ (startY - y) );
@@ -377,7 +389,10 @@ public class PlayActivity extends Activity {
 						// NOP
 						iv.setVisibility(View.INVISIBLE);
 						commonView.setBackgroundColor(Color.TRANSPARENT);
+						tiltState = 0; // NO TILT
 					}
+
+					commonView.invalidate();
 				}
 			}
 

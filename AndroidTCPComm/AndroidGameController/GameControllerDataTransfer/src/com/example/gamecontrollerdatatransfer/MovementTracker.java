@@ -4,7 +4,7 @@ import gc.common_resources.*;
 
 public class MovementTracker {
 	
-	public static CommandType processVector(Vector vector) throws InterruptedException {
+	public static CommandType processVector8D(Vector vector) throws InterruptedException {
 		
 		double angle = vector.angle(false);
 		double threshold = 22.5;
