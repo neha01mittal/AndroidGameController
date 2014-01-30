@@ -151,8 +151,6 @@ public class MyServer {
 			            System.out.println("Waiting for data from stream...");
 
 						while(connectionType == 2) {
-							
-							System.out.println("bluetoothbluetooth");
 							// Init CommandType  with  Default type
 							CommandType commandFromClient = CommandType.DEFAULT; 
 			
@@ -176,7 +174,6 @@ public class MyServer {
 							System.out.println("Message Received: " + commandFromClient
 									+ "  X: " + commandFromClient.getX() + "  Y: "
 									+ commandFromClient.getY());
-
 							}
 							BTOIStream.close();
 						 }catch (Exception  e) {

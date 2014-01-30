@@ -326,10 +326,16 @@ public void doRightScreenProcess(float x, float y, PointF point, int operation) 
 				vec.normalise();
 				  
 				// This function is used to determine the UP, DOWN, LEFT, RIGHT direction of displacement
-				//String command = MovementTracker.processVector(vec);
-				wrapCoordinates(point.x, point.y, operation, touchCommand);
 				
-				break;
+				try {
+				  	// This function is used to determine the UP, DOWN, LEFT, RIGHT direction of displacement
+				  	touchCommand = MovementTracker.processVector4D(vec);
+				  	wrapCoordinates(point.x, point.y, operation, touchCommand);
+				  
+			  } catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			  }
 			}
 		}
 	}
@@ -542,7 +548,7 @@ public void doMouseProcess(float x, float y, int operation) {
 		      mPaint.setColor(colors[i % 9]);
 		  }
     }
-    if(m_context instanceof PlayActivity)
+   /* if(m_context instanceof PlayActivity)
     {
 		PlayActivity activity = (PlayActivity)m_context;
 	    PointF tiltDrawPoint = new PointF((SCREENCENTREX + (activity.tiltX)/4*TILTTHRESHOLD), (SCREENCENTREY - (activity.tiltY)/4*TILTTHRESHOLD));
@@ -554,7 +560,7 @@ public void doMouseProcess(float x, float y, int operation) {
 	    mPaint.setStyle(Paint.Style.FILL);
 	  	canvas.drawCircle(tiltDrawPoint.x, tiltDrawPoint.y, SIZE/2, mPaint);
 	  	Log.d("Drawing","TiltX: " + activity.tiltX + " " + tiltDrawPoint.x + "  TiltY: " + activity.tiltY + "" + tiltDrawPoint.y );
-    }
+    }*/
     canvas.drawText("Total pointers: " + mActivePointers.size(), 10, 40 , textPaint);
   }
 

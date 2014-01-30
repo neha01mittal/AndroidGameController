@@ -124,7 +124,16 @@ public class KeyTouch {
 								// gyrometer/gravity for moving the mouse
 				 
 				break;
-
+			case TAP_NOTILT: 
+				robot.keyPress(KeyEvent.VK_X);
+				robot.delay(100);
+				robot.keyRelease(KeyEvent.VK_X);
+				break;
+			case SWIPEUP_NOTILT: 
+				robot.keyPress(KeyEvent.VK_Z);
+				robot.delay(120);
+				robot.keyRelease(KeyEvent.VK_Z);
+				break;
 			default: // Should not come here Print the type
 				System.out.println("In keyTouch. Unexpected CommandType: "
 						+ command);

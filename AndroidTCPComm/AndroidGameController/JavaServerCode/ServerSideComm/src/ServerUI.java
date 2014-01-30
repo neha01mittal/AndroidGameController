@@ -637,6 +637,7 @@ public class ServerUI extends JFrame {
 		wifiButton.setSelected(true);
 
 		JRadioButton bluetoothButton = new JRadioButton("Bluetooth");
+		JRadioButton wifiDirectButton = new JRadioButton("Wifi Direct");
 		final JButton connect = new JButton("Connect");
 		connect.addActionListener(new ActionListener() {
 
@@ -660,6 +661,7 @@ public class ServerUI extends JFrame {
 		ButtonGroup group = new ButtonGroup();
 		group.add(wifiButton);
 		group.add(bluetoothButton);
+		group.add(wifiDirectButton);
 		group.add(connect);
 
 		wifiButton.addActionListener(new ActionListener() {
@@ -686,6 +688,7 @@ public class ServerUI extends JFrame {
 		radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.LINE_AXIS));
 		radioPanel.add(wifiButton);
 		radioPanel.add(bluetoothButton);
+		radioPanel.add(wifiDirectButton);
 		radioPanel.add(connect);
 		radioPanel.setVisible(true);
 		generalPane.add(radioPanel);

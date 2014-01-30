@@ -31,5 +31,32 @@ public class MovementTracker {
 		
 		return currCommand;
 	}
+	public static CommandType processVector4D(Vector vector) throws InterruptedException {
+		
+		double angle = vector.angle(false);
+		double threshold = 22.5;
+		CommandType currCommand = CommandType.DEFAULT;
+		
+		System.out.println("ANGLE"+angle);
+		
+		if(Math.abs(angle)>(135+threshold))
+			currCommand = CommandType.SWIPEUP_NOTILT;
+		else if(angle>(-135-threshold)&&angle<(-90-threshold))
+			currCommand = CommandType.SWIPEUP_NOTILT;
+		else if(angle>(-90-threshold)&&angle<(-45-threshold))
+			currCommand = CommandType.KEYBOARD_RIGHT;
+		else if(angle>(-45-threshold)&&angle<(-threshold))
+			currCommand = CommandType.KEYBOARD_DOWN_RIGHT;
+		else if(Math.abs(angle)<threshold)
+			currCommand = CommandType.KEYBOARD_DOWN;
+		else if(angle>(threshold)&&angle<(45+threshold))
+			currCommand = CommandType.KEYBOARD_DOWN_LEFT;
+		else if(angle>(45+threshold)&&angle<(90+threshold))
+			currCommand = CommandType.KEYBOARD_LEFT;
+		else if(angle>(90+threshold)&&angle<(135+threshold))
+			currCommand = CommandType.SWIPEUP_NOTILT;
+		
+		return currCommand;
+	}
 
 }
