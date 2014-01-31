@@ -1,0 +1,223 @@
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+public class temp extends JFrame{
+	
+	private JTabbedPane innerTabbedPane;
+	private JPanel tableHolder;
+	private static JLabel status;
+	private int connectionType = 1;
+	private static final int PORT = 8888;
+	private static final int FPS_MIN = 0;
+	private static final int FPS_MAX = 30;
+	private JComboBox<String> comboBox;
+	private JComboBox<String> comboBoxMouse;
+	private JTable keyTable;
+	private static int userChoice = 0;
+	private static final int FPS_INIT = 15; // initial frames per second
+	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
+	private String directionKeys[] = { "^ v < >", "W A S D" };
+	private String keyboardControls[]={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5",
+			"6","7","8","9","0","SPACEBAR","CTRL","ALT","SHIFT","TAB","ENTER","BACKSPACE","CAPSLOCK"}; //TODO-add more?
+	private Object[][] defaultData = { { "Tap", "Z" }, { "Swipe Up", "SPACEBAR" },
+			{ "Swipe Left", "A" }, { "Swipe Down", "D" },
+			{ "Swipe Right", "X" } };
+
+	private Object[][] emptyData = { { "Tap", "None" }, { "Swipe Up", "None" },
+			{ "Swipe Left", "None" }, { "Swipe Down", "None" },
+			{ "Swipe Right", "None" } };
+
+	private Object[][] layout2defaultData = { { "Tap", "LMB" },
+			{ "Swipe Up", "X" }, { "Swipe Down", "C" }, { "Swipe Left", "V" },
+			{ "Swipe Right", "B" } };
+
+	private String[] columnNames = { "Touch Controls", "PC Controls" };
+
+	private JTabbedPane tabbedPane;
+	private JTabbedPane keySettingsTabbedPane;
+	private JPanel generalPane;
+	private JPanel keySettingsPane;
+	private JPanel testKeysPane;
+	private JPanel layout1;
+	private JPanel layout2;
+	private JPanel noTiltPane;
+	private JPanel tiltUpPane;
+	private JPanel tiltDownPane;
+	private JPanel tiltRightPane;
+	private JPanel tiltLeftPane;
+	private JTable table1 = new JTable();
+	private JTable table2 = new JTable();
+	private JTable table3 = new JTable();
+	private JTable table4 = new JTable();
+	private JTable table5 = new JTable();
+	private JTable[] tables = { table1, table2, table3, table4, table5 };
+	public void createServerUI() throws UnknownHostException {
+		temp sui = new temp();
+		status = new JLabel(" Connection Status: Disconnected");
+		sui.createBasicUI();
+		sui.setVisible(true);
+	}
+	
+	private void createBasicUI() throws UnknownHostException {
+		// TODO Auto-generated method stub
+		setTitle("Game Controller Server");
+		setSize(750, 500);
+
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new BorderLayout());
+		getContentPane().add(topPanel);
+		createGeneralTab();
+		//createSettingsTab();
+
+		// We create a panel which will hold the UI components
+		tabbedPane = new JTabbedPane();
+		tabbedPane.addTab("General", generalPane);
+		tabbedPane.addTab("Key Settings", keySettingsPane);
+		topPanel.add(tabbedPane, BorderLayout.CENTER);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	private void createGeneralTab() throws UnknownHostException {
+		// TODO Auto-generated method stub
+		generalPane = new JPanel(new BorderLayout());
+		generalPane.setLayout(new GridLayout(10, 1));
+		generalPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+		JLabel heading = new JLabel(" Server Configuration ");
+		heading.setFont(new Font(heading.getName(), Font.BOLD, 20));
+		generalPane.add(heading);
+
+		JLabel connectionMode = new JLabel(
+				" Choose your preferred connection type: ");
+		generalPane.add(connectionMode);
+
+		JRadioButton wifiButton = new JRadioButton("Wifi");
+		wifiButton.setSelected(true);
+
+		JRadioButton bluetoothButton = new JRadioButton("Bluetooth");
+		JRadioButton wifiDirectButton = new JRadioButton("Wifi Direct");
+		final JButton connect = new JButton("Connect");
+		connect.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int reply = JOptionPane
+						.showConfirmDialog(
+								null,
+								"Once confirmed, you will be not be able to change your choice!",
+								"Connect now?", JOptionPane.YES_NO_OPTION);
+
+				if (reply == JOptionPane.YES_OPTION) {
+					connect.setText("Choice confirmed");
+					userChoice = getConnectionType();
+					connect.setEnabled(false);
+				}
+			}
+		});
+
+		ButtonGroup group = new ButtonGroup();
+		group.add(wifiButton);
+		group.add(bluetoothButton);
+		group.add(wifiDirectButton);
+		group.add(connect);
+
+		wifiButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				connectionType = 1;
+				System.out.println(connectionType + "connectionType");
+			}
+		});
+
+		bluetoothButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				connectionType = 2;
+				System.out.println(connectionType + "connectionType");
+			}
+		});
+
+		JPanel radioPanel = new JPanel();
+		radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.LINE_AXIS));
+		radioPanel.add(wifiButton);
+		radioPanel.add(bluetoothButton);
+		radioPanel.add(wifiDirectButton);
+		radioPanel.add(connect);
+		radioPanel.setVisible(true);
+		generalPane.add(radioPanel);
+
+		JLabel ipConfig = new JLabel(" Host Name/ IP Address: "
+				+ InetAddress.getLocalHost());
+		generalPane.add(ipConfig);
+
+		JLabel port = new JLabel(" Port: " + PORT);
+		generalPane.add(port);
+
+		// change this dynamically
+		generalPane.add(status);
+
+		generalPane.add(new JSeparator(SwingConstants.HORIZONTAL));
+
+		JLabel mouseCursor = new JLabel(" Mouse Cursor Sensitivity ");
+		mouseCursor.setFont(new Font(mouseCursor.getName(), Font.BOLD, 20));
+		generalPane.add(mouseCursor);
+
+		JSlider framesPerSecond = new JSlider(JSlider.HORIZONTAL, FPS_MIN,
+				FPS_MAX, FPS_INIT);
+		framesPerSecond.addChangeListener(new SliderListener());
+
+		framesPerSecond.setMajorTickSpacing(10);
+		framesPerSecond.setMinorTickSpacing(1);
+		framesPerSecond.setPaintTicks(true);
+		framesPerSecond.setPaintLabels(true);
+
+		generalPane.add(framesPerSecond);
+
+		JLabel msgToUser = new JLabel(MESSAGETOUSER);
+		msgToUser.setFont(new Font("Serif", Font.ITALIC, 15));
+		generalPane.add(msgToUser);
+
+	}
+	
+	public int getConnectionType() {
+		return connectionType;
+	}
+	
+	public void updateStatus(boolean value) {
+		// TODO
+		// call this function whenever a connection is made or broken
+		if (value) {
+			status.setText(" Connection Status: Connected");
+		} else {
+			status.setText(" Connection Status: Disconnected");
+		}
+	}
+
+
+}

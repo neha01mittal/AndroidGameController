@@ -267,7 +267,7 @@ public class MultiTouchView extends View {
 	  // So the commandtypes used are KEYBOARD_UP, KEYBOARD_DOWN, KEYBOARD_LEFT, KEYBOARD_RIGHT
 	  
 	  // Only send a packet if the last packet sent was >100mseconds ago
-	  if(System.currentTimeMillis()-prevLeftTime>100){  
+	  if(System.currentTimeMillis()-prevLeftTime>50){  
 
 		  prevLeftTime = System.currentTimeMillis();
 		  
