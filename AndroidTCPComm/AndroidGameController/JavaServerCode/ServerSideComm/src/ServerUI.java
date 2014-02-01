@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -56,7 +57,7 @@ public class ServerUI extends JFrame{
 	private static final int FPS_INIT = 15; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 	private String directionKeys[] = { "^ v < >", "W A S D" };
-	private String keyboardControls[]={"-None-","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5",
+	private String defaultKeyboardControls[]={"-None-","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5",
 			"6","7","8","9","0","SPACEBAR","CTRL","ALT","SHIFT","TAB","ENTER","BACKSPACE","CAPSLOCK","LEFT-MOUSE-BUTTON","RIGHT-MOUSE-BUTTON"}; //TODO-add more?
 	private Object[][] defaultData = { { "Tap", "Z" }, { "Swipe Up", "SPACEBAR"},
 			{ "Swipe Left", "A" }, { "Swipe Down", "D" },
@@ -67,6 +68,7 @@ public class ServerUI extends JFrame{
 			{ "Swipe Right", "-None-" } };
 
 	private String[] columnNames = { "Touch Controls", "PC Controls" };
+	private ArrayList<String> keyboardControlMapping;
 
 	private JTabbedPane tabbedPane;
 	private JPanel generalPane;
@@ -162,7 +164,7 @@ public class ServerUI extends JFrame{
 				String mouseControl = comboBoxMouse.getSelectedItem()
 						.toString();
 
-					File dataFile = createFile();
+					File dataFile = createKeyMapFile();
 					PrintWriter writer;
 					try {
 						writer = new PrintWriter(dataFile, "UTF-8");
@@ -184,6 +186,7 @@ public class ServerUI extends JFrame{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					setKeyMapping();
 				}
 		});
 		keySettingsPane.add(save);
@@ -209,6 +212,10 @@ public class ServerUI extends JFrame{
 			writer.print(pcControl + " ");
 		}
 		writer.println();
+	}
+	
+	public ArrayList<String> getKeyMappings() {
+		return keyboardControlMapping;
 	}
 	
 	private void buildInnerTabs() {
@@ -327,9 +334,14 @@ public class ServerUI extends JFrame{
 			}
 		});
 		JComboBox<String> comboBox = new JComboBox<String>();
-		for(String key: keyboardControls) {
+		/*for(String key: defaultKeyboardControls) {
+			comboBox.addItem(key);
+		}*/
+		setKeyMapping();
+		for(String key: keyboardControlMapping) {
 			comboBox.addItem(key);
 		}
+			
 		col.setCellEditor(new DefaultCellEditor(comboBox));
 		pane.add(jsp);
 
@@ -353,7 +365,22 @@ public class ServerUI extends JFrame{
 		innerTabbedPane.addTab("Tilt left", tiltLeftPane);
 	}
 	
-	public File createFile() {
+	public void setKeyMapping() {
+		File f = new File("SmartController/Data/keyMappings.txt");
+		 
+		  if(f.exists()){ 
+			  //There is an existing keyMap file, read it for keyMap settings
+			  keyboardControlMapping = new ArrayList<String>(readKeyMapFile());
+		  }else{
+			  //No existing keyMap file, read from default setting
+			  keyboardControlMapping = new ArrayList<String>();
+			  for(String key: defaultKeyboardControls) {
+				  keyboardControlMapping.add(key);
+				}
+		  }
+	}
+	
+	public File createKeyMapFile() {
 		File dir = new File("SmartController/Data");
 		dir.mkdirs();
 		File file = new File(dir, "keyMappings.txt");
@@ -370,6 +397,36 @@ public class ServerUI extends JFrame{
 		return file;
 	}
 
+	public ArrayList<String> readKeyMapFile() {
+
+		ArrayList<String> tempArray = new ArrayList<String>();
+		
+		BufferedReader br = null;
+		 
+		try { 
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader("SmartController/Data/keyMappings.txt"));
+ 
+			while ((sCurrentLine = br.readLine()) != null) {
+				//System.out.println(sCurrentLine);
+				String[] temp = sCurrentLine.split(" ");
+				for(int i = 0; i < temp.length; i++)
+					tempArray.add(new String(temp[i]));
+			}
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		return tempArray;
+	}
+	
 	public void buildComponentsInKeySettings(JPanel layout, String mouseElement) {
 		JLabel dirControl = new JLabel("Direction Keys");
 		layout.add(dirControl);

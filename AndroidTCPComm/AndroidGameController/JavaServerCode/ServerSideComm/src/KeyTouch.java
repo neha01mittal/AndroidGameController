@@ -17,14 +17,10 @@ public class KeyTouch {
 			switch (command) {
 			
 			case SHOOT:
-				robot.keyPress(KeyEvent.VK_SPACE);
-				robot.delay(10);
-				robot.keyRelease(KeyEvent.VK_SPACE);
+				pressOneKey(KeyEvent.VK_SPACE, 10);
 				break;
 			case ACTION: 
-				robot.mousePress(InputEvent.BUTTON1_MASK);
-				robot.delay(10);
-				robot.mouseRelease(InputEvent.BUTTON1_MASK);
+				pressOneKey(KeyEvent.BUTTON1_MASK, 10);
 				break;
 			case VIEW: // Should get X and Y from phone for moving the mouse
 				// X: 10 - 300, Y: 210 - 500
@@ -35,59 +31,6 @@ public class KeyTouch {
 				robot.mouseMove((int) x, (int) y);
 				// System.out.println("View - X: "+x+" Y: "+y);
 				break;
-				
-			// From here on all keyboard cases
-
-			case KEYBOARD_UP:
-				robot.keyPress(KeyEvent.VK_UP);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_UP);
-				break;
-			case KEYBOARD_DOWN:
-				robot.keyPress(KeyEvent.VK_DOWN);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_DOWN);
-				break;
-			case KEYBOARD_RIGHT:
-				robot.keyPress(KeyEvent.VK_RIGHT);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_RIGHT);
-				break;
-			case KEYBOARD_LEFT:
-				robot.keyPress(KeyEvent.VK_LEFT);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_LEFT);
-				break;
-			case KEYBOARD_UP_RIGHT:
-				robot.keyPress(KeyEvent.VK_UP);
-				robot.keyPress(KeyEvent.VK_RIGHT);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_UP);
-				robot.keyRelease(KeyEvent.VK_RIGHT);
-				break;
-			case KEYBOARD_DOWN_RIGHT:
-				robot.keyPress(KeyEvent.VK_DOWN);
-				robot.keyPress(KeyEvent.VK_RIGHT);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_DOWN);
-				robot.keyRelease(KeyEvent.VK_RIGHT);
-				break;
-			case KEYBOARD_UP_LEFT:
-				robot.keyPress(KeyEvent.VK_UP);
-				robot.keyPress(KeyEvent.VK_LEFT);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_UP);
-				robot.keyRelease(KeyEvent.VK_LEFT);
-				break;
-			case KEYBOARD_DOWN_LEFT:
-				robot.keyPress(KeyEvent.VK_DOWN);
-				robot.keyPress(KeyEvent.VK_LEFT);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_DOWN);
-				robot.keyRelease(KeyEvent.VK_LEFT);
-				break;
-	
-
 			case ACCELEROMETER: // x is for up down and y is for left right
 				System.out.println("Received Accelerometer values- Y: " + command.getY() + " X: "
 						+ command.getX()+" W: " + command.getW() + " Z: "
@@ -123,22 +66,72 @@ public class KeyTouch {
 				// Should get X and Y from phone
 								// gyrometer/gravity for moving the mouse
 				 
+				break;	
+				
+			// From here on all keyboard cases
+			case KEYBOARD_UP:
+				pressOneKey(KeyEvent.VK_UP, 100);
 				break;
+			case KEYBOARD_DOWN:
+				pressOneKey(KeyEvent.VK_DOWN, 100);
+				break;
+			case KEYBOARD_RIGHT:
+				pressOneKey(KeyEvent.VK_RIGHT, 100);
+				break;
+			case KEYBOARD_LEFT:
+				pressOneKey(KeyEvent.VK_LEFT, 100);
+				break;
+			case KEYBOARD_UP_RIGHT:
+				pressTwoKeys(KeyEvent.VK_UP, KeyEvent.VK_RIGHT, 100);
+				break;
+			case KEYBOARD_DOWN_RIGHT:
+				pressTwoKeys(KeyEvent.VK_DOWN, KeyEvent.VK_RIGHT, 100);
+				break;
+			case KEYBOARD_UP_LEFT:
+				pressTwoKeys(KeyEvent.VK_UP, KeyEvent.VK_LEFT, 100);
+				break;
+			case KEYBOARD_DOWN_LEFT:
+				pressTwoKeys(KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, 100);
+				break;
+				
 			case TAP_NOTILT: 
-				robot.keyPress(KeyEvent.VK_SPACE);
-				robot.delay(100);
-				robot.keyRelease(KeyEvent.VK_SPACE);
+				pressOneKey(KeyEvent.VK_SPACE, 100);
 				break;
 			case SWIPEUP_NOTILT: 
-				robot.keyPress(KeyEvent.VK_SPACE);
-				robot.delay(120);
-				robot.keyRelease(KeyEvent.VK_SPACE);
+				pressOneKey(KeyEvent.VK_SPACE, 120);
 				break;
 			default: // Should not come here Print the type
 				System.out.println("In keyTouch. Unexpected CommandType: "
 						+ command);
 				break;
 			}
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+	}
+	private void pressOneKey(int keyCode, int duration) {
+		try {
+			Robot robot = new Robot();
+			
+			robot.keyPress(keyCode);
+			robot.delay(duration);
+			robot.keyRelease(keyCode);
+			
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	private void pressTwoKeys(int keyCode1, int keyCode2, int duration) {
+		try {
+			Robot robot = new Robot();
+			
+			robot.keyPress(keyCode1);
+			robot.keyPress(keyCode2);
+			robot.delay(duration);
+			robot.keyRelease(keyCode1);
+			robot.keyRelease(keyCode2);
+			
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}

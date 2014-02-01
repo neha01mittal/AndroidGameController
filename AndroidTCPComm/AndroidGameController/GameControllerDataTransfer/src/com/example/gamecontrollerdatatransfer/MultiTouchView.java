@@ -228,7 +228,7 @@ public class MultiTouchView extends View {
 
 	        		// Package the values to be sent to the server
 		        	if(netMovement>THRESHOLD){
-		        		// This action is a fling
+		        		// This action is a swipe
 		        		doRightScreenProcess(displacementX, displacementY, point, 1);
 		        	} else {
 		        		// This action is a tap
@@ -301,27 +301,12 @@ public void doRightScreenProcess(float x, float y, PointF point, int operation) 
 		switch (operation) {
 			case 0:
 				// This action is a tap	
-				switch(activity.tiltState) {
-				case 0: //NO TILT
-					touchCommand = CommandType.TAP_NOTILT;
-					break;
-				case 1:	//TILT UP
-					touchCommand = CommandType.TAP_TILTUP;
-					break;
-				case 2: //TILT DOWN
-					touchCommand = CommandType.TAP_TILTDOWN;
-					break;
-				case 3: //TILT LEFT
-					touchCommand = CommandType.TAP_TILTLEFT;
-					break;
-				case 4: //TILT RIGHT
-					touchCommand = CommandType.TAP_TILTRIGHT;
-					break;
-				}
+				touchCommand = MovementTracker.processTilt(activity.tiltState, CommandType.TAP_NOTILT);
+				
 				wrapCoordinates(point.x, point.y, operation, touchCommand);
 				break;
 			case 1:
-				// This action is a fling
+				// This action is a swipe
 				Vector vec = new Vector(x, y);
 				vec.normalise();
 				  
@@ -329,13 +314,15 @@ public void doRightScreenProcess(float x, float y, PointF point, int operation) 
 				
 				try {
 				  	// This function is used to determine the UP, DOWN, LEFT, RIGHT direction of displacement
-				  	touchCommand = MovementTracker.processVector4D(vec);
+					touchCommand = MovementTracker.processTilt(activity.tiltState, MovementTracker.processVector4D(vec));
 				  	wrapCoordinates(point.x, point.y, operation, touchCommand);
 				  
-			  } catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			  }
+				  } catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				
+				  }
+				break;
 			}
 		}
 	}

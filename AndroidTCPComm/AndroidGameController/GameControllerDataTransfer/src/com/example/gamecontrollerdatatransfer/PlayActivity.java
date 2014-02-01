@@ -89,12 +89,13 @@ public class PlayActivity extends Activity {
 	        public void onClick(View v) {
 
 	            if(isPaused) {
-	            	// play it 
+	            	// Detection enabled, show the pause button
 	            	playPauseButton.setImageResource(R.drawable.pausebutton);
 	            	Toast.makeText(getApplicationContext(), "Tilt detection enabled", Toast.LENGTH_SHORT).show();
 	            	isPaused= false;
 	            	onResume();
 	            } else {
+	            	// Detection disabled, show the pause button
 	            	playPauseButton.setImageResource(R.drawable.playbutton);
 	            	Toast.makeText(getApplicationContext(), "Tilt detection disabled", Toast.LENGTH_SHORT).show();
 	            	isPaused= true;
@@ -198,13 +199,13 @@ public class PlayActivity extends Activity {
 	// Create the threads and pass the commands to them
 	public void sendPacketToServer(CommandType updateCommand) {
 		if(connectType.equals("wifi")) {
-			if (!connected) {
+			//if (!connected) {
 				Thread cThread = new Thread(new ClientSocketThread(updateCommand));
 				cThread.start();
-			}
-			}else if(connectType.equals("bluetooth")) {
-				SingletonBluetooth.getInstance().sendToDevice(updateCommand);
-			}
+			//}
+		}else if(connectType.equals("bluetooth")) {
+			SingletonBluetooth.getInstance().sendToDevice(updateCommand);
+		}
 	}
 
 	// Thread class to send commands to the Server
@@ -310,88 +311,93 @@ public class PlayActivity extends Activity {
 			 * System.out.println("X= " + values[0] + " Y= " + values[1] +
 			 * " Z= " + values[2]);
 			 */
-			if (flag&& !isPaused) {
-				if (!isStartPositionRegistered) {
-					tvX.setText("0.0");
-					tvY.setText("0.0");
-					tvZ.setText("0.0");
-					startX = x;
-					startY = y;
-					startZ = z;
-					isStartPositionRegistered = true;
-				}
-
-				else {
-					float deltaX = Math.abs(startX - x);
-					float deltaY = Math.abs(startY - y);
-					float deltaZ = Math.abs(startZ - z);
-					tiltX = startX - x;
-					tiltY = startY - y;
-					if (deltaX < NOISE)
-						deltaX = (float) 0.0;
-					if (deltaY < NOISE)
-						deltaY = (float) 0.0;
-					if (deltaZ < NOISE)
-						deltaZ = (float) 0.0;
-
-					tvX.setText(Float.toString(deltaX));
-					tvY.setText(Float.toString(deltaY));
-					tvZ.setText(Float.toString(deltaZ));
-					iv.setVisibility(View.VISIBLE);
-					/*
-					 * if (deltaZ > deltaX && deltaZ > deltaY) {
-					 * Toast.makeText(getApplicationContext(),
-					 * "Z axis movement", Toast.LENGTH_SHORT).show();
-					 * iv.setImageResource(R.drawable.ic_launcher); } else {
-					 */
-					if (deltaX > deltaY) {
-						/*
-						 * Toast.makeText(getApplicationContext(),
-						 * "X axis movement", Toast.LENGTH_SHORT) .show();
-						 */
-						iv.setImageResource(R.drawable.horizontal);
-						
-						if((startX-x)<0) {
-							//down tilt
-							commonView.setBackgroundColor(Color.RED);
-							tiltState = 1; // TILT UP
-						}
-						else {
-							commonView.setBackgroundColor(Color.GREEN);
-							tiltState = 2; // TILT DOWN
-						}
-						
-						System.out.println("Delta 1=" + (startX - x) + " Delta 2="
-								+ (startY - y) );
-						
-					} else if (deltaX < deltaY) {
-						/*
-						 * Toast.makeText(getApplicationContext(),
-						 * "Y axis movement", Toast.LENGTH_SHORT) .show();
-						 */
-						iv.setImageResource(R.drawable.vertical);
-						
-						if((startY-y)<0) {
-							//down tilt
-							commonView.setBackgroundColor(Color.MAGENTA);
-							tiltState = 3; // TILT LEFT
-						}
-						else {
-							commonView.setBackgroundColor(Color.YELLOW);
-							tiltState = 4; // TILT RIGHT
-						}
-						
-						System.out.println("Delta 1=" + (startX - x) + " Delta 2="
-								+ (startY - y) );
-						
-					} else {
-						// NOP
-						iv.setVisibility(View.INVISIBLE);
-						commonView.setBackgroundColor(Color.TRANSPARENT);
-						tiltState = 0; // NO TILT
+			if (flag) {
+				if(!isPaused){
+					if (!isStartPositionRegistered) {
+						tvX.setText("0.0");
+						tvY.setText("0.0");
+						tvZ.setText("0.0");
+						startX = x;
+						startY = y;
+						startZ = z;
+						isStartPositionRegistered = true;
 					}
-
-					commonView.invalidate();
+	
+					else {
+						float deltaX = Math.abs(startX - x);
+						float deltaY = Math.abs(startY - y);
+						float deltaZ = Math.abs(startZ - z);
+						tiltX = startX - x;
+						tiltY = startY - y;
+						if (deltaX < NOISE)
+							deltaX = (float) 0.0;
+						if (deltaY < NOISE)
+							deltaY = (float) 0.0;
+						if (deltaZ < NOISE)
+							deltaZ = (float) 0.0;
+	
+						tvX.setText(Float.toString(deltaX));
+						tvY.setText(Float.toString(deltaY));
+						tvZ.setText(Float.toString(deltaZ));
+						iv.setVisibility(View.VISIBLE);
+						/*
+						 * if (deltaZ > deltaX && deltaZ > deltaY) {
+						 * Toast.makeText(getApplicationContext(),
+						 * "Z axis movement", Toast.LENGTH_SHORT).show();
+						 * iv.setImageResource(R.drawable.ic_launcher); } else {
+						 */
+						if (deltaX > deltaY) {
+							/*
+							 * Toast.makeText(getApplicationContext(),
+							 * "X axis movement", Toast.LENGTH_SHORT) .show();
+							 */
+							iv.setImageResource(R.drawable.horizontal);
+							
+							if((startX-x)<0) {
+								//down tilt
+								commonView.setBackgroundColor(Color.RED);
+								tiltState = 1; // TILT UP
+							}
+							else {
+								commonView.setBackgroundColor(Color.GREEN);
+								tiltState = 2; // TILT DOWN
+							}
+							
+							System.out.println("Delta 1=" + (startX - x) + " Delta 2="
+									+ (startY - y) );
+							
+						} else if (deltaX < deltaY) {
+							/*
+							 * Toast.makeText(getApplicationContext(),
+							 * "Y axis movement", Toast.LENGTH_SHORT) .show();
+							 */
+							iv.setImageResource(R.drawable.vertical);
+							
+							if((startY-y)<0) {
+								//down tilt
+								commonView.setBackgroundColor(Color.MAGENTA);
+								tiltState = 3; // TILT LEFT
+							}
+							else {
+								commonView.setBackgroundColor(Color.YELLOW);
+								tiltState = 4; // TILT RIGHT
+							}
+							
+							System.out.println("Delta 1=" + (startX - x) + " Delta 2="
+									+ (startY - y) );
+							
+						} else {
+							// NOP
+							iv.setVisibility(View.INVISIBLE);
+							commonView.setBackgroundColor(Color.TRANSPARENT);
+							tiltState = 0; // NO TILT
+						}
+	
+						commonView.invalidate();
+					}
+				} else {
+					// Don't detect tilt
+					tiltState = 0; // NO TILT
 				}
 			}
 
