@@ -60,15 +60,15 @@ public class ServerUI extends JFrame{
 	private String defaultKeyboardControls[]={"-None-","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5",
 			"6","7","8","9","0","SPACEBAR","CTRL","ALT","SHIFT","TAB","ENTER","BACKSPACE","CAPSLOCK","LEFT-MOUSE-BUTTON","RIGHT-MOUSE-BUTTON"}; //TODO-add more?
 	private Object[][] defaultData = { { "Tap", "Z" }, { "Swipe Up", "SPACEBAR"},
-			{ "Swipe Left", "A" }, { "Swipe Down", "D" },
+			{ "Swipe Down", "D" }, { "Swipe Left", "A" },
 			{ "Swipe Right", "X" } };
 
-	private Object[][] emptyData = { { "Tap", "-None-" }, { "Swipe Up", "-None-" },
-			{ "Swipe Left", "-None-" }, { "Swipe Down", "-None-" },
+	private Object[][] emptyData = { { "Tap", "-None-" }, { "Swipe Up", "-None-" }, 
+			{ "Swipe Down", "-None-" }, { "Swipe Left", "-None-" },
 			{ "Swipe Right", "-None-" } };
 
 	private String[] columnNames = { "Touch Controls", "PC Controls" };
-	private ArrayList<String> keyboardControlMapping;
+	private ArrayList<String> keyboardControlMapping = new ArrayList<String>();
 
 	private JTabbedPane tabbedPane;
 	private JPanel generalPane;
@@ -172,8 +172,8 @@ public class ServerUI extends JFrame{
 						storeMappings(writer, tables, 0, "No Tilt");
 						storeMappings(writer, tables, 1, "Tilt Up");
 						storeMappings(writer, tables, 2, "Tilt Down");
-						storeMappings(writer, tables, 3, "Tilt Right");
-						storeMappings(writer, tables, 4, "Tilt Left");
+						storeMappings(writer, tables, 3, "Tilt Left");
+						storeMappings(writer, tables, 4, "Tilt Right");
 						writer.close();
 						JOptionPane.showMessageDialog(null, "Direction keys: "
 								+ directionKeys + "  Mouse control: "
@@ -186,7 +186,8 @@ public class ServerUI extends JFrame{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					setKeyMapping();
+					setDefaultSettings();
+//					setKeyMapping();
 				}
 		});
 		keySettingsPane.add(save);
@@ -195,12 +196,12 @@ public class ServerUI extends JFrame{
 	private void resetOriginalValues() {
 
 		Object[][] originalDefaultData = { { "Tap", "Z" }, { "Swipe Up", "SPACEBAR"},
-				{ "Swipe Left", "A" }, { "Swipe Down", "D" },
+				{ "Swipe Down", "D" }, { "Swipe Left", "A" },
 				{ "Swipe Right", "X" } };
 
-		Object[][] originalEmptyData = { { "Tap", "-None-" },
-				{ "Swipe Up", "-None-" }, { "Swipe Left", "-None-" },
-				{ "Swipe Down", "-None-" }, { "Swipe Right", "-None-" } };
+		Object[][] originalEmptyData = { { "Tap", "-None-" }, { "Swipe Up", "-None-" }, 
+				{ "Swipe Down", "-None-" }, { "Swipe Left", "-None-" },
+				{ "Swipe Right", "-None-" } };
 		defaultData = originalDefaultData;
 		emptyData = originalEmptyData;
 	}
@@ -247,6 +248,7 @@ public class ServerUI extends JFrame{
 		// read from file here
 		BufferedReader br = null;
 		JPanel panels[] = new JPanel[5];
+		ArrayList<String> temp = new ArrayList<String>();
 		try {
 			String sCurrentLine;
 			File file = new File("SmartController/Data", "keyMappings.txt");
@@ -255,10 +257,16 @@ public class ServerUI extends JFrame{
 				// create with default settings
 				System.out.println("File corrupted/ missing.. Restoring default values..");
 				for (int i = 0; i < 5; i++) {
-					if (i == 0)
+					if (i == 0) {
 						panels[i] = createTiltTab(defaultData, tables, i);
-					else
+						for(int j = 0; j < 5; j++)
+							temp.add((String)defaultData[j][1]);
+					}
+					else {
 						panels[i] = createTiltTab(emptyData, tables, i);
+						for(int j = 0; j < 5; j++)
+							temp.add((String)emptyData[j][1]);
+					}
 				}
 			} else {
 				br = new BufferedReader(new FileReader(file));
@@ -270,13 +278,23 @@ public class ServerUI extends JFrame{
 							else
 								emptyData[i][1] = tokens[i];
 					}
-					if (count == 0)
+					if (count == 0) {
 						panels[0] = createTiltTab(defaultData, tables, 0);
-					else
+						for(int j = 0; j < 5; j++)
+							temp.add((String)defaultData[j][1]);
+					}
+					else {
 						panels[count] = createTiltTab(emptyData, tables, count);
+						for(int j = 0; j < 5; j++)
+							temp.add((String)emptyData[j][1]);
+					}
 					count++;
 				}
 			}
+			 keyboardControlMapping.clear();
+			 for(int i = 0; i < temp.size(); i++) {
+				 keyboardControlMapping.add(temp.get(i));
+			 }
 			assignPanels(panels);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -334,13 +352,10 @@ public class ServerUI extends JFrame{
 			}
 		});
 		JComboBox<String> comboBox = new JComboBox<String>();
-		/*for(String key: defaultKeyboardControls) {
-			comboBox.addItem(key);
-		}*/
-		setKeyMapping();
-		for(String key: keyboardControlMapping) {
+		for(String key: defaultKeyboardControls) {
 			comboBox.addItem(key);
 		}
+	//	setKeyMapping();
 			
 		col.setCellEditor(new DefaultCellEditor(comboBox));
 		pane.add(jsp);
@@ -353,18 +368,18 @@ public class ServerUI extends JFrame{
 		noTiltPane = panels[0];
 		tiltUpPane = panels[1];
 		tiltDownPane = panels[2];
-		tiltRightPane = panels[3];
-		tiltLeftPane = panels[4];
+		tiltLeftPane = panels[3];
+		tiltRightPane = panels[4];
 	}
 	
 	public void populateTabs(JTabbedPane innerTabbedPane) {
 		innerTabbedPane.addTab("No Tilt", noTiltPane);
 		innerTabbedPane.addTab("Tilt up", tiltUpPane);
 		innerTabbedPane.addTab("Tilt down", tiltDownPane);
-		innerTabbedPane.addTab("Tilt right", tiltRightPane);
 		innerTabbedPane.addTab("Tilt left", tiltLeftPane);
+		innerTabbedPane.addTab("Tilt right", tiltRightPane);
 	}
-	
+	/*
 	public void setKeyMapping() {
 		File f = new File("SmartController/Data/keyMappings.txt");
 		 
@@ -378,7 +393,7 @@ public class ServerUI extends JFrame{
 				  keyboardControlMapping.add(key);
 				}
 		  }
-	}
+	}*/
 	
 	public File createKeyMapFile() {
 		File dir = new File("SmartController/Data");
@@ -397,36 +412,6 @@ public class ServerUI extends JFrame{
 		return file;
 	}
 
-	public ArrayList<String> readKeyMapFile() {
-
-		ArrayList<String> tempArray = new ArrayList<String>();
-		
-		BufferedReader br = null;
-		 
-		try { 
-			String sCurrentLine;
-			br = new BufferedReader(new FileReader("SmartController/Data/keyMappings.txt"));
- 
-			while ((sCurrentLine = br.readLine()) != null) {
-				//System.out.println(sCurrentLine);
-				String[] temp = sCurrentLine.split(" ");
-				for(int i = 0; i < temp.length; i++)
-					tempArray.add(new String(temp[i]));
-			}
- 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null)
-					br.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-		return tempArray;
-	}
-	
 	public void buildComponentsInKeySettings(JPanel layout, String mouseElement) {
 		JLabel dirControl = new JLabel("Direction Keys");
 		layout.add(dirControl);

@@ -1,4 +1,4 @@
-import gc.common_resources.CommandType;
+import gc.common_resources.*;
 
 import java.awt.AWTException;
 import java.awt.Dimension;
@@ -7,20 +7,20 @@ import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class KeyTouch {
 
-	public void identifyKey(CommandType command) {
+	public void identifyKey(CommandType command, ArrayList<String> keyMap) {
 		try {
 			Robot robot = new Robot();
+			KeyList keyList = new KeyList();
 
 			switch (command) {
 			
-			case SHOOT:
-				pressOneKey(KeyEvent.VK_SPACE, 10);
+			case SHOOT: pressOneKey(KeyEvent.VK_SPACE, 10);
 				break;
-			case ACTION: 
-				pressOneKey(KeyEvent.BUTTON1_MASK, 10);
+			case ACTION: pressOneKey(KeyEvent.BUTTON1_MASK, 10);
 				break;
 			case VIEW: // Should get X and Y from phone for moving the mouse
 				// X: 10 - 300, Y: 210 - 500
@@ -64,42 +64,89 @@ public class KeyTouch {
 				robot.mouseMove(mouseX+(int)newMouseXLocation,mouseY+(int)newMouseYLocation);
 				//robot	.mouseMove(mouseX,mouseY+(int)newMouseXLocation);
 				// Should get X and Y from phone
-								// gyrometer/gravity for moving the mouse
+				// gyrometer/gravity for moving the mouse
 				 
 				break;	
 				
 			// From here on all keyboard cases
-			case KEYBOARD_UP:
-				pressOneKey(KeyEvent.VK_UP, 100);
+			case KEYBOARD_UP: pressOneKey(KeyEvent.VK_UP, 100);
 				break;
-			case KEYBOARD_DOWN:
-				pressOneKey(KeyEvent.VK_DOWN, 100);
+			case KEYBOARD_DOWN: pressOneKey(KeyEvent.VK_DOWN, 100);
 				break;
-			case KEYBOARD_RIGHT:
-				pressOneKey(KeyEvent.VK_RIGHT, 100);
+			case KEYBOARD_RIGHT: pressOneKey(KeyEvent.VK_RIGHT, 100);
 				break;
-			case KEYBOARD_LEFT:
-				pressOneKey(KeyEvent.VK_LEFT, 100);
+			case KEYBOARD_LEFT: pressOneKey(KeyEvent.VK_LEFT, 100);
 				break;
-			case KEYBOARD_UP_RIGHT:
-				pressTwoKeys(KeyEvent.VK_UP, KeyEvent.VK_RIGHT, 100);
+			case KEYBOARD_UP_RIGHT: pressTwoKeys(KeyEvent.VK_UP, KeyEvent.VK_RIGHT, 100);
 				break;
-			case KEYBOARD_DOWN_RIGHT:
-				pressTwoKeys(KeyEvent.VK_DOWN, KeyEvent.VK_RIGHT, 100);
+			case KEYBOARD_DOWN_RIGHT: pressTwoKeys(KeyEvent.VK_DOWN, KeyEvent.VK_RIGHT, 100);
 				break;
-			case KEYBOARD_UP_LEFT:
-				pressTwoKeys(KeyEvent.VK_UP, KeyEvent.VK_LEFT, 100);
+			case KEYBOARD_UP_LEFT: pressTwoKeys(KeyEvent.VK_UP, KeyEvent.VK_LEFT, 100);
 				break;
-			case KEYBOARD_DOWN_LEFT:
-				pressTwoKeys(KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, 100);
+			case KEYBOARD_DOWN_LEFT: pressTwoKeys(KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, 100);
 				break;
 				
-			case TAP_NOTILT: 
-				pressOneKey(KeyEvent.VK_SPACE, 100);
+			// Tap
+			case TAP_NOTILT:  pressOneKey(keyList.getKeyEntry(keyMap.get(0)), 10);
 				break;
-			case SWIPEUP_NOTILT: 
-				pressOneKey(KeyEvent.VK_SPACE, 120);
+			case TAP_TILTUP:  pressOneKey(keyList.getKeyEntry(keyMap.get(1)), 10);
+			break;
+			case TAP_TILTDOWN:  pressOneKey(keyList.getKeyEntry(keyMap.get(2)), 10);
+			break;
+			case TAP_TILTLEFT:  pressOneKey(keyList.getKeyEntry(keyMap.get(3)), 10);
+			break;
+			case TAP_TILTRIGHT:  pressOneKey(keyList.getKeyEntry(keyMap.get(4)), 10);
+			break;
+				
+			// Swipe Up
+			case SWIPEUP_NOTILT:  pressOneKey(keyList.getKeyEntry(keyMap.get(5)), 10);
 				break;
+			case SWIPEUP_TILTUP:  pressOneKey(keyList.getKeyEntry(keyMap.get(6)), 10);
+			break;
+			case SWIPEUP_TILTDOWN:  pressOneKey(keyList.getKeyEntry(keyMap.get(7)), 10);
+			break;
+			case SWIPEUP_TILTLEFT:  pressOneKey(keyList.getKeyEntry(keyMap.get(8)), 10);
+			break;
+			case SWIPEUP_TILTRIGHT:  pressOneKey(keyList.getKeyEntry(keyMap.get(9)), 10);
+			break;
+			
+			// Swipe Down
+			case SWIPEDOWN_NOTILT:  pressOneKey(keyList.getKeyEntry(keyMap.get(10)), 10);
+				break;
+			case SWIPEDOWN_TILTUP:  pressOneKey(keyList.getKeyEntry(keyMap.get(11)), 10);
+			break;
+			case SWIPEDOWN_TILTDOWN:  pressOneKey(keyList.getKeyEntry(keyMap.get(12)), 10);
+			break;
+			case SWIPEDOWN_TILTLEFT:  pressOneKey(keyList.getKeyEntry(keyMap.get(13)), 10);
+			break;
+			case SWIPEDOWN_TILTRIGHT:  pressOneKey(keyList.getKeyEntry(keyMap.get(14)), 10);
+			break;
+			
+			// Swipe Left
+			case SWIPELEFT_NOTILT:  pressOneKey(keyList.getKeyEntry(keyMap.get(15)), 10);
+				break;
+			case SWIPELEFT_TILTUP:  pressOneKey(keyList.getKeyEntry(keyMap.get(16)), 10);
+			break;
+			case SWIPELEFT_TILTDOWN:  pressOneKey(keyList.getKeyEntry(keyMap.get(17)), 10);
+			break;
+			case SWIPELEFT_TILTLEFT:  pressOneKey(keyList.getKeyEntry(keyMap.get(18)), 10);
+			break;
+			case SWIPELEFT_TILTRIGHT:  pressOneKey(keyList.getKeyEntry(keyMap.get(19)), 10);
+			break;
+			
+			// Swipe Right
+			case SWIPERIGHT_NOTILT:  pressOneKey(keyList.getKeyEntry(keyMap.get(20)), 10);
+				break;
+			case SWIPERIGHT_TILTUP:  pressOneKey(keyList.getKeyEntry(keyMap.get(21)), 10);
+			break;
+			case SWIPERIGHT_TILTDOWN:  pressOneKey(keyList.getKeyEntry(keyMap.get(22)), 10);
+			break;
+			case SWIPERIGHT_TILTLEFT:  pressOneKey(keyList.getKeyEntry(keyMap.get(23)), 10);
+			break;
+			case SWIPERIGHT_TILTRIGHT:  pressOneKey(keyList.getKeyEntry(keyMap.get(24)), 10);
+			break;
+				
+				
 			default: // Should not come here Print the type
 				System.out.println("In keyTouch. Unexpected CommandType: "
 						+ command);
