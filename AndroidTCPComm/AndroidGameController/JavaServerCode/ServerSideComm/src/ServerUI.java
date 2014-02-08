@@ -13,8 +13,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -33,7 +39,6 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
@@ -43,29 +48,33 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 
-public class ServerUI extends JFrame{
-	
+public class ServerUI extends JFrame {
+
 	private JTabbedPane innerTabbedPane;
 	private static JLabel status;
 	private int connectionType = 1;
 	private static final int PORT = 8888;
 	private static final int FPS_MIN = 0;
 	private static final int FPS_MAX = 30;
-	private JComboBox<String> comboBox;
-	private JComboBox<String> comboBoxMouse;
+	private JComboBox comboBox;
+	private JComboBox comboBoxMouse;
 	private static int userChoice = 0;
 	private static final int FPS_INIT = 15; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 	private String directionKeys[] = { "^ v < >", "W A S D" };
-	private String defaultKeyboardControls[]={"-None-","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5",
-			"6","7","8","9","0","SPACEBAR","CTRL","ALT","SHIFT","TAB","ENTER","BACKSPACE","CAPSLOCK","LEFT-MOUSE-BUTTON","RIGHT-MOUSE-BUTTON"}; //TODO-add more?
-	private Object[][] defaultData = { { "Tap", "Z" }, { "Swipe Up", "SPACEBAR"},
-			{ "Swipe Down", "D" }, { "Swipe Left", "A" },
-			{ "Swipe Right", "X" } };
+	private String defaultKeyboardControls[] = { "-None-", "A", "B", "C", "D",
+			"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
+			"R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4",
+			"5", "6", "7", "8", "9", "0", "SPACEBAR", "CTRL", "ALT", "SHIFT",
+			"TAB", "ENTER", "BACKSPACE", "CAPSLOCK", "LEFT-MOUSE-BUTTON",
+			"RIGHT-MOUSE-BUTTON" }; // TODO-add more?
+	private Object[][] defaultData = { { "Tap", "Z" },
+			{ "Swipe Up", "SPACEBAR" }, { "Swipe Down", "D" },
+			{ "Swipe Left", "A" }, { "Swipe Right", "X" } };
 
-	private Object[][] emptyData = { { "Tap", "-None-" }, { "Swipe Up", "-None-" }, 
-			{ "Swipe Down", "-None-" }, { "Swipe Left", "-None-" },
-			{ "Swipe Right", "-None-" } };
+	private Object[][] emptyData = { { "Tap", "-None-" },
+			{ "Swipe Up", "-None-" }, { "Swipe Down", "-None-" },
+			{ "Swipe Left", "-None-" }, { "Swipe Right", "-None-" } };
 
 	private String[] columnNames = { "Touch Controls", "PC Controls" };
 	private ArrayList<String> keyboardControlMapping = new ArrayList<String>();
@@ -91,7 +100,7 @@ public class ServerUI extends JFrame{
 		sui.createBasicUI();
 		sui.setVisible(true);
 	}
-	
+
 	private void createBasicUI() throws UnknownHostException {
 		// TODO Auto-generated method stub
 		setTitle("Game Controller Server");
@@ -110,12 +119,11 @@ public class ServerUI extends JFrame{
 		topPanel.add(tabbedPane, BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
 
 	public int getUserChoice() {
 		return userChoice;
 	}
-	
+
 	private void createSettingsTab() {
 		keySettingsPane = new JPanel();
 		keySettingsPane = new JPanel(new BorderLayout());
@@ -124,11 +132,11 @@ public class ServerUI extends JFrame{
 
 		buildComponentsInKeySettings(keySettingsPane, "Hold and Drag");
 
-		
-		JLabel msgToUser = new JLabel("Please map your button configuration here.");
+		JLabel msgToUser = new JLabel(
+				"Please map your button configuration here.");
 		msgToUser.setFont(new Font("Serif", Font.ITALIC, 15));
 		keySettingsPane.add(msgToUser);
-		
+
 		buildInnerTabs();
 
 		JButton restoreToDefault = new JButton("Restore to default settings");
@@ -139,7 +147,7 @@ public class ServerUI extends JFrame{
 				// TODO Auto-generated method stub
 				innerTabbedPane.removeAll();
 				resetOriginalValues();
-				JPanel[] panels= new JPanel[5];
+				JPanel[] panels = new JPanel[5];
 				for (int i = 0; i < 5; i++) {
 					if (i == 0)
 						panels[i] = createTiltTab(defaultData, tables, i);
@@ -164,48 +172,48 @@ public class ServerUI extends JFrame{
 				String mouseControl = comboBoxMouse.getSelectedItem()
 						.toString();
 
-					File dataFile = createKeyMapFile();
-					PrintWriter writer;
-					try {
-						writer = new PrintWriter(dataFile, "UTF-8");
+				File dataFile = createKeyMapFile();
+				PrintWriter writer;
+				try {
+					writer = new PrintWriter(dataFile, "UTF-8");
 
-						storeMappings(writer, tables, 0, "No Tilt");
-						storeMappings(writer, tables, 1, "Tilt Up");
-						storeMappings(writer, tables, 2, "Tilt Down");
-						storeMappings(writer, tables, 3, "Tilt Left");
-						storeMappings(writer, tables, 4, "Tilt Right");
-						writer.close();
-						JOptionPane.showMessageDialog(null, "Direction keys: "
-								+ directionKeys + "  Mouse control: "
-								+ mouseControl
-								+ "\nAll changes saved successfully.");
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					setDefaultSettings();
-//					setKeyMapping();
+					storeMappings(writer, tables, 0, "No Tilt");
+					storeMappings(writer, tables, 1, "Tilt Up");
+					storeMappings(writer, tables, 2, "Tilt Down");
+					storeMappings(writer, tables, 3, "Tilt Left");
+					storeMappings(writer, tables, 4, "Tilt Right");
+					writer.close();
+					JOptionPane.showMessageDialog(null, "Direction keys: "
+							+ directionKeys + "  Mouse control: "
+							+ mouseControl
+							+ "\nAll changes saved successfully.");
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+				setDefaultSettings();
+				// setKeyMapping();
+			}
 		});
 		keySettingsPane.add(save);
 	}
 
 	private void resetOriginalValues() {
 
-		Object[][] originalDefaultData = { { "Tap", "Z" }, { "Swipe Up", "SPACEBAR"},
-				{ "Swipe Down", "D" }, { "Swipe Left", "A" },
-				{ "Swipe Right", "X" } };
+		Object[][] originalDefaultData = { { "Tap", "Z" },
+				{ "Swipe Up", "SPACEBAR" }, { "Swipe Down", "D" },
+				{ "Swipe Left", "A" }, { "Swipe Right", "X" } };
 
-		Object[][] originalEmptyData = { { "Tap", "-None-" }, { "Swipe Up", "-None-" }, 
-				{ "Swipe Down", "-None-" }, { "Swipe Left", "-None-" },
-				{ "Swipe Right", "-None-" } };
+		Object[][] originalEmptyData = { { "Tap", "-None-" },
+				{ "Swipe Up", "-None-" }, { "Swipe Down", "-None-" },
+				{ "Swipe Left", "-None-" }, { "Swipe Right", "-None-" } };
 		defaultData = originalDefaultData;
 		emptyData = originalEmptyData;
 	}
-	
+
 	public void storeMappings(PrintWriter writer, JTable[] tables, int index,
 			String tabName) {
 		for (int i = 0; i < tables[index].getRowCount(); i++) {
@@ -214,11 +222,11 @@ public class ServerUI extends JFrame{
 		}
 		writer.println();
 	}
-	
+
 	public ArrayList<String> getKeyMappings() {
 		return keyboardControlMapping;
 	}
-	
+
 	private void buildInnerTabs() {
 		// TODO Auto-generated method stub
 		innerTabbedPane = new JTabbedPane();
@@ -228,7 +236,7 @@ public class ServerUI extends JFrame{
 		populateTabs(innerTabbedPane);
 		keySettingsPane.add(innerTabbedPane, BorderLayout.CENTER);
 	}
-	
+
 	public int getNumberOfLines(File file) {
 		int count = 0;
 		BufferedReader br = null;
@@ -255,17 +263,17 @@ public class ServerUI extends JFrame{
 			int count = 0;
 			if (!file.isFile() || getNumberOfLines(file) != 5) {
 				// create with default settings
-				System.out.println("File corrupted/ missing.. Restoring default values..");
+				System.out
+						.println("File corrupted/ missing.. Restoring default values..");
 				for (int i = 0; i < 5; i++) {
 					if (i == 0) {
 						panels[i] = createTiltTab(defaultData, tables, i);
-						for(int j = 0; j < 5; j++)
-							temp.add((String)defaultData[j][1]);
-					}
-					else {
+						for (int j = 0; j < 5; j++)
+							temp.add((String) defaultData[j][1]);
+					} else {
 						panels[i] = createTiltTab(emptyData, tables, i);
-						for(int j = 0; j < 5; j++)
-							temp.add((String)emptyData[j][1]);
+						for (int j = 0; j < 5; j++)
+							temp.add((String) emptyData[j][1]);
 					}
 				}
 			} else {
@@ -273,28 +281,27 @@ public class ServerUI extends JFrame{
 				while ((sCurrentLine = br.readLine()) != null) {
 					String[] tokens = sCurrentLine.split("\\s+");
 					for (int i = 0; i < tokens.length; i++) {
-							if (count == 0)
-								defaultData[i][1] = tokens[i];
-							else
-								emptyData[i][1] = tokens[i];
+						if (count == 0)
+							defaultData[i][1] = tokens[i];
+						else
+							emptyData[i][1] = tokens[i];
 					}
 					if (count == 0) {
 						panels[0] = createTiltTab(defaultData, tables, 0);
-						for(int j = 0; j < 5; j++)
-							temp.add((String)defaultData[j][1]);
-					}
-					else {
+						for (int j = 0; j < 5; j++)
+							temp.add((String) defaultData[j][1]);
+					} else {
 						panels[count] = createTiltTab(emptyData, tables, count);
-						for(int j = 0; j < 5; j++)
-							temp.add((String)emptyData[j][1]);
+						for (int j = 0; j < 5; j++)
+							temp.add((String) emptyData[j][1]);
 					}
 					count++;
 				}
 			}
-			 keyboardControlMapping.clear();
-			 for(int i = 0; i < temp.size(); i++) {
-				 keyboardControlMapping.add(temp.get(i));
-			 }
+			keyboardControlMapping.clear();
+			for (int i = 0; i < temp.size(); i++) {
+				keyboardControlMapping.add(temp.get(i));
+			}
 			assignPanels(panels);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -307,8 +314,9 @@ public class ServerUI extends JFrame{
 			}
 		}
 	}
-	
-	private JPanel createTiltTab(Object[][] data, final JTable[] tables, final int index) {
+
+	private JPanel createTiltTab(Object[][] data, final JTable[] tables,
+			final int index) {
 		// TODO Auto-generated method stub
 		JPanel pane = new JPanel(new BorderLayout());
 
@@ -329,41 +337,43 @@ public class ServerUI extends JFrame{
 				}
 			}
 		};
-		
+
 		JScrollPane jsp = new JScrollPane(tables[index],
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		tables[index].setRowHeight(20);
 		tables[index].setPreferredScrollableViewportSize(tables[index]
 				.getPreferredSize());
-		TableColumn col=tables[index].getColumnModel().getColumn(1);
-		
-		tables[index].setCellSelectionEnabled(true);  
-		tables[index].getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent lse) {
-				if (!lse.getValueIsAdjusting()) {
-					// do stuff
-					int col=tables[index].getSelectedColumn();
-					int row= tables[index].getSelectedRow();
-					if(!tables[index].isCellEditable(row, col))
-						tables[index].changeSelection(row, col+1, false, false);
-				}
-			}
-		});
+		TableColumn col = tables[index].getColumnModel().getColumn(1);
+
+		tables[index].setCellSelectionEnabled(true);
+		tables[index].getSelectionModel().addListSelectionListener(
+				new ListSelectionListener() {
+					@Override
+					public void valueChanged(ListSelectionEvent lse) {
+						if (!lse.getValueIsAdjusting()) {
+							// do stuff
+							int col = tables[index].getSelectedColumn();
+							int row = tables[index].getSelectedRow();
+							if (!tables[index].isCellEditable(row, col))
+								tables[index].changeSelection(row, col + 1,
+										false, false);
+						}
+					}
+				});
 		JComboBox<String> comboBox = new JComboBox<String>();
-		for(String key: defaultKeyboardControls) {
+		for (String key : defaultKeyboardControls) {
 			comboBox.addItem(key);
 		}
-	//	setKeyMapping();
-			
+		// setKeyMapping();
+
 		col.setCellEditor(new DefaultCellEditor(comboBox));
 		pane.add(jsp);
 
 		resetOriginalValues();
 		return pane;
 	}
-	
+
 	public void assignPanels(JPanel[] panels) {
 		noTiltPane = panels[0];
 		tiltUpPane = panels[1];
@@ -371,7 +381,7 @@ public class ServerUI extends JFrame{
 		tiltLeftPane = panels[3];
 		tiltRightPane = panels[4];
 	}
-	
+
 	public void populateTabs(JTabbedPane innerTabbedPane) {
 		innerTabbedPane.addTab("No Tilt", noTiltPane);
 		innerTabbedPane.addTab("Tilt up", tiltUpPane);
@@ -379,22 +389,19 @@ public class ServerUI extends JFrame{
 		innerTabbedPane.addTab("Tilt left", tiltLeftPane);
 		innerTabbedPane.addTab("Tilt right", tiltRightPane);
 	}
+
 	/*
-	public void setKeyMapping() {
-		File f = new File("SmartController/Data/keyMappings.txt");
-		 
-		  if(f.exists()){ 
-			  //There is an existing keyMap file, read it for keyMap settings
-			  keyboardControlMapping = new ArrayList<String>(readKeyMapFile());
-		  }else{
-			  //No existing keyMap file, read from default setting
-			  keyboardControlMapping = new ArrayList<String>();
-			  for(String key: defaultKeyboardControls) {
-				  keyboardControlMapping.add(key);
-				}
-		  }
-	}*/
-	
+	 * public void setKeyMapping() { File f = new
+	 * File("SmartController/Data/keyMappings.txt");
+	 * 
+	 * if(f.exists()){ //There is an existing keyMap file, read it for keyMap
+	 * settings keyboardControlMapping = new
+	 * ArrayList<String>(readKeyMapFile()); }else{ //No existing keyMap file,
+	 * read from default setting keyboardControlMapping = new
+	 * ArrayList<String>(); for(String key: defaultKeyboardControls) {
+	 * keyboardControlMapping.add(key); } } }
+	 */
+
 	public File createKeyMapFile() {
 		File dir = new File("SmartController/Data");
 		dir.mkdirs();
@@ -423,16 +430,15 @@ public class ServerUI extends JFrame{
 		comboBox.setSize(1, 1);
 		layout.add(comboBox);
 
-		
-        // add the image label
-		//TODO get better GIF
+		// add the image label
+		// TODO get better GIF
 		JLabel imageLabel = new JLabel();
-        ImageIcon ii = new ImageIcon("src/Images/phoneswipe.gif");
-        imageLabel.setIcon(ii);
-        layout.add(imageLabel, java.awt.BorderLayout.CENTER);
-        // show it
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+		ImageIcon ii = new ImageIcon("src/Images/phoneswipe.gif");
+		imageLabel.setIcon(ii);
+		layout.add(imageLabel, java.awt.BorderLayout.CENTER);
+		// show it
+		this.setLocationRelativeTo(null);
+		this.setVisible(true);
 
 		JLabel mouseMove = new JLabel("Mouse Control");
 		layout.add(mouseMove);
@@ -445,7 +451,7 @@ public class ServerUI extends JFrame{
 		layout.add(comboBoxMouse);
 	}
 
-	private void createGeneralTab() throws UnknownHostException {
+	private void createGeneralTab() {
 		// TODO Auto-generated method stub
 		generalPane = new JPanel(new BorderLayout());
 		generalPane.setLayout(new GridLayout(10, 1));
@@ -517,8 +523,41 @@ public class ServerUI extends JFrame{
 		radioPanel.setVisible(true);
 		generalPane.add(radioPanel);
 
-		JLabel ipConfig = new JLabel(" Host Name/ IP Address: "
-				+ InetAddress.getLocalHost());
+		HashSet<InetAddress> listOfBroadcasts = new HashSet<InetAddress>();
+		Enumeration list;
+		try {
+			list = NetworkInterface.getNetworkInterfaces();
+
+			while (list.hasMoreElements()) {
+				NetworkInterface iface = (NetworkInterface) list.nextElement();
+
+				if (iface == null)
+					continue;
+
+				if (!iface.isLoopback() && iface.isUp()) {
+					Iterator it = iface.getInterfaceAddresses().iterator();
+					while (it.hasNext()) {
+						InterfaceAddress address = (InterfaceAddress) it.next();
+						if (address == null)
+							continue;
+						InetAddress broadcast = address.getBroadcast();
+						if (broadcast != null) {
+							listOfBroadcasts.add(broadcast);
+						}
+					}
+				}
+			}
+		} catch (SocketException ex) {
+			System.err.println("Error while getting network interfaces");
+			ex.printStackTrace();
+		}
+
+		String ip = "";
+		for (InetAddress broadcast : listOfBroadcasts) {
+			ip += " " + broadcast;
+		}
+
+		JLabel ipConfig = new JLabel(" IP Address: " + ip);
 		generalPane.add(ipConfig);
 
 		JLabel port = new JLabel(" Port: " + PORT);
@@ -549,11 +588,11 @@ public class ServerUI extends JFrame{
 		generalPane.add(msgToUser);
 
 	}
-	
+
 	public int getConnectionType() {
 		return connectionType;
 	}
-	
+
 	public void updateStatus(boolean value) {
 		// TODO
 		// call this function whenever a connection is made or broken
@@ -563,6 +602,7 @@ public class ServerUI extends JFrame{
 			status.setText(" Connection Status: Disconnected");
 		}
 	}
+
 	class SliderListener implements ChangeListener {
 
 		public void stateChanged(ChangeEvent e) {

@@ -1,11 +1,11 @@
-import gc.common_resources.*;
+import gc.common_resources.CommandType;
+import gc.common_resources.KeyList;
 
 import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 

@@ -39,29 +39,30 @@ public final class R {
     }
     public static final class id {
         public static final int TextHeaderDiscovered=0x7f080000;
-        public static final int action_settings=0x7f08001b;
-        public static final int addToFavourites=0x7f080015;
+        public static final int action_settings=0x7f08001c;
+        public static final int addToFavourites=0x7f080016;
         public static final int bluetooth=0x7f080008;
-        public static final int buttoncloseicon=0x7f080011;
-        public static final int buttonplaypause=0x7f080012;
-        public static final int buttonreset=0x7f080013;
-        public static final int clearList=0x7f080019;
-        public static final int delete=0x7f080018;
+        public static final int buttoncloseicon=0x7f080013;
+        public static final int buttonplaypause=0x7f080011;
+        public static final int buttonreset=0x7f080012;
+        public static final int clearList=0x7f08001a;
+        public static final int delete=0x7f080019;
         public static final int image=0x7f080010;
-        public static final int linear_layout=0x7f080017;
+        public static final int linear_layout=0x7f080018;
         public static final int listBTDiscovered=0x7f080001;
         public static final int listBTPaired=0x7f080003;
         public static final int multi_touch_view=0x7f08000c;
-        public static final int play=0x7f080016;
+        public static final int out=0x7f080014;
+        public static final int play=0x7f080017;
         public static final int playActivity=0x7f08000a;
         public static final int send=0x7f080005;
         public static final int textHeaderPaired=0x7f080002;
         public static final int textView=0x7f08000b;
-        public static final int textViewItem=0x7f08001a;
+        public static final int textViewItem=0x7f08001b;
         public static final int textin=0x7f080006;
         public static final int textout=0x7f080004;
         public static final int usb=0x7f080009;
-        public static final int user_input=0x7f080014;
+        public static final int user_input=0x7f080015;
         public static final int wifi=0x7f080007;
         public static final int x_axis=0x7f08000d;
         public static final int y_axis=0x7f08000e;
@@ -72,12 +73,13 @@ public final class R {
         public static final int activity_client=0x7f030001;
         public static final int activity_main=0x7f030002;
         public static final int activity_play=0x7f030003;
-        public static final int activity_usb=0x7f030004;
-        public static final int activity_wificonnect=0x7f030005;
-        public static final int button_background=0x7f030006;
-        public static final int button_background_red=0x7f030007;
-        public static final int list_view_row_item=0x7f030008;
-        public static final int rotate_move_view=0x7f030009;
+        public static final int activity_test=0x7f030004;
+        public static final int activity_usb=0x7f030005;
+        public static final int activity_wificonnect=0x7f030006;
+        public static final int button_background=0x7f030007;
+        public static final int button_background_red=0x7f030008;
+        public static final int list_view_row_item=0x7f030009;
+        public static final int rotate_move_view=0x7f03000a;
     }
     public static final class menu {
         public static final int main=0x7f070000;

@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 
 public class KeyList {
 	
-	KeyList() {
+	public KeyList() {
 		
 	}
 	

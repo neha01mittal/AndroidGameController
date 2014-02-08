@@ -177,7 +177,7 @@ public class PlayActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		// diable back button
+		// disable back button
 		Toast.makeText(getApplicationContext(),
 				"Back button disabled. \nPlease use the close button above.",
 				Toast.LENGTH_SHORT).show();
@@ -339,6 +339,11 @@ public class PlayActivity extends Activity {
 						tvX.setText(Float.toString(deltaX));
 						tvY.setText(Float.toString(deltaY));
 						tvZ.setText(Float.toString(deltaZ));
+						// change to visible for testing/ debugging
+						tvX.setVisibility(View.INVISIBLE);
+						tvY.setVisibility(View.INVISIBLE);
+						tvZ.setVisibility(View.INVISIBLE);
+						
 						iv.setVisibility(View.VISIBLE);
 						/*
 						 * if (deltaZ > deltaX && deltaZ > deltaY) {
