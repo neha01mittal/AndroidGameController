@@ -522,40 +522,30 @@ public class ServerUI extends JFrame {
 		radioPanel.add(connect);
 		radioPanel.setVisible(true);
 		generalPane.add(radioPanel);
-
-		HashSet<InetAddress> listOfBroadcasts = new HashSet<InetAddress>();
-		Enumeration list;
-		try {
-			list = NetworkInterface.getNetworkInterfaces();
-
-			while (list.hasMoreElements()) {
-				NetworkInterface iface = (NetworkInterface) list.nextElement();
-
-				if (iface == null)
-					continue;
-
-				if (!iface.isLoopback() && iface.isUp()) {
-					Iterator it = iface.getInterfaceAddresses().iterator();
-					while (it.hasNext()) {
-						InterfaceAddress address = (InterfaceAddress) it.next();
-						if (address == null)
-							continue;
-						InetAddress broadcast = address.getBroadcast();
-						if (broadcast != null) {
-							listOfBroadcasts.add(broadcast);
-						}
-					}
-				}
-			}
-		} catch (SocketException ex) {
-			System.err.println("Error while getting network interfaces");
-			ex.printStackTrace();
-		}
-
+		//-------------------
+		Enumeration<NetworkInterface> e;
 		String ip = "";
-		for (InetAddress broadcast : listOfBroadcasts) {
-			ip += " " + broadcast;
+		try {
+			e = NetworkInterface.getNetworkInterfaces();
+			 while(e.hasMoreElements())
+		        {
+		            NetworkInterface n=(NetworkInterface) e.nextElement();
+		            Enumeration<InetAddress> ee = n.getInetAddresses();
+		            while(ee.hasMoreElements())
+		            {
+		                InetAddress i= (InetAddress) ee.nextElement();
+		                if(i.isSiteLocalAddress()) {
+		                	ip+=i.getHostAddress()+" or ";
+		                	System.out.println(i.getHostAddress());
+		                }
+		            }
+		        }
+		} catch (SocketException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
+       
+		///----------------------
 
 		JLabel ipConfig = new JLabel(" IP Address: " + ip);
 		generalPane.add(ipConfig);

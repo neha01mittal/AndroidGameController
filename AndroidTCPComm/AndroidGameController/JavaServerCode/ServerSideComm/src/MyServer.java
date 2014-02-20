@@ -48,7 +48,7 @@ public class MyServer {
 			
 			connectionType= serverui.getUserChoice();
 			// Print this variable to ensure the value is set properly
-			System.out.println(connectionType);
+			//System.out.println(connectionType);
 			switch(connectionType) {
 				case 1:
 						// Wifi Connection
