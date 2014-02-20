@@ -1,5 +1,4 @@
-import gc.common_resources.CommandType;
-import gc.common_resources.KeyList;
+import gc.common_resources.*;
 
 import java.awt.AWTException;
 import java.awt.Dimension;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 
 public class KeyTouch {
 
-	public void identifyKey(CommandType command, ArrayList<String> keyMap) {
+	public void identifyKey(CommandType command, ArrayList<String> keyMap, float mouseRatio) {
 		try {
 			Robot robot = new Robot();
 			KeyList keyList = new KeyList();
@@ -24,10 +23,11 @@ public class KeyTouch {
 				break;
 			case VIEW: // Should get X and Y from phone for moving the mouse
 				// X: 10 - 300, Y: 210 - 500
+				Point mousePos = new Point(MouseInfo.getPointerInfo().getLocation());
 				System.out.println("Received - X: " + command.getY() + " Y: "
 						+ command.getX());
-				float x = 1366 - ((command.getY() - 110) / 290 * 1366);
-				float y = (command.getX() - 210) / 290 * 768;
+				float x = mousePos.x + (command.getY() * -1)*mouseRatio;
+				float y = mousePos.y + command.getX()*mouseRatio;
 				robot.mouseMove((int) x, (int) y);
 				// System.out.println("View - X: "+x+" Y: "+y);
 				break;
