@@ -89,7 +89,7 @@ public class MyServer {
 						commandFromClient.setX(X);
 						commandFromClient.setY(Y);
 
-						keyTouch.identifyKey(commandFromClient, serverui.getKeyMappings());
+					keyTouch.identifyKey(commandFromClient, new ArrayList<String>(serverui.getKeyMappings()), serverui.getMouseRatio());
 
 						System.out.println("Message Received: " + commandFromClient
 								+ "  X: " + commandFromClient.getX() + "  Y: "
@@ -169,7 +169,7 @@ public class MyServer {
 							commandFromClient.setX(X);
 							commandFromClient.setY(Y);
 			
-							keyTouch.identifyKey(commandFromClient, serverui.getKeyMappings());
+								keyTouch.identifyKey(commandFromClient, serverui.getKeyMappings(), serverui.getMouseRatio());
 			
 							System.out.println("Message Received: " + commandFromClient
 									+ "  X: " + commandFromClient.getX() + "  Y: "

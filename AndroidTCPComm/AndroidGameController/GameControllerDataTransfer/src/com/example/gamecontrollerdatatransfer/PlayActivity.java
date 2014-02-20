@@ -25,21 +25,16 @@ import android.widget.Toast;
 
 public class PlayActivity extends Activity {
 
-	private String ipAddress,  connectType;
-	private final float NOISE = (float) 2.0;
-	private static Socket socket = null;
-	private boolean connected = false;
+	private final Context context = this;
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
-	private boolean isStartPositionRegistered;
-	private float startX = 0;
-	private float startY = 0;
-	private float startZ = 0;
-	private boolean flag = false;
-	private final Context context = this;
-	private boolean isPaused= false;
 	private View commonView;
-	private static ObjectOutputStream objOutputStream;
+	private String ipAddress,  connectType;
+	
+	private final float NOISE = (float) 2.0;
+	private float startX = 0, startY = 0, startZ = 0;
+	private boolean connected = false, flag = false, isPaused= false;
+	private boolean isStartPositionRegistered;
 	
 	public int tiltState = 0;
 	public float tiltX, tiltY;
@@ -60,9 +55,6 @@ public class PlayActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			connectType = extras.getString("connectType");
-			
-			if(connectType.equals("wifi"))
-				ipAddress = extras.getString("ipAddress");
 		}
 
 		registerRestPosition();
@@ -179,7 +171,7 @@ public class PlayActivity extends Activity {
 	public void onBackPressed() {
 		// disable back button
 		Toast.makeText(getApplicationContext(),
-				"Back button disabled. \nPlease use the close button above.",
+				"Back button disabled. \nPlease use the back button above.",
 				Toast.LENGTH_SHORT).show();
 	}
 
@@ -199,63 +191,12 @@ public class PlayActivity extends Activity {
 	// Create the threads and pass the commands to them
 	public void sendPacketToServer(CommandType updateCommand) {
 		if(connectType.equals("wifi")) {
-			//if (!connected) {
-				Thread cThread = new Thread(new ClientSocketThread(updateCommand));
-				cThread.start();
-			//}
+			SingletonWifi.getInstance().sendToDevice(updateCommand);
 		}else if(connectType.equals("bluetooth")) {
 			SingletonBluetooth.getInstance().sendToDevice(updateCommand);
 		}
 	}
-
-	// Thread class to send commands to the Server
-	public class ClientSocketThread implements Runnable {
-
-		private CommandType commandToSend;
-
-		public ClientSocketThread(CommandType currCommand) {
-			commandToSend = currCommand;
-
-			Log.d("PlayActivity - ThreadConstructor", "commandToSend: "
-					+ commandToSend + " " + commandToSend.getX() + " "
-					+ commandToSend.getY());
-		}
-
-		public void run() {
-			try {
-				socket = new Socket(ipAddress, 8888);
-			    objOutputStream = new ObjectOutputStream(
-				socket.getOutputStream());
-				connected = true;
-
-				try {
-					Log.d("PlayActivity", "Sending: " + commandToSend + " "
-							+ commandToSend.getX() + " " + commandToSend.getY());
-
-					// Send the enum(commandToSend) and the fields(X and Y)
-					// separately
-					// as the serializing and deserializing of enum through
-					// ObjectOutputStream
-					// and ObjectInputStream will not save the fields in the
-					// enum
-					objOutputStream.writeObject(commandToSend);
-					objOutputStream.writeFloat(commandToSend.getX());
-					objOutputStream.writeFloat(commandToSend.getY());
-				} catch (Exception e) {
-					Log.e("PlayActivity", "S: Error", e);
-				}
-				// Close outputstream and socket
-				objOutputStream.close();
-				socket.close();
-				connected = false;
-				
-			} catch (Exception e) {
-				Log.e("PlayActivity", "C: Error", e);
-			}
-		}
-
-	}
-
+	
 	@Override
 	protected void onResume() {
 		// Ideally a game should implement onResume() and onPause()
@@ -270,7 +211,7 @@ public class PlayActivity extends Activity {
 		// to take appropriate action when the activity looses focus
 		super.onPause();
     	commonView.setBackgroundColor(Color.TRANSPARENT);
-    	System.out.println("Setting backround");
+    	System.out.println("Setting background");
     	mRenderer.stop();
 	}
 
@@ -398,7 +339,7 @@ public class PlayActivity extends Activity {
 							tiltState = 0; // NO TILT
 						}
 	
-						commonView.invalidate();
+						commonView.postInvalidate();
 					}
 				} else {
 					// Don't detect tilt

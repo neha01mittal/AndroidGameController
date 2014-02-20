@@ -54,8 +54,8 @@ public class ServerUI extends JFrame {
 	private static JLabel status;
 	private int connectionType = 1;
 	private static final int PORT = 8888;
-	private static final int FPS_MIN = 0;
-	private static final int FPS_MAX = 30;
+	private static final int FPS_MIN = 10;
+	private static final int FPS_MAX = 50;
 	private JComboBox comboBox;
 	private JComboBox comboBoxMouse;
 	private static int userChoice = 0;
@@ -79,6 +79,8 @@ public class ServerUI extends JFrame {
 	private String[] columnNames = { "Touch Controls", "PC Controls" };
 	private ArrayList<String> keyboardControlMapping = new ArrayList<String>();
 
+	private static float mouseRatio; 
+	
 	private JTabbedPane tabbedPane;
 	private JPanel generalPane;
 	private JPanel keySettingsPane;
@@ -118,6 +120,9 @@ public class ServerUI extends JFrame {
 		tabbedPane.addTab("Key Settings", keySettingsPane);
 		topPanel.add(tabbedPane, BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		//Initialize variables
+		mouseRatio = (float)(FPS_INIT*0.1);
 	}
 
 	public int getUserChoice() {
@@ -370,7 +375,7 @@ public class ServerUI extends JFrame {
 		col.setCellEditor(new DefaultCellEditor(comboBox));
 		pane.add(jsp);
 
-		resetOriginalValues();
+		//resetOriginalValues();
 		return pane;
 	}
 
@@ -582,6 +587,10 @@ public class ServerUI extends JFrame {
 	public int getConnectionType() {
 		return connectionType;
 	}
+	
+	public float getMouseRatio(){
+		return mouseRatio;
+	}
 
 	public void updateStatus(boolean value) {
 		// TODO
@@ -602,6 +611,7 @@ public class ServerUI extends JFrame {
 				System.out.println("Slider value" + fps);
 				// TODO
 				// change according to mouse cursor movement
+				mouseRatio = (float)(fps * 0.1);
 			}
 		}
 	}

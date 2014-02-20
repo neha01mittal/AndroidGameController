@@ -107,6 +107,24 @@ public class WifiConnectActivity extends ListActivity {
 		buttonDeleteSelected.setOnClickListener(buttonDelSelected);
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		//Check if wifi is enabled
+		WifiManager wifi = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+		if (!wifi.isWifiEnabled()){
+			//wifi is not enabled, enable it
+			wifi.setWifiEnabled(true);
+			
+			Intent enableWifiIntent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+			startActivity(enableWifiIntent);
+
+			Toast.makeText(getApplicationContext(),
+					"Ensure that your device is connected to the same Wifi network as your computer.", Toast.LENGTH_LONG).show();
+		}
+	}
+	
 	Button.OnClickListener buttonDelSelected = new Button.OnClickListener() {
 
 		@Override
@@ -138,9 +156,12 @@ public class WifiConnectActivity extends ListActivity {
 			// TODO Auto-generated method stub
 			IPAddressFormatValidator iadfv = new IPAddressFormatValidator();
 			if (iadfv.validate(userInput.getText().toString())) {
-				Intent k = new Intent(WifiConnectActivity.this, PlayActivity.class);
+			// Start the Wifi Singleton with this ipAddress
+				SingletonWifi.getInstance().setIPAddress(userInput.getText().toString());
+				
+				//Go to PlayActivity
+				Intent k = new Intent(WifiConnectActivity.this, PlayActivity.class);				
 				k.putExtra("connectType", "wifi");
-				k.putExtra("ipAddress", userInput.getText().toString());
 				startActivity(k);
 			} else {
 				Toast.makeText(getApplicationContext(),
