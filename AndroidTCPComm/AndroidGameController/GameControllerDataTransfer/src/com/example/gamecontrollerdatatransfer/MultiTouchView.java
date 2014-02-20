@@ -43,6 +43,7 @@ private long prevLeftTime=0, prevRightTime=0, prevDragTime=0;
 	private Display screenDisplay;
 	private Point screenSize;
 	private Vibrator v;
+	private static Handler leftScreenHandler;
 
 	private SparseArray<PointF> mActivePointers;
 	private SparseArray<Float> startPointerX, startPointerY;
@@ -528,7 +529,7 @@ public void processTapSwipe(float x, float y, PointF point, int operation) {
 		        //canvas.drawLine(point.x, point.y, startPoint[i].getX(), startPoint[i].getY(), mPaint);
 		        mPaint.setColor(colors[i % 9]);
 		        mPaint.setStyle(Paint.Style.FILL);
-		      	canvas.drawCircle(drawPoint.getX(), drawPoint.getY(), SIZE, mPaint);
+		      canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE, mPaint);
 		      }
 	      }
 	      else { //isRightScreen
