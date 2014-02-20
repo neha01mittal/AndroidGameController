@@ -527,7 +527,7 @@ public class ServerUI extends JFrame {
 		radioPanel.add(connect);
 		radioPanel.setVisible(true);
 		generalPane.add(radioPanel);
-		//-------------------
+
 		Enumeration<NetworkInterface> e;
 		String ip = "";
 		try {
@@ -541,7 +541,7 @@ public class ServerUI extends JFrame {
 		                InetAddress i= (InetAddress) ee.nextElement();
 		                if(i.isSiteLocalAddress()) {
 		                	ip+=i.getHostAddress()+" or ";
-		                	System.out.println(i.getHostAddress());
+		                	//System.out.println(i.getHostAddress());
 		                }
 		            }
 		        }
@@ -549,9 +549,7 @@ public class ServerUI extends JFrame {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-       
-		///----------------------
-
+		
 		JLabel ipConfig = new JLabel(" IP Address: " + ip);
 		generalPane.add(ipConfig);
 
