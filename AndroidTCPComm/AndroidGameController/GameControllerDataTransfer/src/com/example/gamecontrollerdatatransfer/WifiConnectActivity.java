@@ -8,18 +8,27 @@ import java.util.Map;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -210,5 +219,39 @@ public class WifiConnectActivity extends ListActivity {
 		for (int i = 0; i < adapter.getCount(); i++) {
 			lv.setItemChecked(i, false);
 		}
+	}
+	
+	public View getView(int position, View convertView, ViewGroup parent)
+	{
+	ImageView imageView;
+	Context mContext= getApplicationContext();
+	if (convertView == null)
+	{
+	imageView = new ImageView(mContext);
+	imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
+	imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+	imageView.setPadding(8, 8, 8, 8); 
+	}
+	else
+	{
+	   imageView = (ImageView) convertView;
+	   Bitmap Image=BitmapFactory.decodeResource(mContext.getResources(),R.drawable.cable);
+	        Image=Image.copy(Bitmap.Config.ARGB_8888,true);
+	        Paint paint=new Paint();
+	        paint.setDither(true);
+	        paint.setFilterBitmap(true);
+	        Bitmap glow=BitmapFactory.decodeResource(mContext.getResources(), R.drawable.green);
+	        Bitmap bitmap=Bitmap.createBitmap(Image.getWidth(),Image.getHeight(), Config.ARGB_8888);
+	        Canvas canvas=new Canvas(bitmap);
+
+	        canvas.drawBitmap(glow, new Rect(0,0,glow.getWidth(),glow.getHeight()), new Rect(0,0,Image.getWidth(),Image.getHeight()),paint);
+	        canvas.drawBitmap(Image, new Rect(0,0,Image.getWidth(),Image.getHeight()), new Rect(0+5,0+5,Image.getWidth()-5,Image.getHeight()-5),paint);
+
+
+
+	        imageView.setImageBitmap(bitmap);
+	}
+
+	   return imageView;
 	}
 }

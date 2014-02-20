@@ -31,8 +31,8 @@
         </activity>
         <activity
             android:name="com.example.gamecontrollerdatatransfer.ShakeActivity"
-            android:label="@string/app_name" >
-            android:screenOrientation="portrait"
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name="com.example.gamecontrollerdatatransfer.BluetoothConnectActivity"
@@ -45,6 +45,48 @@
             android:screenOrientation="portrait"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name="com.example.gamecontrollerdatatransfer.TransitionActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.example.gamecontrollerdatatransfer.TiltUpActivity"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.example.gamecontrollerdatatransfer.TiltRightActivity"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.example.gamecontrollerdatatransfer.TiltLeftActivity"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.example.gamecontrollerdatatransfer.TiltDownActivity"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.example.gamecontrollerdatatransfer.ControlsActivity"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.example.gamecontrollerdatatransfer.ButtonsActivity"
+            android:screenOrientation="landscape"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.example.gamecontrollerdatatransfer.PositionActivity"
+            android:screenOrientation="reverseLandscape"
+            android:label="@string/app_name" >
+        </activity>
+        
+        
         <activity
             android:name="com.example.gamecontrollerdatatransfer.MainActivity"
             android:screenOrientation="portrait"

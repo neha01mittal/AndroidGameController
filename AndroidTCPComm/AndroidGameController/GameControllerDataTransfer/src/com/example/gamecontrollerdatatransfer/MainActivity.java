@@ -1,9 +1,11 @@
 package com.example.gamecontrollerdatatransfer;
 
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 public class MainActivity extends Activity {
@@ -21,8 +23,21 @@ public class MainActivity extends Activity {
 		bluetooth.setOnClickListener(buttonBluetooth);
 		ImageButton usb = (ImageButton) findViewById(R.id.usb);
 		usb.setOnClickListener(buttonUsb);
+		
+		Button goToTutorials = (Button) findViewById(R.id.tutorials);
+		goToTutorials.setOnClickListener(buttonTutorials);
+		
 
 	}
+	
+	Button.OnClickListener buttonTutorials = new Button.OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			Intent k = new Intent(MainActivity.this, PositionActivity.class);
+			startActivity(k);
+		}
+	};
 
 	ImageButton.OnClickListener buttonWifiConnect = new ImageButton.OnClickListener() {
 
