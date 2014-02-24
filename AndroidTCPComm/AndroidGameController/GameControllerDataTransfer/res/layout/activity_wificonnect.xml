@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:background="@drawable/background3" >
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@drawable/background1"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="vertical" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/game_controller"
-            android:textSize="40sp" />
 
         <EditText
             android:id="@+id/user_input"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:hint="@string/enter_ipaddress"
- />
+            android:layout_marginTop="100dp"
+            android:textColorHint="#49311c"
+            android:hint="@string/enter_ipaddress" />
 
         <Button
             android:id="@+id/addToFavourites"

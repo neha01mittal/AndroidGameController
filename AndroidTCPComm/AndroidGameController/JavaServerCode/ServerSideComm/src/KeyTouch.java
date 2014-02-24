@@ -163,7 +163,6 @@ public class KeyTouch {
 			robot.keyPress(keyCode);
 			robot.delay(duration);
 			robot.keyRelease(keyCode);
-			
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}		

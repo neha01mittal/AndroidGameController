@@ -1,10 +1,6 @@
 package com.example.gamecontrollerdatatransfer;
 
 import gc.common_resources.CommandType;
-
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -15,7 +11,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -29,13 +26,14 @@ public class PlayActivity extends Activity {
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
 	private View commonView;
-	private String ipAddress,  connectType;
-	
+	private boolean doubleBackToExitPressedOnce = false;
+	private String connectType;
+
 	private final float NOISE = (float) 2.0;
 	private float startX = 0, startY = 0, startZ = 0;
-	private boolean connected = false, flag = false, isPaused= false;
+	private boolean flag = false, isPaused = false;
 	private boolean isStartPositionRegistered;
-	
+
 	public int tiltState = 0;
 	public float tiltX, tiltY;
 
@@ -59,42 +57,42 @@ public class PlayActivity extends Activity {
 
 		registerRestPosition();
 
-		ImageButton closeButton = (ImageButton) findViewById(R.id.buttoncloseicon);
-		closeButton.setOnClickListener(buttonCloseIcon);
-		
 		final ImageButton resetButton = (ImageButton) findViewById(R.id.buttonreset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
 
-	        @Override
-	        public void onClick(View v) {
-	        	flag=false;
-	        	isStartPositionRegistered=false;
-	        	registerRestPosition();
-	        	
-	        }
-	        });
+			@Override
+			public void onClick(View v) {
+				flag = false;
+				isStartPositionRegistered = false;
+				registerRestPosition();
+			}
+		});
 
 		final ImageButton playPauseButton = (ImageButton) findViewById(R.id.buttonplaypause);
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
 
-	        @Override
-	        public void onClick(View v) {
+			@Override
+			public void onClick(View v) {
 
-	            if(isPaused) {
-	            	// Detection enabled, show the pause button
-	            	playPauseButton.setImageResource(R.drawable.pausebutton);
-	            	Toast.makeText(getApplicationContext(), "Tilt detection enabled", Toast.LENGTH_SHORT).show();
-	            	isPaused= false;
-	            	onResume();
-	            } else {
-	            	// Detection disabled, show the pause button
-	            	playPauseButton.setImageResource(R.drawable.playbutton);
-	            	Toast.makeText(getApplicationContext(), "Tilt detection disabled", Toast.LENGTH_SHORT).show();
-	            	isPaused= true;
-	            	onPause();
-	            }
-	        }
-	    });
+				if (isPaused) {
+					// Detection enabled, show the pause button
+					playPauseButton.setImageResource(R.drawable.pausebutton);
+					Toast.makeText(getApplicationContext(),
+							"Tilt detection enabled", Toast.LENGTH_SHORT)
+							.show();
+					isPaused = false;
+					onResume();
+				} else {
+					// Detection disabled, show the pause button
+					playPauseButton.setImageResource(R.drawable.playbutton);
+					Toast.makeText(getApplicationContext(),
+							"Tilt detection disabled", Toast.LENGTH_SHORT)
+							.show();
+					isPaused = true;
+					onPause();
+				}
+			}
+		});
 
 	}
 
@@ -123,56 +121,32 @@ public class PlayActivity extends Activity {
 		builder.show();
 	}
 
-	ImageButton.OnClickListener buttonCloseIcon = new ImageButton.OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-			builder.setTitle("Quit playing?");
-			builder.setMessage("Are you sure you want to quit this session?")
-					.setPositiveButton(R.string.ok,
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int id) { //
-									//connected= false;
-									//TODO
-									//
-									finish();
-								}
-							})
-					.setNegativeButton(R.string.cancel,
-							new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog,
-										int id) {
-									// NOP
-								}
-							});
-			AlertDialog alertDialog = builder.create();
-
-			alertDialog.show();
-
-		}
-	};
-	
 	@Override
 	protected void onStop() {
 		super.onStop();
-		if(connectType.equals("bluetooth"))
+		if (connectType.equals("bluetooth"))
 			SingletonBluetooth.getInstance().closeConnection();
 	}
 
 	@Override
 	public void onBackPressed() {
 		// disable back button
-		Toast.makeText(getApplicationContext(),
-				"Back button disabled. \nPlease use the back button above.",
+		if (doubleBackToExitPressedOnce) {
+			super.onBackPressed();
+			return;
+		}
+		this.doubleBackToExitPressedOnce = true;
+		Toast.makeText(this, "Please click BACK again to exit",
 				Toast.LENGTH_SHORT).show();
+		new Handler().postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				doubleBackToExitPressedOnce = false;
+
+			}
+		}, 2000);
+
 	}
 
 	public void updateCoordinates(TouchCoordinates tc, CommandType newCommand) {
@@ -190,13 +164,13 @@ public class PlayActivity extends Activity {
 
 	// Create the threads and pass the commands to them
 	public void sendPacketToServer(CommandType updateCommand) {
-		if(connectType.equals("wifi")) {
+		if (connectType.equals("wifi")) {
 			SingletonWifi.getInstance().sendToDevice(updateCommand);
-		}else if(connectType.equals("bluetooth")) {
+		} else if (connectType.equals("bluetooth")) {
 			SingletonBluetooth.getInstance().sendToDevice(updateCommand);
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
 		// Ideally a game should implement onResume() and onPause()
@@ -210,9 +184,9 @@ public class PlayActivity extends Activity {
 		// Ideally a game should implement onResume() and onPause()
 		// to take appropriate action when the activity looses focus
 		super.onPause();
-    	commonView.setBackgroundColor(Color.TRANSPARENT);
-    	System.out.println("Setting background");
-    	mRenderer.stop();
+		commonView.setBackgroundColor(Color.TRANSPARENT);
+		System.out.println("Setting background");
+		mRenderer.stop();
 	}
 
 	class MyRenderer implements SensorEventListener {
@@ -253,7 +227,7 @@ public class PlayActivity extends Activity {
 			 * " Z= " + values[2]);
 			 */
 			if (flag) {
-				if(!isPaused){
+				if (!isPaused) {
 					if (!isStartPositionRegistered) {
 						tvX.setText("0.0");
 						tvY.setText("0.0");
@@ -263,7 +237,7 @@ public class PlayActivity extends Activity {
 						startZ = z;
 						isStartPositionRegistered = true;
 					}
-	
+
 					else {
 						float deltaX = Math.abs(startX - x);
 						float deltaY = Math.abs(startY - y);
@@ -276,7 +250,7 @@ public class PlayActivity extends Activity {
 							deltaY = (float) 0.0;
 						if (deltaZ < NOISE)
 							deltaZ = (float) 0.0;
-	
+
 						tvX.setText(Float.toString(deltaX));
 						tvY.setText(Float.toString(deltaY));
 						tvZ.setText(Float.toString(deltaZ));
@@ -284,7 +258,7 @@ public class PlayActivity extends Activity {
 						tvX.setVisibility(View.INVISIBLE);
 						tvY.setVisibility(View.INVISIBLE);
 						tvZ.setVisibility(View.INVISIBLE);
-						
+
 						iv.setVisibility(View.VISIBLE);
 						/*
 						 * if (deltaZ > deltaX && deltaZ > deltaY) {
@@ -298,47 +272,45 @@ public class PlayActivity extends Activity {
 							 * "X axis movement", Toast.LENGTH_SHORT) .show();
 							 */
 							iv.setImageResource(R.drawable.horizontal);
-							
-							if((startX-x)<0) {
-								//down tilt
+
+							if ((startX - x) < 0) {
+								// down tilt
 								commonView.setBackgroundColor(Color.RED);
 								tiltState = 1; // TILT UP
-							}
-							else {
+							} else {
 								commonView.setBackgroundColor(Color.GREEN);
 								tiltState = 2; // TILT DOWN
 							}
-							
-							System.out.println("Delta 1=" + (startX - x) + " Delta 2="
-									+ (startY - y) );
-							
+
+							System.out.println("Delta 1=" + (startX - x)
+									+ " Delta 2=" + (startY - y));
+
 						} else if (deltaX < deltaY) {
 							/*
 							 * Toast.makeText(getApplicationContext(),
 							 * "Y axis movement", Toast.LENGTH_SHORT) .show();
 							 */
 							iv.setImageResource(R.drawable.vertical);
-							
-							if((startY-y)<0) {
-								//down tilt
+
+							if ((startY - y) < 0) {
+								// down tilt
 								commonView.setBackgroundColor(Color.MAGENTA);
 								tiltState = 3; // TILT LEFT
-							}
-							else {
+							} else {
 								commonView.setBackgroundColor(Color.YELLOW);
 								tiltState = 4; // TILT RIGHT
 							}
-							
-							System.out.println("Delta 1=" + (startX - x) + " Delta 2="
-									+ (startY - y) );
-							
+
+							System.out.println("Delta 1=" + (startX - x)
+									+ " Delta 2=" + (startY - y));
+
 						} else {
 							// NOP
 							iv.setVisibility(View.INVISIBLE);
 							commonView.setBackgroundColor(Color.TRANSPARENT);
 							tiltState = 0; // NO TILT
 						}
-	
+
 						commonView.postInvalidate();
 					}
 				} else {

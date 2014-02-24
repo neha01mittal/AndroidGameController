@@ -7,26 +7,24 @@ public class MovementTracker {
 	public static CommandType processVector8D(Vector vector) throws InterruptedException {
 		
 		double angle = vector.angle(false);
-		double threshold = 22.5;
+		final double THRESHOLD = 22.5;
 		CommandType currCommand = CommandType.DEFAULT;
 		
-		System.out.println("ANGLE"+angle);
-		
-		if(Math.abs(angle)>(135+threshold))
+		if(Math.abs(angle)>(135+THRESHOLD))
 			currCommand = CommandType.KEYBOARD_UP;
-		else if(angle>(-135-threshold)&&angle<(-90-threshold))
+		else if(angle>(-135-THRESHOLD)&&angle<(-90-THRESHOLD))
 			currCommand = CommandType.KEYBOARD_UP_RIGHT;
-		else if(angle>(-90-threshold)&&angle<(-45-threshold))
+		else if(angle>(-90-THRESHOLD)&&angle<(-45-THRESHOLD))
 			currCommand = CommandType.KEYBOARD_RIGHT;
-		else if(angle>(-45-threshold)&&angle<(-threshold))
+		else if(angle>(-45-THRESHOLD)&&angle<(-THRESHOLD))
 			currCommand = CommandType.KEYBOARD_DOWN_RIGHT;
-		else if(Math.abs(angle)<threshold)
+		else if(Math.abs(angle)<THRESHOLD)
 			currCommand = CommandType.KEYBOARD_DOWN;
-		else if(angle>(threshold)&&angle<(45+threshold))
+		else if(angle>(THRESHOLD)&&angle<(45+THRESHOLD))
 			currCommand = CommandType.KEYBOARD_DOWN_LEFT;
-		else if(angle>(45+threshold)&&angle<(90+threshold))
+		else if(angle>(45+THRESHOLD)&&angle<(90+THRESHOLD))
 			currCommand = CommandType.KEYBOARD_LEFT;
-		else if(angle>(90+threshold)&&angle<(135+threshold))
+		else if(angle>(90+THRESHOLD)&&angle<(135+THRESHOLD))
 			currCommand = CommandType.KEYBOARD_UP_LEFT;
 		
 		return currCommand;
@@ -34,14 +32,14 @@ public class MovementTracker {
 public static CommandType processVector4D(Vector vector) throws InterruptedException {
 		
 		double angle = vector.angle(false);
-		double threshold = 22.5;
+		double THRESHOLD = 22.5;
 		CommandType currCommand = CommandType.DEFAULT;
 		
 		System.out.println("ANGLE"+angle);
 		
 		if(Math.abs(angle)>(135))
 			currCommand = CommandType.SWIPEUP_NOTILT;
-		else if(angle>(-135)&&angle<(-45-threshold))
+		else if(angle>(-135)&&angle<(-45-THRESHOLD))
 			currCommand = CommandType.SWIPERIGHT_NOTILT;
 		else if(Math.abs(angle)<(45))
 			currCommand = CommandType.SWIPEDOWN_NOTILT;

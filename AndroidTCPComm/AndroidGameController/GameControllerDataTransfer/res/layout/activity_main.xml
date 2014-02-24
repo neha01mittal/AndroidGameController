@@ -1,56 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/welcomescreen"
-    android:orientation="horizontal"
+    android:background="@drawable/mainscreen"
+    android:orientation="vertical"
     android:padding="10dp" >
 
     <View
-        android:layout_width="1dp"
-        android:layout_height="10dp" >
+        android:layout_width="15dp"
+        android:layout_height="70dp" >
     </View>
 
     <ImageButton
         android:id="@+id/wifi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="200dp"
         android:src="@drawable/wifi" />
 
-    <View
-        android:layout_width="1dp"
-        android:layout_height="10dp" >
-    </View>
 
     <ImageButton
         android:id="@+id/bluetooth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="center_horizontal"
         android:src="@drawable/bt" />
 
     <View
-        android:layout_width="1dp"
-        android:layout_height="10dp" >
-    </View>
-
-    <ImageButton
-        android:id="@+id/usb"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/cable" />
-    
-     <View
-        android:layout_width="1dp"
+        android:layout_width="20dp"
         android:layout_height="20dp" >
     </View>
     <Button
         android:id="@+id/tutorials"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Go to tuorials" />
-
-
+        android:background="@drawable/background"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/gototutorials" />
 </LinearLayout>

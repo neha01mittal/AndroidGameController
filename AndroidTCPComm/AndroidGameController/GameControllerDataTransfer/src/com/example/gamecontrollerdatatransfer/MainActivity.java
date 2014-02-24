@@ -1,6 +1,6 @@
 package com.example.gamecontrollerdatatransfer;
 
-
+//@CLEANED
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,20 +21,16 @@ public class MainActivity extends Activity {
 		wifiConnect.setOnClickListener(buttonWifiConnect);
 		ImageButton bluetooth = (ImageButton) findViewById(R.id.bluetooth);
 		bluetooth.setOnClickListener(buttonBluetooth);
-		ImageButton usb = (ImageButton) findViewById(R.id.usb);
-		usb.setOnClickListener(buttonUsb);
 		
 		Button goToTutorials = (Button) findViewById(R.id.tutorials);
 		goToTutorials.setOnClickListener(buttonTutorials);
-		
-
 	}
 	
 	Button.OnClickListener buttonTutorials = new Button.OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
-			Intent k = new Intent(MainActivity.this, PositionActivity.class);
+			Intent k = new Intent(MainActivity.this, TutorialActivity.class);
 			startActivity(k);
 		}
 	};
@@ -61,16 +57,4 @@ public class MainActivity extends Activity {
 			startActivity(k);
 		}
 	};
-
-	ImageButton.OnClickListener buttonUsb = new ImageButton.OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-
-			Intent k = new Intent(MainActivity.this, UsbConnectActivity.class);
-			startActivity(k);
-		}
-	};
-
 }

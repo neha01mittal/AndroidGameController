@@ -24,7 +24,6 @@ public class Controller {
 		}
 		
 		else {
-			
 			while(currentVec.magnitude()<200){
 			currentVec = currentVec.plusEq(previousVec);
 			previousVec = currentVec;
@@ -32,6 +31,4 @@ public class Controller {
 		}
 		
 	}
-	
-	
 }

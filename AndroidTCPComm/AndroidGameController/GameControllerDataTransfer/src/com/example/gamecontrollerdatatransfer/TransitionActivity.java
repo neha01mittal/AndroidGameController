@@ -33,7 +33,7 @@ public class TransitionActivity extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			Intent k = new Intent(TransitionActivity.this, PositionActivity.class);
+			Intent k = new Intent(TransitionActivity.this, TutorialActivity.class);
 			startActivity(k);
 		}
 	};

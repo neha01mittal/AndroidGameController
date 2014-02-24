@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="X-Axis"
+                android:text="@string/xaxis"
                 android:textSize="14sp"
                 android:visibility="invisible" />
 
@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Y-Axis"
+                android:text="@string/yaxis"
                 android:textSize="14sp"
                 android:visibility="invisible" />
 
@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Z-Axis"
+                android:text="@string/zaxis"
                 android:textSize="14sp"
                 android:visibility="invisible" />
         </TableRow>
@@ -79,6 +79,7 @@
 
     <ImageButton
         android:id="@+id/buttonplaypause"
+        android:contentDescription="@string/buttonplaypause"
         android:layout_gravity="bottom|right"
         android:layout_width="30dip" 
         android:layout_height="30dip"
@@ -86,17 +87,11 @@
 
     <ImageButton
         android:id="@+id/buttonreset"
+        android:contentDescription="@string/buttonreset"
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="40dip"
         android:layout_width="30dip" 
         android:layout_height="30dip"
         android:src="@drawable/resetbutton"
         />
-
-    <ImageButton
-        android:id="@+id/buttoncloseicon"
-        android:layout_width="36dp"
-        android:layout_height="49dp"
-        android:src="@drawable/closebutton" />
-    
 </FrameLayout>
