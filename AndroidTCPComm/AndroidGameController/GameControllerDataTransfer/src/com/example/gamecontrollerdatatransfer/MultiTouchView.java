@@ -49,7 +49,7 @@ public class MultiTouchView extends View {
 
 	private TouchCoordinates leftDrawPoint;
 
-	private Paint mPaint;
+	private Paint mPaint, glowPaint, textPaint;
 	private int[] colors = { Color.BLUE, Color.YELLOW, Color.GREEN,
 			Color.BLACK, Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY,
 			Color.LTGRAY, Color.YELLOW };
@@ -57,8 +57,6 @@ public class MultiTouchView extends View {
 	private int[] bigColors = { Color.LTGRAY, Color.WHITE, Color.GRAY,
 			Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN,
 			Color.GREEN, Color.CYAN };
-
-	private Paint textPaint;
 
 	protected Bitmap mBitmap;
 	protected Canvas currentCanvas;
@@ -99,12 +97,22 @@ public class MultiTouchView extends View {
 		lastSentPointerY = new SparseArray<Float>();
 		pointerStartDragTime = new SparseArray<Long>();
 		registeredDragPointer = new SparseArray<Boolean>();
+		// Set Painter properties
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		// set painter color to a color you like
+		mPaint.setDither(true);
 		mPaint.setColor(Color.BLUE);
 		mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+		mPaint.setStrokeJoin(Paint.Join.ROUND);
+		mPaint.setStrokeCap(Paint.Cap.ROUND);
+		//mPaint.setMaskFilter(new BlurMaskFilter(10, BlurMaskFilter.Blur.NORMAL));
+		
 		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		textPaint.setTextSize(20);
+		
+		glowPaint = new Paint();
+		glowPaint.set(mPaint);
+		glowPaint.setColor(Color.argb(235, 74, 138, 255));
+		glowPaint.setMaskFilter(new BlurMaskFilter(20, BlurMaskFilter.Blur.NORMAL));
 	}
 
 	@Override
@@ -526,7 +534,7 @@ public class MultiTouchView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if (mBitmap == null) {
+		/*if (mBitmap == null) {
 			canvasWidth = canvas.getWidth();
 			canvasHeight = canvas.getHeight();
 			mBitmap = Bitmap.createBitmap(canvasWidth, canvasHeight,
@@ -538,9 +546,10 @@ public class MultiTouchView extends View {
 		currentCanvas.drawPaint(mPaint);
 		currentCanvas.setBitmap(mBitmap);
 
-		currentCanvas.drawBitmap(mBitmap, 0, 0, mPaint);
+		currentCanvas.drawBitmap(mBitmap, 0, 0, mPaint);*/
 
-		currentCanvas.drawLine(0, SCREENCENTREY, SCREENWIDTH, SCREENCENTREY,
+		mPaint.setColor(Color.argb(235, 144, 208, 255));
+		canvas.drawLine(0, SCREENCENTREY, SCREENWIDTH, SCREENCENTREY,
 				mPaint);
 
 		/*
@@ -560,15 +569,31 @@ public class MultiTouchView extends View {
 			if (isLeftScreen(startPoint.y)) {
 				if (point != null) {
 					mPaint.setColor(bigColors[i % 9]);
-					mPaint.setStyle(Paint.Style.FILL);
-//					mPaint.setStrokeWidth(20);
-					mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC)) ;
-					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD,
-							mPaint);
+					mPaint.setStyle(Paint.Style.STROKE);
+					mPaint.setStrokeWidth(20f);
+
+					mPaint.setColor(Color.argb(235, 144, 208, 255));
+					glowPaint.setColor(Color.argb(80, 144, 208, 255));
+					//glowPaint.setStyle(Paint.Style.FILL);
+					glowPaint.setStyle(Paint.Style.STROKE);
+					glowPaint.setStrokeWidth(30f);
+					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, glowPaint);
+					//mPaint.setStyle(Paint.Style.FILL);
+					mPaint.setStyle(Paint.Style.STROKE);
+					mPaint.setStrokeWidth(10f);
+					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, mPaint);
+					
+					//mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC)) ;
+					//mPaint.setShadowLayer(THRESHOLD+50, startPoint.x, startPoint.y, Color.argb(235, 74, 138, 255));
+					//canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, mPaint);
+					
+					glowPaint.setColor(colors[i % 9]);
+					glowPaint.setAlpha(70);
+					glowPaint.setStyle(Paint.Style.FILL);
+					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE+10, glowPaint);			
 					mPaint.setColor(colors[i % 9]);
 					mPaint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(leftDrawPoint.getX(),
-							leftDrawPoint.getY(), SIZE, mPaint);
+					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE, mPaint);
 				}
 			} else { // isRightScreen
 						// ACTION
