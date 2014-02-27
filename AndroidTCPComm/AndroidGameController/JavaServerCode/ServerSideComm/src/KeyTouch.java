@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
@@ -199,11 +200,23 @@ public class KeyTouch {
 
 	private void pressOneKey(int keyCode, int duration) {
 		try {
-			if (keyCode != 0) {
-				Robot robot = new Robot();
+			Robot robot = new Robot();
+			
+			if (keyCode > 0) {
 				robot.keyPress(keyCode);
 				robot.delay(duration);
 				robot.keyRelease(keyCode);
+			} else {
+				switch(keyCode) {
+					case -1:	//LEFT-MOUSE-BUTTON
+						robot.mousePress(InputEvent.BUTTON1_MASK );
+						robot.mouseRelease(InputEvent.BUTTON1_MASK );
+						break;
+					case -2:	//RIGHT-MOUSE-BUTTON
+						robot.mousePress(InputEvent.BUTTON3_MASK );
+						robot.mouseRelease(InputEvent.BUTTON3_MASK );
+						break;
+				}
 			}
 		} catch (AWTException e) {
 			e.printStackTrace();
@@ -212,6 +225,7 @@ public class KeyTouch {
 
 	private void pressTwoKeys(int keyCode1, int keyCode2, int duration) {
 		try {
+			if (keyCode1 > 0 && keyCode2 > 0 ) {
 			Robot robot = new Robot();
 
 			robot.keyPress(keyCode1);
@@ -219,7 +233,7 @@ public class KeyTouch {
 			robot.delay(duration);
 			robot.keyRelease(keyCode1);
 			robot.keyRelease(keyCode2);
-
+			}
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}

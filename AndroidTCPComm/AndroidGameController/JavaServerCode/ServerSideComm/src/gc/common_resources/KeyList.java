@@ -96,8 +96,14 @@ public class KeyList {
 					keyCode = KeyEvent.VK_SPACE;
 				break;
 			default:
-				if(stringEntry.equals("BACKSPACE"))
+				if(stringEntry.equals("LEFT-MOUSE-BUTTON"))
+					keyCode = -1;
+				else if(stringEntry.equals("RIGHT-MOUSE-BUTTON"))
+					keyCode = -2;
+				else if(stringEntry.equals("BACKSPACE"))
 					keyCode = KeyEvent.VK_BACK_SPACE;
+				else if(stringEntry.equals("SPACEBAR"))
+					keyCode = KeyEvent.VK_SPACE;
 				else {
 					System.out.println("Invalid keyEntry detected. Entry: " + stringEntry + "  Ascii: " + ascii);
 					keyCode = 0;
