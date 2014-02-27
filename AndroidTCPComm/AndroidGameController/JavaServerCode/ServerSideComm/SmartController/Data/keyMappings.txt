@@ -1,5 +1,5 @@
-Z SPACEBAR A D X 
--None- -None- -None- -None- -None- 
--None- -None- E -None- -None- 
--None- -None- -None- -None- -None- 
+Z SPACEBAR C D X 
+-None- F D -None- E 
+-None- F D -None- E 
+-None- F D -None- E 
 -None- F D -None- E 

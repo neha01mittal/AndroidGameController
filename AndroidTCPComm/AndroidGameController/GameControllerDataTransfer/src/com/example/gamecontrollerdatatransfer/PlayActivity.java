@@ -23,6 +23,7 @@ import android.widget.Toast;
 public class PlayActivity extends Activity {
 
 	private final Context context = this;
+	
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
 	private View commonView;
@@ -136,7 +137,7 @@ public class PlayActivity extends Activity {
 			return;
 		}
 		this.doubleBackToExitPressedOnce = true;
-		Toast.makeText(this, "Please click BACK again to exit",
+		Toast.makeText(this, "Please tap BACK again to exit",
 				Toast.LENGTH_SHORT).show();
 		new Handler().postDelayed(new Runnable() {
 
@@ -275,10 +276,10 @@ public class PlayActivity extends Activity {
 
 							if ((startX - x) < 0) {
 								// down tilt
-								commonView.setBackgroundColor(Color.RED);
+								commonView.setBackgroundColor(Color.parseColor("#ff669966"));
 								tiltState = 1; // TILT UP
 							} else {
-								commonView.setBackgroundColor(Color.GREEN);
+								commonView.setBackgroundColor(Color.parseColor("#ff668899"));
 								tiltState = 2; // TILT DOWN
 							}
 
@@ -294,10 +295,10 @@ public class PlayActivity extends Activity {
 
 							if ((startY - y) < 0) {
 								// down tilt
-								commonView.setBackgroundColor(Color.MAGENTA);
+								commonView.setBackgroundColor(Color.parseColor("#ff6E6699"));
 								tiltState = 3; // TILT LEFT
 							} else {
-								commonView.setBackgroundColor(Color.YELLOW);
+								commonView.setBackgroundColor(Color.parseColor("#ff886699"));
 								tiltState = 4; // TILT RIGHT
 							}
 

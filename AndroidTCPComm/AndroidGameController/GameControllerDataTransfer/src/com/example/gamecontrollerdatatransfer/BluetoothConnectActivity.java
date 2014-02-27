@@ -1,6 +1,8 @@
 package com.example.gamecontrollerdatatransfer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,12 +21,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 
 public class BluetoothConnectActivity extends Activity implements
 		OnItemClickListener {
 
+	private Context context = this;
 	private final static int REQUEST_ENABLE_BT = 1;
 	private final static int RESULT_CANCELED = 0;
 
@@ -50,6 +54,7 @@ public class BluetoothConnectActivity extends Activity implements
 		deviceListPaired = new ArrayList<BluetoothDevice>();
 		deviceListDiscovered = new ArrayList<BluetoothDevice>();		
 
+		showInstructions();
 		// BT Stuff happening in onResume() below
 	}
 
@@ -238,4 +243,27 @@ public class BluetoothConnectActivity extends Activity implements
 					Toast.LENGTH_SHORT).show();
 		}
 	}
+	
+	public void showInstructions() {
+		// record initial coordinates
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle("Important!");
+		builder.setMessage(R.string.bluetoothinstructions)
+				.setPositiveButton(R.string.ok,
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int id) { //
+								// User clicked OK, so save the mSelectedItems
+								// results somewhere // or
+								// return them to the component that opened the
+								// dialog
+
+								//NOP
+							}
+						});
+		builder.show();
+	}
+
 }

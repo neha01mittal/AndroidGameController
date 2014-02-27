@@ -78,6 +78,7 @@ public class MyServer {
 						try {
 							commandFromClient = (CommandType) objInputStream
 									.readObject();
+							System.out.println("Command "+commandFromClient);
 						} catch (ClassNotFoundException e) {
 							// TODO Auto-generated catch block
 							serverui.updateStatus(false);
@@ -86,10 +87,10 @@ public class MyServer {
 
 						float X = objInputStream.readFloat();
 						float Y = objInputStream.readFloat();
-
+						
 						commandFromClient.setX(X);
 						commandFromClient.setY(Y);
-
+						
 					keyTouch.identifyKey(commandFromClient, new ArrayList<String>(serverui.getKeyMappings()), serverui.getMouseRatio());
 
 						System.out.println("Message Received: " + commandFromClient

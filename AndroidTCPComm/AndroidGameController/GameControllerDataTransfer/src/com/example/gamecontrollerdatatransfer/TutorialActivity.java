@@ -31,6 +31,8 @@ public class TutorialActivity extends Activity {
 	    animation.addFrame(getResources().getDrawable(R.drawable.tiltup), 2000);
 	    animation.addFrame(getResources().getDrawable(R.drawable.tiltleft), 2000);
 	    animation.addFrame(getResources().getDrawable(R.drawable.tiltright), 2000);
+	    animation.addFrame(getResources().getDrawable(R.drawable.simulatebutton), 3000);
+	    animation.addFrame(getResources().getDrawable(R.drawable.servermap), 5000);
 	    animation.addFrame(getResources().getDrawable(R.drawable.buttons), 5000);
 	    animation.setOneShot(true);
 

@@ -77,10 +77,10 @@ public class ServerUI extends JFrame {
 			{ "Swipe Left", "-None-" }, { "Swipe Right", "-None-" } };
 
 	private String[] columnNames = { "Touch Controls", "PC Controls" };
-	private ArrayList<String> keyboardControlMapping = new ArrayList<String>();
+	private static ArrayList<String> keyboardControlMapping = new ArrayList<String>();
 
-	private static float mouseRatio; 
-	
+	private static float mouseRatio;
+
 	private JTabbedPane tabbedPane;
 	private JPanel generalPane;
 	private JPanel keySettingsPane;
@@ -120,9 +120,9 @@ public class ServerUI extends JFrame {
 		tabbedPane.addTab("Key Settings", keySettingsPane);
 		topPanel.add(tabbedPane, BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		//Initialize variables
-		mouseRatio = (float)(FPS_INIT*0.1);
+
+		// Initialize variables
+		mouseRatio = (float) (FPS_INIT * 0.1);
 	}
 
 	public int getUserChoice() {
@@ -375,7 +375,7 @@ public class ServerUI extends JFrame {
 		col.setCellEditor(new DefaultCellEditor(comboBox));
 		pane.add(jsp);
 
-		//resetOriginalValues();
+		// resetOriginalValues();
 		return pane;
 	}
 
@@ -532,24 +532,22 @@ public class ServerUI extends JFrame {
 		String ip = "";
 		try {
 			e = NetworkInterface.getNetworkInterfaces();
-			 while(e.hasMoreElements())
-		        {
-		            NetworkInterface n=(NetworkInterface) e.nextElement();
-		            Enumeration<InetAddress> ee = n.getInetAddresses();
-		            while(ee.hasMoreElements())
-		            {
-		                InetAddress i= (InetAddress) ee.nextElement();
-		                if(i.isSiteLocalAddress()) {
-		                	ip+=i.getHostAddress()+" or ";
-		                	//System.out.println(i.getHostAddress());
-		                }
-		            }
-		        }
+			while (e.hasMoreElements()) {
+				NetworkInterface n = (NetworkInterface) e.nextElement();
+				Enumeration<InetAddress> ee = n.getInetAddresses();
+				while (ee.hasMoreElements()) {
+					InetAddress i = (InetAddress) ee.nextElement();
+					if (i.isSiteLocalAddress()) {
+						ip += i.getHostAddress() + "\n";
+						// System.out.println(i.getHostAddress());
+					}
+				}
+			}
 		} catch (SocketException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		JLabel ipConfig = new JLabel(" IP Address: " + ip);
 		generalPane.add(ipConfig);
 
@@ -585,8 +583,8 @@ public class ServerUI extends JFrame {
 	public int getConnectionType() {
 		return connectionType;
 	}
-	
-	public float getMouseRatio(){
+
+	public float getMouseRatio() {
 		return mouseRatio;
 	}
 
@@ -609,7 +607,7 @@ public class ServerUI extends JFrame {
 				System.out.println("Slider value" + fps);
 				// TODO
 				// change according to mouse cursor movement
-				mouseRatio = (float)(fps * 0.1);
+				mouseRatio = (float) (fps * 0.1);
 			}
 		}
 	}

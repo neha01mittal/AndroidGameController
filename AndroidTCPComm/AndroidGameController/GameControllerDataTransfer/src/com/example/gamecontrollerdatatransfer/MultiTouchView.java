@@ -4,20 +4,24 @@ import gc.common_resources.CommandType;
 import android.app.Service;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
+import android.graphics.BlurMaskFilter.Blur;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.util.Log;
-import android.os.Handler;
 
 public class MultiTouchView extends View {
 
@@ -93,6 +97,8 @@ public class MultiTouchView extends View {
 		startPointerY = new SparseArray<Float>();
 		lastSentPointerX = new SparseArray<Float>();
 		lastSentPointerY = new SparseArray<Float>();
+		pointerStartDragTime = new SparseArray<Long>();
+		registeredDragPointer = new SparseArray<Boolean>();
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		// set painter color to a color you like
 		mPaint.setColor(Color.BLUE);
@@ -104,7 +110,6 @@ public class MultiTouchView extends View {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 
-		v.vibrate(100);
 		// get pointer index from the event object
 		int pointerIndex = event.getActionIndex();
 
@@ -344,7 +349,7 @@ public class MultiTouchView extends View {
 
 					processDirectionalMovement(point, startPoint);
 				}
-				leftScreenHandler.postDelayed(this, 80);
+				leftScreenHandler.postDelayed(this, 90);
 			}
 		}
 	};
@@ -412,6 +417,7 @@ public class MultiTouchView extends View {
 			try {
 				// This function is used to determine the UP, DOWN, LEFT, RIGHT
 				// direction of displacement
+				v.vibrate(100);
 				touchCommand = MovementTracker.processVector8D(vec);
 				wrapCoordinates(point.x, point.y, operation, touchCommand);
 
@@ -441,6 +447,7 @@ public class MultiTouchView extends View {
 		if (durationHasPassed(prevDragTime, System.currentTimeMillis(), 20)) {
 			prevDragTime = System.currentTimeMillis();
 
+			v.vibrate(100);
 			wrapCoordinates(displacementX, displacementY, 1, CommandType.VIEW);
 			Log.d("Dragpointer", "Sent Dragpoint: " + displacementX + " : "
 					+ displacementY);
@@ -468,6 +475,7 @@ public class MultiTouchView extends View {
 				switch (operation) {
 				case 0:
 					// This action is a tap
+					v.vibrate(100);
 					touchCommand = MovementTracker.processTilt(
 							activity.tiltState, CommandType.TAP_NOTILT);
 
@@ -484,6 +492,7 @@ public class MultiTouchView extends View {
 					try {
 						// This function is used to determine the UP, DOWN,
 						// LEFT, RIGHT direction of displacement
+						v.vibrate(100);
 						touchCommand = MovementTracker.processTilt(
 								activity.tiltState,
 								MovementTracker.processVector4D(vec));
@@ -551,8 +560,9 @@ public class MultiTouchView extends View {
 			if (isLeftScreen(startPoint.y)) {
 				if (point != null) {
 					mPaint.setColor(bigColors[i % 9]);
-					mPaint.setStyle(Paint.Style.STROKE);
-					mPaint.setStrokeWidth(20);
+					mPaint.setStyle(Paint.Style.FILL);
+//					mPaint.setStrokeWidth(20);
+					mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC)) ;
 					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD,
 							mPaint);
 					mPaint.setColor(colors[i % 9]);

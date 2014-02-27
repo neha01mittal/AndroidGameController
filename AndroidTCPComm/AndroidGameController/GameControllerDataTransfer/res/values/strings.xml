@@ -25,6 +25,10 @@
 	<string name="game_controller">SmartController</string>
 	<string name="delete">Delete Selected</string>
 	<string name="ip_list">Past Favourites</string>
+	<string name="paireddevices">Paired Devices</string>
+	<string name="discovereddevices">Discovered Devices</string>
+	<string name="bluetoothinstructions">Please make sure that your device is already paired with your PC</string>
+	<string name="instructions">1. Please make sure that your PC/ MAC server is running.\n\n2. Confirm your preferred connection on PC/ MAC server before starting a connection on this device.\n\n3. Don\'t forget to map your key settings under Key Settings tab on the desktop server. </string>
 	<string name="confirm_clear_list">Are you sure you want to delete all the IP addresses? </string>
 	<string name="get_rest_position_message">Hold your phone horizontally at a comfortable angle.\n Press OK while holding the phone in that position.</string>
 </resources>
