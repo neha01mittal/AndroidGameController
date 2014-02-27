@@ -243,38 +243,38 @@ public class WifiConnectActivity extends ListActivity {
 			lv.setItemChecked(i, false);
 		}
 	}
-	
-	public View getView(int position, View convertView, ViewGroup parent)
-	{
-	ImageView imageView;
-	Context mContext= getApplicationContext();
-	if (convertView == null)
-	{
-	imageView = new ImageView(mContext);
-	imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
-	imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-	imageView.setPadding(8, 8, 8, 8); 
-	}
-	else
-	{
-	   imageView = (ImageView) convertView;
-	   Bitmap Image=BitmapFactory.decodeResource(mContext.getResources(),R.drawable.cable);
-	        Image=Image.copy(Bitmap.Config.ARGB_8888,true);
-	        Paint paint=new Paint();
-	        paint.setDither(true);
-	        paint.setFilterBitmap(true);
-	        Bitmap glow=BitmapFactory.decodeResource(mContext.getResources(), R.drawable.green);
-	        Bitmap bitmap=Bitmap.createBitmap(Image.getWidth(),Image.getHeight(), Config.ARGB_8888);
-	        Canvas canvas=new Canvas(bitmap);
-
-	        canvas.drawBitmap(glow, new Rect(0,0,glow.getWidth(),glow.getHeight()), new Rect(0,0,Image.getWidth(),Image.getHeight()),paint);
-	        canvas.drawBitmap(Image, new Rect(0,0,Image.getWidth(),Image.getHeight()), new Rect(0+5,0+5,Image.getWidth()-5,Image.getHeight()-5),paint);
-
-
-
-	        imageView.setImageBitmap(bitmap);
-	}
-
-	   return imageView;
-	}
+//	
+//	public View getView(int position, View convertView, ViewGroup parent)
+//	{
+//	ImageView imageView;
+//	Context mContext= getApplicationContext();
+//	if (convertView == null)
+//	{
+//	imageView = new ImageView(mContext);
+//	imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
+//	imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//	imageView.setPadding(8, 8, 8, 8); 
+//	}
+//	else
+//	{
+//	   imageView = (ImageView) convertView;
+//	   Bitmap Image=BitmapFactory.decodeResource(mContext.getResources(),R.drawable.cable);
+//	        Image=Image.copy(Bitmap.Config.ARGB_8888,true);
+//	        Paint paint=new Paint();
+//	        paint.setDither(true);
+//	        paint.setFilterBitmap(true);
+//	        Bitmap glow=BitmapFactory.decodeResource(mContext.getResources(), R.drawable.green);
+//	        Bitmap bitmap=Bitmap.createBitmap(Image.getWidth(),Image.getHeight(), Config.ARGB_8888);
+//	        Canvas canvas=new Canvas(bitmap);
+//
+//	        canvas.drawBitmap(glow, new Rect(0,0,glow.getWidth(),glow.getHeight()), new Rect(0,0,Image.getWidth(),Image.getHeight()),paint);
+//	        canvas.drawBitmap(Image, new Rect(0,0,Image.getWidth(),Image.getHeight()), new Rect(0+5,0+5,Image.getWidth()-5,Image.getHeight()-5),paint);
+//
+//
+//
+//	        imageView.setImageBitmap(bitmap);
+//	}
+//
+//	   return imageView;
+//	}
 }
