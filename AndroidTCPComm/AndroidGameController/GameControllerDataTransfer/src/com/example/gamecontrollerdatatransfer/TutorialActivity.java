@@ -1,5 +1,6 @@
 package com.example.gamecontrollerdatatransfer;
 
+import android.R.anim;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;

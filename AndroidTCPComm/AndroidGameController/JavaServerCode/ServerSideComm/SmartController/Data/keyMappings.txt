@@ -1,4 +1,4 @@
-Z SPACEBAR C D X 
+Z SPACEBAR LEFT-MOUSE-BUTTON D X 
 -None- F D -None- E 
 -None- F D -None- E 
 -None- F D -None- E 

@@ -538,7 +538,7 @@ public class ServerUI extends JFrame {
 				while (ee.hasMoreElements()) {
 					InetAddress i = (InetAddress) ee.nextElement();
 					if (i.isSiteLocalAddress()) {
-						ip += i.getHostAddress() + "\n";
+						ip += i.getHostName()+": "+i.getHostAddress() + " \n";
 						// System.out.println(i.getHostAddress());
 					}
 				}
