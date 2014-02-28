@@ -15,7 +15,7 @@
 	<string name="IPV4">IPV4</string>
 	<string name="faq">FAQ Page</string>
 	<string name="gototutorials">View tutorials</string>
-	<string name="skiptut">Skip Tutorial</string>
+	<string name="tutorial_page">Tutorials: Touch a page to expand it (Touch to close)</string>
 	<string name="repeatTutorials">Repeat Tutorials</string>
 	<string name="buttonreset">Rest Tilt Position</string>
 	<string name="buttonplaypause">Stop/ Resume Tilt Detection</string>
@@ -23,6 +23,7 @@
 	<string name="yaxis">Y-Axis</string>
 	<string name="zaxis">Z-Axis</string>
 	<string name="game_controller">SmartController</string>
+	<string name="demovideo">Demo Video</string>
 	<string name="delete">Delete Selected</string>
 	<string name="ip_list">Past Favourites</string>
 	<string name="paireddevices">Paired Devices</string>

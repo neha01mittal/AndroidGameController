@@ -77,7 +77,7 @@ public class PlayActivity extends Activity {
 
 				if (isPaused) {
 					// Detection enabled, show the pause button
-					playPauseButton.setImageResource(R.drawable.pausebutton);
+					playPauseButton.setBackgroundResource(R.drawable.pausebutton);
 					Toast.makeText(getApplicationContext(),
 							"Tilt detection enabled", Toast.LENGTH_SHORT)
 							.show();
@@ -85,7 +85,7 @@ public class PlayActivity extends Activity {
 					onResume();
 				} else {
 					// Detection disabled, show the pause button
-					playPauseButton.setImageResource(R.drawable.playbutton);
+					playPauseButton.setBackgroundResource(R.drawable.playbutton);
 					Toast.makeText(getApplicationContext(),
 							"Tilt detection disabled", Toast.LENGTH_SHORT)
 							.show();

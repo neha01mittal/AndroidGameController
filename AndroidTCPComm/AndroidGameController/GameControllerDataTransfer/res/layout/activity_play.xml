@@ -79,19 +79,19 @@
 
     <ImageButton
         android:id="@+id/buttonplaypause"
-        android:contentDescription="@string/buttonplaypause"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="bottom|right"
-        android:layout_width="30dip" 
-        android:layout_height="30dip"
-        android:src="@drawable/pausebutton" />
+        android:contentDescription="@string/buttonplaypause"
+        android:background="@drawable/pausebutton" />
 
     <ImageButton
         android:id="@+id/buttonreset"
-        android:contentDescription="@string/buttonreset"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="bottom|right"
-        android:layout_marginBottom="40dip"
-        android:layout_width="30dip" 
-        android:layout_height="30dip"
-        android:src="@drawable/resetbutton"
-        />
+        android:layout_marginBottom="50dip"
+        android:contentDescription="@string/buttonreset"
+        android:background="@drawable/resetbutton" />
+
 </FrameLayout>
