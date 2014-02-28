@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
@@ -102,85 +103,85 @@ public class KeyTouch {
 				pressTwoKeys(KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, 100);
 				break;
 
-			// Tap
+			// No Tilt
 			case TAP_NOTILT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(0)), 10);
 				break;
-			case TAP_TILTUP:
+			case SWIPEUP_NOTILT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(1)), 10);
 				break;
-			case TAP_TILTDOWN:
+			case SWIPEDOWN_NOTILT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(2)), 10);
 				break;
-			case TAP_TILTLEFT:
+			case SWIPELEFT_NOTILT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(3)), 10);
 				break;
-			case TAP_TILTRIGHT:
+			case SWIPERIGHT_NOTILT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(4)), 10);
 				break;
 
-			// Swipe Up
-			case SWIPEUP_NOTILT:
+			// Tilt Up
+			case TAP_TILTUP:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(5)), 10);
 				break;
 			case SWIPEUP_TILTUP:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(6)), 10);
 				break;
-			case SWIPEUP_TILTDOWN:
+			case SWIPEDOWN_TILTUP:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(7)), 10);
 				break;
-			case SWIPEUP_TILTLEFT:
+			case SWIPELEFT_TILTUP:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(8)), 10);
 				break;
-			case SWIPEUP_TILTRIGHT:
+			case SWIPERIGHT_TILTUP:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(9)), 10);
 				break;
 
-			// Swipe Down
-			case SWIPEDOWN_NOTILT:
+			// Tilt Down
+			case TAP_TILTDOWN:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(10)), 10);
 				break;
-			case SWIPEDOWN_TILTUP:
+			case SWIPEUP_TILTDOWN:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(11)), 10);
 				break;
 			case SWIPEDOWN_TILTDOWN:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(12)), 10);
 				break;
-			case SWIPEDOWN_TILTLEFT:
+			case SWIPELEFT_TILTDOWN:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(13)), 10);
 				break;
-			case SWIPEDOWN_TILTRIGHT:
+			case SWIPERIGHT_TILTDOWN:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(14)), 10);
 				break;
 
-			// Swipe Left
-			case SWIPELEFT_NOTILT:
+			// Tilt Left
+			case TAP_TILTLEFT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(15)), 10);
 				break;
-			case SWIPELEFT_TILTUP:
+			case SWIPEUP_TILTLEFT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(16)), 10);
 				break;
-			case SWIPELEFT_TILTDOWN:
+			case SWIPEDOWN_TILTLEFT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(17)), 10);
 				break;
 			case SWIPELEFT_TILTLEFT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(18)), 10);
 				break;
-			case SWIPELEFT_TILTRIGHT:
+			case SWIPERIGHT_TILTLEFT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(19)), 10);
 				break;
 
-			// Swipe Right
-			case SWIPERIGHT_NOTILT:
+			// Tilt Right
+			case TAP_TILTRIGHT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(20)), 10);
 				break;
-			case SWIPERIGHT_TILTUP:
+			case SWIPEUP_TILTRIGHT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(21)), 10);
 				break;
-			case SWIPERIGHT_TILTDOWN:
+			case SWIPEDOWN_TILTRIGHT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(22)), 10);
 				break;
-			case SWIPERIGHT_TILTLEFT:
+			case SWIPELEFT_TILTRIGHT:
 				pressOneKey(keyList.getKeyEntry(keyMap.get(23)), 10);
 				break;
 			case SWIPERIGHT_TILTRIGHT:
@@ -199,11 +200,23 @@ public class KeyTouch {
 
 	private void pressOneKey(int keyCode, int duration) {
 		try {
-			if (keyCode != 0) {
-				Robot robot = new Robot();
+			Robot robot = new Robot();
+			
+			if (keyCode > 0) {
 				robot.keyPress(keyCode);
 				robot.delay(duration);
 				robot.keyRelease(keyCode);
+			} else {
+				switch(keyCode) {
+					case -1:	//LEFT-MOUSE-BUTTON
+						robot.mousePress(InputEvent.BUTTON1_MASK );
+						robot.mouseRelease(InputEvent.BUTTON1_MASK );
+						break;
+					case -2:	//RIGHT-MOUSE-BUTTON
+						robot.mousePress(InputEvent.BUTTON3_MASK );
+						robot.mouseRelease(InputEvent.BUTTON3_MASK );
+						break;
+				}
 			}
 		} catch (AWTException e) {
 			e.printStackTrace();
@@ -212,6 +225,7 @@ public class KeyTouch {
 
 	private void pressTwoKeys(int keyCode1, int keyCode2, int duration) {
 		try {
+			if (keyCode1 > 0 && keyCode2 > 0 ) {
 			Robot robot = new Robot();
 
 			robot.keyPress(keyCode1);
@@ -219,7 +233,7 @@ public class KeyTouch {
 			robot.delay(duration);
 			robot.keyRelease(keyCode1);
 			robot.keyRelease(keyCode2);
-
+			}
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
