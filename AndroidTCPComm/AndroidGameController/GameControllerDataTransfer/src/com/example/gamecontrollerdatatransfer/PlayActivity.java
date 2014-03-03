@@ -37,6 +37,8 @@ public class PlayActivity extends Activity {
 
 	public int tiltState = 0;
 	public float tiltX, tiltY;
+	
+	private int bgColor = Color.TRANSPARENT;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -122,6 +124,10 @@ public class PlayActivity extends Activity {
 		builder.show();
 	}
 
+	public boolean isTiltDetectionOn(){
+		return !isPaused;
+	}
+	
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -260,7 +266,7 @@ public class PlayActivity extends Activity {
 						tvY.setVisibility(View.INVISIBLE);
 						tvZ.setVisibility(View.INVISIBLE);
 
-						iv.setVisibility(View.VISIBLE);
+						iv.setVisibility(View.INVISIBLE);
 						/*
 						 * if (deltaZ > deltaX && deltaZ > deltaY) {
 						 * Toast.makeText(getApplicationContext(),
@@ -276,10 +282,10 @@ public class PlayActivity extends Activity {
 
 							if ((startX - x) < 0) {
 								// down tilt
-								commonView.setBackgroundColor(Color.parseColor("#ff669966"));
+								bgColor = Color.parseColor("#ff669966");
 								tiltState = 1; // TILT UP
 							} else {
-								commonView.setBackgroundColor(Color.parseColor("#ff668899"));
+								bgColor = Color.parseColor("#ff668899");
 								tiltState = 2; // TILT DOWN
 							}
 
@@ -295,10 +301,10 @@ public class PlayActivity extends Activity {
 
 							if ((startY - y) < 0) {
 								// down tilt
-								commonView.setBackgroundColor(Color.parseColor("#ff6E6699"));
+								bgColor = Color.parseColor("#ff6E6699");
 								tiltState = 3; // TILT LEFT
 							} else {
-								commonView.setBackgroundColor(Color.parseColor("#ff886699"));
+								bgColor = Color.parseColor("#ff886699");
 								tiltState = 4; // TILT RIGHT
 							}
 
@@ -308,11 +314,11 @@ public class PlayActivity extends Activity {
 						} else {
 							// NOP
 							iv.setVisibility(View.INVISIBLE);
-							commonView.setBackgroundColor(Color.TRANSPARENT);
+							bgColor = Color.TRANSPARENT;
 							tiltState = 0; // NO TILT
 						}
-
-						commonView.postInvalidate();
+					commonView.setBackgroundColor(bgColor);
+					commonView.invalidate();
 					}
 				} else {
 					// Don't detect tilt
