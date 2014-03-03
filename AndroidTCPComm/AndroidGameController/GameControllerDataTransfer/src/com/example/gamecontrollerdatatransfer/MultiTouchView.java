@@ -5,14 +5,12 @@ import android.app.Service;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
-import android.graphics.BlurMaskFilter.Blur;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.AttributeSet;
@@ -25,10 +23,10 @@ import android.view.WindowManager;
 
 public class MultiTouchView extends View {
 
-	private static final int THRESHOLD = 70;
+	private static final int THRESHOLD = 70, TILTTHRESHOLD = 120;
 	private static final int MINDRAGTIMETHRESHOLD = 170;
-	private final int SIZE;
-	private final int SCREENCENTREY, SCREENWIDTH, SCREENHEIGHT;
+	private final int SIZE, TILTSIZE;
+	private final int SCREENCENTREX, SCREENCENTREY, SCREENWIDTH, SCREENHEIGHT;
 	private long prevLeftTime = 0, prevRightTime = 0, prevDragTime = 0;
 	private Context m_context;
 
@@ -48,11 +46,14 @@ public class MultiTouchView extends View {
 	private SparseArray<Boolean> registeredDragPointer;
 
 	private TouchCoordinates leftDrawPoint;
+	
+	private static RectF tiltCircleRect;
+	private static PointF tiltCircleLineStart, tiltCircleLineEnd, tiltCircleDotStart, tiltCircleDotEnd;
 
 	private Paint mPaint, glowPaint, textPaint;
-	private int[] colors = { Color.BLUE, Color.YELLOW, Color.GREEN,
-			Color.BLACK, Color.CYAN, Color.GRAY, Color.RED, Color.DKGRAY,
-			Color.LTGRAY, Color.YELLOW };
+	private int[] colors = { Color.BLUE, Color.YELLOW, Color.GREEN, Color.CYAN, Color.RED, Color.GRAY, Color.DKGRAY,
+			Color.LTGRAY, Color.YELLOW,
+			Color.BLACK };
 
 	private int[] bigColors = { Color.LTGRAY, Color.WHITE, Color.GRAY,
 			Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN,
@@ -80,10 +81,18 @@ public class MultiTouchView extends View {
 		screenDisplay.getSize(screenSize);
 		SCREENWIDTH = screenSize.x;
 		SCREENHEIGHT = screenSize.y;
-
+		
+		SCREENCENTREX = SCREENWIDTH / 2;
 		SCREENCENTREY = SCREENHEIGHT / 2;
-		SIZE = SCREENWIDTH / 30;
-
+		SIZE = SCREENWIDTH / 40;
+		TILTSIZE = SCREENWIDTH / 80;
+		
+		tiltCircleRect = new RectF(SCREENCENTREX - TILTTHRESHOLD, SCREENCENTREY - TILTTHRESHOLD, SCREENCENTREX + TILTTHRESHOLD, SCREENCENTREY + TILTTHRESHOLD);
+		tiltCircleLineStart = new PointF((float)Math.cos(Math.toRadians(60)) * (TILTTHRESHOLD + 8), (float)Math.sin(Math.toRadians(60)) * (TILTTHRESHOLD + 8));
+		tiltCircleLineEnd = new PointF((float)Math.cos(Math.toRadians(60)) * (TILTTHRESHOLD + 12), (float)Math.sin(Math.toRadians(60)) * (TILTTHRESHOLD + 12));
+		tiltCircleDotStart = new PointF((float)Math.cos(Math.toRadians(45)) * (TILTTHRESHOLD + 8), (float)Math.sin(Math.toRadians(45)) * (TILTTHRESHOLD + 8));
+		tiltCircleDotEnd = new PointF((float)Math.cos(Math.toRadians(45)) * (TILTTHRESHOLD + 12), (float)Math.sin(Math.toRadians(45)) * (TILTTHRESHOLD + 12));
+		
 		// Init Arrays
 		for (int i = 0; i < 2; i++)
 			initView();
@@ -97,14 +106,16 @@ public class MultiTouchView extends View {
 		lastSentPointerY = new SparseArray<Float>();
 		pointerStartDragTime = new SparseArray<Long>();
 		registeredDragPointer = new SparseArray<Boolean>();
+		
 		// Set Painter properties
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPaint.setDither(true);
-		mPaint.setColor(Color.BLUE);
+		//mPaint.setColor(Color.BLUE);
+		mPaint.setColor(Color.WHITE);
 		mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
-		//mPaint.setMaskFilter(new BlurMaskFilter(10, BlurMaskFilter.Blur.NORMAL));
+		mPaint.setMaskFilter(new BlurMaskFilter(1, BlurMaskFilter.Blur.NORMAL));
 		
 		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		textPaint.setTextSize(20);
@@ -112,7 +123,7 @@ public class MultiTouchView extends View {
 		glowPaint = new Paint();
 		glowPaint.set(mPaint);
 		glowPaint.setColor(Color.argb(235, 74, 138, 255));
-		glowPaint.setMaskFilter(new BlurMaskFilter(20, BlurMaskFilter.Blur.NORMAL));
+		glowPaint.setMaskFilter(new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL));
 	}
 
 	@Override
@@ -533,77 +544,130 @@ public class MultiTouchView extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-		/*if (mBitmap == null) {
-			canvasWidth = canvas.getWidth();
-			canvasHeight = canvas.getHeight();
-			mBitmap = Bitmap.createBitmap(canvasWidth, canvasHeight,
-					Bitmap.Config.RGB_565);
-			currentCanvas = new Canvas(mBitmap);
-			mPaint = new Paint();
+		super.onDraw(canvas);		
+
+		//If Tilt Detection is on, draw the Accelerometer
+		if (m_context instanceof PlayActivity) {
+			
+			PlayActivity activity = (PlayActivity) m_context;
+			
+			if(activity.isTiltDetectionOn()){
+				
+				PointF tiltDrawPoint = new PointF((SCREENCENTREX + (float)((activity.tiltX)/2.5*TILTTHRESHOLD)), (SCREENCENTREY - (float)((activity.tiltY)/2.5*TILTTHRESHOLD)));
+	
+				// Set paint colours and visibility for accelerometer circle here
+				glowPaint.setColor(Color.argb(150, 124, 188, 255));
+				mPaint.setColor(Color.argb(150, 255, 255, 255));
+				
+				//glowPaint: Draw Ring
+				glowPaint.setStrokeJoin(Paint.Join.BEVEL);
+				glowPaint.setStrokeCap(Paint.Cap.SQUARE);
+				glowPaint.setMaskFilter(new BlurMaskFilter(3, BlurMaskFilter.Blur.NORMAL));
+				glowPaint.setStyle(Paint.Style.STROKE);
+				glowPaint.setStrokeWidth(10f);
+				canvas.drawLine(SCREENCENTREX - tiltCircleLineStart.x, SCREENCENTREY - tiltCircleLineStart.y, SCREENCENTREX - tiltCircleLineEnd.x, SCREENCENTREY - tiltCircleLineEnd.y, glowPaint);
+				canvas.drawLine(SCREENCENTREX - tiltCircleLineStart.x, SCREENCENTREY + tiltCircleLineStart.y, SCREENCENTREX - tiltCircleLineEnd.x, SCREENCENTREY + tiltCircleLineEnd.y, glowPaint);
+				
+				canvas.drawLine(SCREENCENTREX - tiltCircleLineStart.y, SCREENCENTREY - tiltCircleLineStart.x, SCREENCENTREX - tiltCircleLineEnd.y, SCREENCENTREY - tiltCircleLineEnd.x, glowPaint);
+				canvas.drawLine(SCREENCENTREX - tiltCircleLineStart.y, SCREENCENTREY + tiltCircleLineStart.x, SCREENCENTREX - tiltCircleLineEnd.y, SCREENCENTREY + tiltCircleLineEnd.x, glowPaint);
+				
+				canvas.drawLine(SCREENCENTREX + tiltCircleLineStart.x, SCREENCENTREY - tiltCircleLineStart.y, SCREENCENTREX + tiltCircleLineEnd.x, SCREENCENTREY - tiltCircleLineEnd.y, glowPaint);
+				canvas.drawLine(SCREENCENTREX + tiltCircleLineStart.x, SCREENCENTREY + tiltCircleLineStart.y, SCREENCENTREX + tiltCircleLineEnd.x, SCREENCENTREY + tiltCircleLineEnd.y, glowPaint);
+
+				canvas.drawLine(SCREENCENTREX + tiltCircleLineStart.y, SCREENCENTREY - tiltCircleLineStart.x, SCREENCENTREX + tiltCircleLineEnd.y, SCREENCENTREY - tiltCircleLineEnd.x, glowPaint);
+				canvas.drawLine(SCREENCENTREX + tiltCircleLineStart.y, SCREENCENTREY + tiltCircleLineStart.x, SCREENCENTREX + tiltCircleLineEnd.y, SCREENCENTREY + tiltCircleLineEnd.x, glowPaint);
+				
+				canvas.drawLine(SCREENCENTREX - tiltCircleDotStart.x, SCREENCENTREY - tiltCircleDotStart.y, SCREENCENTREX - tiltCircleDotEnd.x, SCREENCENTREY - tiltCircleDotEnd.y, glowPaint);
+				canvas.drawLine(SCREENCENTREX - tiltCircleDotStart.x, SCREENCENTREY + tiltCircleDotStart.y, SCREENCENTREX - tiltCircleDotEnd.x, SCREENCENTREY + tiltCircleDotEnd.y, glowPaint);
+				canvas.drawLine(SCREENCENTREX + tiltCircleDotStart.x, SCREENCENTREY - tiltCircleDotStart.y, SCREENCENTREX + tiltCircleDotEnd.x, SCREENCENTREY - tiltCircleDotEnd.y, glowPaint);
+				canvas.drawLine(SCREENCENTREX + tiltCircleDotStart.x, SCREENCENTREY + tiltCircleDotStart.y, SCREENCENTREX + tiltCircleDotEnd.x, SCREENCENTREY + tiltCircleDotEnd.y, glowPaint);
+
+				
+				canvas.drawArc(tiltCircleRect, (float)60, (float)60, false, glowPaint);
+				canvas.drawArc(tiltCircleRect, (float)150, (float)60, false, glowPaint);
+				canvas.drawArc(tiltCircleRect, (float)240, (float)60, false, glowPaint);
+				canvas.drawArc(tiltCircleRect, (float)330, (float)60, false, glowPaint);
+	
+				//glowPaint: Draw Point
+				glowPaint.setMaskFilter(new BlurMaskFilter(3, BlurMaskFilter.Blur.NORMAL));
+				glowPaint.setStyle(Paint.Style.FILL);	
+				canvas.drawLine(tiltDrawPoint.x - TILTSIZE, tiltDrawPoint.y, tiltDrawPoint.x - 5, tiltDrawPoint.y, glowPaint);
+				canvas.drawLine(tiltDrawPoint.x + 5, tiltDrawPoint.y, tiltDrawPoint.x + TILTSIZE, tiltDrawPoint.y, glowPaint);
+				canvas.drawLine(tiltDrawPoint.x, tiltDrawPoint.y - TILTSIZE, tiltDrawPoint.x, tiltDrawPoint.y - 5, glowPaint);
+				canvas.drawLine(tiltDrawPoint.x, tiltDrawPoint.y + 5, tiltDrawPoint.x, tiltDrawPoint.y + TILTSIZE, glowPaint);				
+				
+				Log.d("Drawing","TiltX: " + activity.tiltX + " " + tiltDrawPoint.x + "  TiltY: " + activity.tiltY + "" + tiltDrawPoint.y );
+			
+			} else {
+				//Otherwise draw a line to divide the two screens into halves
+				// Set paint colours and visibility for line here
+				glowPaint.setColor(Color.argb(150, 114, 178, 255));
+				glowPaint.setStrokeJoin(Paint.Join.BEVEL);
+				glowPaint.setStrokeCap(Paint.Cap.SQUARE);
+				glowPaint.setMaskFilter(new BlurMaskFilter(3, BlurMaskFilter.Blur.NORMAL));
+				glowPaint.setStyle(Paint.Style.STROKE);
+				glowPaint.setStrokeWidth(10f);
+				
+				canvas.drawLine(0, SCREENCENTREY, SCREENWIDTH, SCREENCENTREY,
+						glowPaint);
+			}
 		}
 
-		currentCanvas.drawPaint(mPaint);
-		currentCanvas.setBitmap(mBitmap);
-
-		currentCanvas.drawBitmap(mBitmap, 0, 0, mPaint);*/
-
-		mPaint.setColor(Color.argb(235, 144, 208, 255));
-		canvas.drawLine(0, SCREENCENTREY, SCREENWIDTH, SCREENCENTREY,
-				mPaint);
-
-		/*
-		 * ( if(mouseRegistered) { mPaint.setStyle(Paint.Style.STROKE);
-		 * 
-		 * //canvas.drawLine(mouseBoxCentreX+mouseBoxVectors[0]., startY, stopX,
-		 * stopY, paint) }
-		 */
-
-		// draw all pointers
+		// Draw all Pointers on the left and right screen
 		for (int size = mActivePointers.size(), i = 0; i < size; i++) {
 
 			PointF point = mActivePointers.valueAt(i);
 			PointF startPoint = new PointF(startPointerX.valueAt(i),
 					startPointerY.valueAt(i));
+			
 
 			if (isLeftScreen(startPoint.y)) {
-				if (point != null) {
-					mPaint.setColor(bigColors[i % 9]);
-					mPaint.setStyle(Paint.Style.STROKE);
-					mPaint.setStrokeWidth(20f);
-
-					mPaint.setColor(Color.argb(235, 144, 208, 255));
-					glowPaint.setColor(Color.argb(80, 144, 208, 255));
-					//glowPaint.setStyle(Paint.Style.FILL);
+				if (point != null) {			
+					// Set paint colours and visibility for pointers and rings here				
+					glowPaint.setColor(Color.argb(255, 144, 208, 255));
+					glowPaint.setAlpha(255);
+					glowPaint.setStrokeJoin(Paint.Join.ROUND);
+					glowPaint.setStrokeCap(Paint.Cap.ROUND);
+					glowPaint.setMaskFilter(new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL));
+					mPaint.setColor(Color.argb(255, 255, 255, 255));
+					
+					//glowPaint: Draw Ring
 					glowPaint.setStyle(Paint.Style.STROKE);
-					glowPaint.setStrokeWidth(30f);
+					glowPaint.setStrokeWidth(15f);
 					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, glowPaint);
-					//mPaint.setStyle(Paint.Style.FILL);
-					mPaint.setStyle(Paint.Style.STROKE);
-					mPaint.setStrokeWidth(10f);
-					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, mPaint);
-					
-					//mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC)) ;
-					//mPaint.setShadowLayer(THRESHOLD+50, startPoint.x, startPoint.y, Color.argb(235, 74, 138, 255));
-					//canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, mPaint);
-					
-					glowPaint.setColor(colors[i % 9]);
-					glowPaint.setAlpha(70);
+
+					//glowPaint: Draw Point
 					glowPaint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE+10, glowPaint);			
-					mPaint.setColor(colors[i % 9]);
+					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE+2, glowPaint);	
+
+					//mPaint: Draw Ring
+					mPaint.setStyle(Paint.Style.STROKE);
+					mPaint.setStrokeWidth(8f);
+					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, mPaint);
+
+					//mPaint: Draw Point				
 					mPaint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE, mPaint);
+					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE-3, mPaint);
 				}
 			} else { // isRightScreen
-						// ACTION
-				canvas.drawCircle(point.x, point.y, SIZE, mPaint);
+
+				// Set paint colours and visibility for pointers here				
+				glowPaint.setColor(colors[i % 9]);	
+				glowPaint.setAlpha(255);
+				glowPaint.setStrokeJoin(Paint.Join.ROUND);
+				glowPaint.setStrokeCap(Paint.Cap.ROUND);
+				glowPaint.setMaskFilter(new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL));
+				mPaint.setColor(Color.argb(255, 255, 255, 255));
+				
+				//glowPaint: Draw Point
+				glowPaint.setStyle(Paint.Style.FILL);
+				canvas.drawCircle(point.x, point.y, SIZE+7, glowPaint);	
+				
+				//mPaint: Draw Point				
 				mPaint.setStyle(Paint.Style.FILL);
-				mPaint.setColor(colors[(i + 1) % 9]);
+				canvas.drawCircle(point.x, point.y, SIZE, mPaint);
 			}
-		}
-		canvas.drawText("Total pointers: " + mActivePointers.size(), 10, 40,
-				textPaint);
+		}				
 	}
 
 	public void wrapCoordinates(float x, float y, int operation,
