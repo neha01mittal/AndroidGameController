@@ -36,11 +36,6 @@ import android.widget.Toast;
 
 public class WifiConnectActivity extends ListActivity {
 
-	/** TODOS: 
-	 *  Confirmation msg for delete all;
-	 *  Fix scroll bar;
-	 *  Sort list ;
-	 */
 	private String ipAddress;
 	private EditText userInput;
 	private SharedPreferences preferences;
@@ -178,7 +173,6 @@ public class WifiConnectActivity extends ListActivity {
 		@Override
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
-			// editor.clear();
 			IPAddressFormatValidator iadfv = new IPAddressFormatValidator();
 			if (iadfv.validate(userInput.getText().toString())) {
 				editor.putString(userInput.getText().toString(), "dummy");
@@ -200,26 +194,14 @@ public class WifiConnectActivity extends ListActivity {
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					getApplicationContext());
-			/*
-			 * builder.setTitle("Are you sure?");
-			 * builder.setMessage(R.string.confirm_clear_list
-			 * ).setPositiveButton(R.string.ok, new
-			 * DialogInterface.OnClickListener() {
-			 * 
-			 * @Override public void onClick(DialogInterface dialog, int id) {
-			 * // User clicked OK, so save the mSelectedItems results somewhere
-			 * // or return them to the component that opened the dialog
-			 * 
-			 * } }).setNegativeButton(R.string.cancel, new
-			 * DialogInterface.OnClickListener() {
-			 * 
-			 * @Override public void onClick(DialogInterface dialog, int id) {
-			 * //NOP } }); builder.show();
-			 */
 			clearlistview();
 		}
 	};
 
+	/**
+	 * called when ip addresses are added to favourites
+	 * @param v
+	 */
 	public void addItems(View v) {
 
 		adapter.clear();
@@ -243,38 +225,4 @@ public class WifiConnectActivity extends ListActivity {
 			lv.setItemChecked(i, false);
 		}
 	}
-//	
-//	public View getView(int position, View convertView, ViewGroup parent)
-//	{
-//	ImageView imageView;
-//	Context mContext= getApplicationContext();
-//	if (convertView == null)
-//	{
-//	imageView = new ImageView(mContext);
-//	imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
-//	imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//	imageView.setPadding(8, 8, 8, 8); 
-//	}
-//	else
-//	{
-//	   imageView = (ImageView) convertView;
-//	   Bitmap Image=BitmapFactory.decodeResource(mContext.getResources(),R.drawable.cable);
-//	        Image=Image.copy(Bitmap.Config.ARGB_8888,true);
-//	        Paint paint=new Paint();
-//	        paint.setDither(true);
-//	        paint.setFilterBitmap(true);
-//	        Bitmap glow=BitmapFactory.decodeResource(mContext.getResources(), R.drawable.green);
-//	        Bitmap bitmap=Bitmap.createBitmap(Image.getWidth(),Image.getHeight(), Config.ARGB_8888);
-//	        Canvas canvas=new Canvas(bitmap);
-//
-//	        canvas.drawBitmap(glow, new Rect(0,0,glow.getWidth(),glow.getHeight()), new Rect(0,0,Image.getWidth(),Image.getHeight()),paint);
-//	        canvas.drawBitmap(Image, new Rect(0,0,Image.getWidth(),Image.getHeight()), new Rect(0+5,0+5,Image.getWidth()-5,Image.getHeight()-5),paint);
-//
-//
-//
-//	        imageView.setImageBitmap(bitmap);
-//	}
-//
-//	   return imageView;
-//	}
 }

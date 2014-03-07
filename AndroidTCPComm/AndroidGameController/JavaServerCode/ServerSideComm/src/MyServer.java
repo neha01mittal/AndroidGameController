@@ -42,6 +42,11 @@ public class MyServer {
 		myServer.startConnection(0);
 	}
 	
+	/**
+	 * checks for connection type (Wifi or Bluetooth) and start a connection
+	 * @param connectionType
+	 * @throws UnknownHostException
+	 */
 	public void startConnection(int connectionType) throws UnknownHostException {
 		// TODO Auto-generated method stub
 		while(true) {

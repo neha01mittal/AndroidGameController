@@ -22,6 +22,7 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
@@ -128,6 +129,9 @@ public class TutorialActivity extends FragmentActivity {
 		iAmReady.setOnClickListener(iAmReadyButton);
 		Button faq = (Button) findViewById(R.id.faq);
 		faq.setOnClickListener(faqButton);
+
+		Button demoVideo = (Button) findViewById(R.id.demovideo);
+		faq.setOnClickListener(demoVideoButton);
 
 		// Retrieve and cache the system's default "short" animation time.
 		mShortAnimationDuration = getResources().getInteger(
@@ -325,8 +329,20 @@ public class TutorialActivity extends FragmentActivity {
 		@Override
 		public void onClick(View v) {
 			// build this page
-			Intent k = new Intent(TutorialActivity.this, MainActivity.class);
-			startActivity(k);
+			Uri uri = Uri.parse("http://www.google.com");
+			 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			 startActivity(intent);
+		}
+	};
+	
+	Button.OnClickListener demoVideoButton = new Button.OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// build this page
+			Uri uri = Uri.parse("http://www.youtube.com/watch?v=UPwG8pzzxww");
+			 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			 startActivity(intent);
 		}
 	};
 }

@@ -11,6 +11,12 @@ import java.util.ArrayList;
 
 public class KeyTouch {
 
+	/**
+	 * map the keys to corresponding action
+	 * @param command
+	 * @param keyMap
+	 * @param mouseRatio
+	 */
 	public void identifyKey(CommandType command, ArrayList<String> keyMap,
 			float mouseRatio) {
 		try {
@@ -62,16 +68,8 @@ public class KeyTouch {
 				int mouseY = (int) point.getY();
 				System.out.println(mouseX + " " + mouseY);
 
-				/*
-				 * if(mouseY>=screenHeight) mouseY=0; else
-				 * if(mouseX>=screenWidth) mouseX=0; else if(mouseY<=0) mouseY=
-				 * (int) screenHeight; else if(mouseX<=0) mouseX=(int)
-				 * screenWidth;
-				 */
-
 				robot.mouseMove(mouseX + (int) newMouseXLocation, mouseY
 						+ (int) newMouseYLocation);
-				// robot .mouseMove(mouseX,mouseY+(int)newMouseXLocation);
 				// Should get X and Y from phone
 				// gyrometer/gravity for moving the mouse
 
@@ -198,6 +196,11 @@ public class KeyTouch {
 		}
 	}
 
+	/**
+	 * perform action on key touch ( and introduce relevant delay )
+	 * @param keyCode
+	 * @param duration
+	 */
 	private void pressOneKey(int keyCode, int duration) {
 		try {
 			Robot robot = new Robot();
@@ -223,6 +226,12 @@ public class KeyTouch {
 		}
 	}
 
+	/**
+	 * this function is called when two keys are pressed at the same time
+	 * @param keyCode1
+	 * @param keyCode2
+	 * @param duration
+	 */
 	private void pressTwoKeys(int keyCode1, int keyCode2, int duration) {
 		try {
 			if (keyCode1 > 0 && keyCode2 > 0 ) {

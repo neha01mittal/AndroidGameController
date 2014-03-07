@@ -75,12 +75,18 @@ public class BluetoothConnectActivity extends Activity implements
 
 	}
 
+	/**
+	 * enable bluetooth connection
+	 */
 	public void enableBT() {
 		Intent enableBtIntent = new Intent(SingletonBluetooth.getInstance()
 				.getBTAdapter().ACTION_REQUEST_ENABLE);
 		startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 	}
 
+	/**
+	 * find the list of paired devices
+	 */
 	public void getPairedBTDevices() {
 
 		SingletonBluetooth.getInstance().setPairedDevicesList();
@@ -100,16 +106,15 @@ public class BluetoothConnectActivity extends Activity implements
 				// ListView
 				deviceListPaired.add(device);
 				adapterPaired.add(device.getName() + "\n" + device.getAddress());
-				Log.d("BT Paired Device: ", device.getName() + "\n" + device.getAddress()); // only
-																		// keys
-																		// with
-																		// true
-																		// are
-																		// shown
+				Log.d("BT Paired Device: ", device.getName() + "\n" + device.getAddress()); 
+				// only keys with true value are shown
 			}
 		}
 	}
 
+	/**
+	 * update status while turning on bluetooth
+	 */
 	public void discoverBTDevices() {
 
 		btReceiver = new BroadcastReceiver() {
@@ -139,11 +144,11 @@ public class BluetoothConnectActivity extends Activity implements
 					}
 				}else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED
 						.equals(action)) {
-					Toast.makeText(getApplicationContext(), "Started bluetooth discovery...", Toast.LENGTH_SHORT);
+					Toast.makeText(getApplicationContext(), "Started bluetooth discovery...", Toast.LENGTH_SHORT).show();
 					
 				}else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
 						.equals(action)) {
-					Toast.makeText(getApplicationContext(), "Bluetooth discovery ended", Toast.LENGTH_SHORT);
+					Toast.makeText(getApplicationContext(), "Bluetooth discovery ended", Toast.LENGTH_SHORT).show();
 					
 				}
 			}

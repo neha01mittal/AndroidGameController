@@ -47,9 +47,34 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
-
+/**
+ * This class builds a GUI for server handler that runs on the PC. 
+ * The server handler is used for connecting the PC to the android device via Wifi or bluetooth
+ * It consists of two tabs- General Settings (for ip address and port display) and Key Settings (for setting key configrations)
+ */
 public class ServerUI extends JFrame {
 
+	private static final String MOUSE_CURSOR_SENSITIVITY = " Mouse Cursor Sensitivity ";
+	private static final String IP_ADDRESS = " IP Address: ";
+	private static final String CHOICE_CONFIRMED = "Choice confirmed";
+	private static final String CHOOSE_YOUR_PREFERRED_CONNECTION_TYPE = " Choose your preferred connection type: ";
+	private static final String SERVER_CONFIGURATION = " Server Configuration ";
+	private static final String ERROR_CREATING_NEW_FILE = "Error creating new file: ";
+	private static final String CORRUPT_FILE_ERROR = "File corrupted/ missing.. Restoring default values..";
+	private static final String SMART_CONTROLLER_DIRECTORY = "SmartController/Data";
+	private static final String KEY_MAPPINGS_FILE = "keyMappings.txt";
+	private static final String DIRECTION_KEYS = "Direction keys: ";
+	private static final String MOUSE_CONTROL = "  Mouse control: ";
+	private static final String ALL_CHANGES_SAVED_SUCCESSFULLY = "\nAll changes saved successfully.";
+	private static final String TILT_RIGHT = "Tilt Right";
+	private static final String TILT_LEFT = "Tilt Left";
+	private static final String TILT_DOWN = "Tilt Down";
+	private static final String TILT_UP = "Tilt Up";
+	private static final String NO_TILT = "No Tilt";
+	private static final String SAVE_CHANGES = "Save changes";
+	private static final String RESTORE_TO_DEFAULT_SETTINGS = "Restore to default settings";
+	private static final String PLEASE_MAP_YOUR_BUTTON_CONFIGURATION_HERE = "Please map your button configuration here.";
+	private static final String GAME_CONTROLLER_SERVER = " SmartController Server";
 	private JTabbedPane innerTabbedPane;
 	private static JLabel status;
 	private int connectionType = 1;
@@ -105,7 +130,7 @@ public class ServerUI extends JFrame {
 
 	private void createBasicUI() throws UnknownHostException {
 		// TODO Auto-generated method stub
-		setTitle("Game Controller Server");
+		setTitle(GAME_CONTROLLER_SERVER);
 		setSize(750, 500);
 
 		JPanel topPanel = new JPanel();
@@ -124,11 +149,19 @@ public class ServerUI extends JFrame {
 		// Initialize variables
 		mouseRatio = (float) (FPS_INIT * 0.1);
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 * userChoice-1- Wifi 2- Bluetooth
+	 */
 	public int getUserChoice() {
 		return userChoice;
 	}
 
+	/**
+	 * Key settings tab with dropdowns and table for key mappings
+	 */
 	private void createSettingsTab() {
 		keySettingsPane = new JPanel();
 		keySettingsPane = new JPanel(new BorderLayout());
@@ -138,13 +171,13 @@ public class ServerUI extends JFrame {
 		buildComponentsInKeySettings(keySettingsPane, "Hold and Drag");
 
 		JLabel msgToUser = new JLabel(
-				"Please map your button configuration here.");
+				PLEASE_MAP_YOUR_BUTTON_CONFIGURATION_HERE);
 		msgToUser.setFont(new Font("Serif", Font.ITALIC, 15));
 		keySettingsPane.add(msgToUser);
 
 		buildInnerTabs();
 
-		JButton restoreToDefault = new JButton("Restore to default settings");
+		JButton restoreToDefault = new JButton(RESTORE_TO_DEFAULT_SETTINGS);
 		restoreToDefault.addActionListener(new ActionListener() {
 
 			@Override
@@ -169,7 +202,7 @@ public class ServerUI extends JFrame {
 
 		keySettingsPane.add(restoreToDefault);
 
-		JButton save = new JButton("Save changes");
+		JButton save = new JButton(SAVE_CHANGES);
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				// ... called when button clicked
@@ -182,16 +215,16 @@ public class ServerUI extends JFrame {
 				try {
 					writer = new PrintWriter(dataFile, "UTF-8");
 
-					storeMappings(writer, tables, 0, "No Tilt");
-					storeMappings(writer, tables, 1, "Tilt Up");
-					storeMappings(writer, tables, 2, "Tilt Down");
-					storeMappings(writer, tables, 3, "Tilt Left");
-					storeMappings(writer, tables, 4, "Tilt Right");
+					storeMappings(writer, tables, 0, NO_TILT);
+					storeMappings(writer, tables, 1, TILT_UP);
+					storeMappings(writer, tables, 2, TILT_DOWN);
+					storeMappings(writer, tables, 3, TILT_LEFT);
+					storeMappings(writer, tables, 4, TILT_RIGHT);
 					writer.close();
-					JOptionPane.showMessageDialog(null, "Direction keys: "
-							+ directionKeys + "  Mouse control: "
+					JOptionPane.showMessageDialog(null, DIRECTION_KEYS
+							+ directionKeys + MOUSE_CONTROL
 							+ mouseControl
-							+ "\nAll changes saved successfully.");
+							+ ALL_CHANGES_SAVED_SUCCESSFULLY);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -219,6 +252,9 @@ public class ServerUI extends JFrame {
 		emptyData = originalEmptyData;
 	}
 
+	/**
+	 * store values in a temp file on system
+	 */
 	public void storeMappings(PrintWriter writer, JTable[] tables, int index,
 			String tabName) {
 		for (int i = 0; i < tables[index].getRowCount(); i++) {
@@ -232,6 +268,9 @@ public class ServerUI extends JFrame {
 		return keyboardControlMapping;
 	}
 
+	/**
+	 * Build tabs (table) for mapping keys to touch 
+	 */
 	private void buildInnerTabs() {
 		// TODO Auto-generated method stub
 		innerTabbedPane = new JTabbedPane();
@@ -242,6 +281,11 @@ public class ServerUI extends JFrame {
 		keySettingsPane.add(innerTabbedPane, BorderLayout.CENTER);
 	}
 
+	/**
+	 * count the number of lines in a file
+	 * @param file
+	 * @return
+	 */
 	public int getNumberOfLines(File file) {
 		int count = 0;
 		BufferedReader br = null;
@@ -257,6 +301,9 @@ public class ServerUI extends JFrame {
 		return count;
 	}
 
+	/**
+	 * populate table with initial default settings
+	 */
 	public void setDefaultSettings() {
 		// read from file here
 		BufferedReader br = null;
@@ -264,12 +311,12 @@ public class ServerUI extends JFrame {
 		ArrayList<String> temp = new ArrayList<String>();
 		try {
 			String sCurrentLine;
-			File file = new File("SmartController/Data", "keyMappings.txt");
+			File file = new File(SMART_CONTROLLER_DIRECTORY, KEY_MAPPINGS_FILE);
 			int count = 0;
 			if (!file.isFile() || getNumberOfLines(file) != 5) {
 				// create with default settings
 				System.out
-						.println("File corrupted/ missing.. Restoring default values..");
+						.println(CORRUPT_FILE_ERROR);
 				for (int i = 0; i < 5; i++) {
 					if (i == 0) {
 						panels[i] = createTiltTab(defaultData, tables, i);
@@ -320,6 +367,9 @@ public class ServerUI extends JFrame {
 		}
 	}
 
+	/**
+	 * create tabs for each table  
+	 */
 	private JPanel createTiltTab(Object[][] data, final JTable[] tables,
 			final int index) {
 		// TODO Auto-generated method stub
@@ -375,10 +425,13 @@ public class ServerUI extends JFrame {
 		col.setCellEditor(new DefaultCellEditor(comboBox));
 		pane.add(jsp);
 
-		// resetOriginalValues();
 		return pane;
 	}
 
+	/**
+	 * assign panels 
+	 * @param panels
+	 */
 	public void assignPanels(JPanel[] panels) {
 		noTiltPane = panels[0];
 		tiltUpPane = panels[1];
@@ -387,12 +440,16 @@ public class ServerUI extends JFrame {
 		tiltRightPane = panels[4];
 	}
 
+	/**
+	 * put each tab's content in the right pane
+	 * @param innerTabbedPane
+	 */
 	public void populateTabs(JTabbedPane innerTabbedPane) {
-		innerTabbedPane.addTab("No Tilt", noTiltPane);
-		innerTabbedPane.addTab("Tilt up", tiltUpPane);
-		innerTabbedPane.addTab("Tilt down", tiltDownPane);
-		innerTabbedPane.addTab("Tilt left", tiltLeftPane);
-		innerTabbedPane.addTab("Tilt right", tiltRightPane);
+		innerTabbedPane.addTab(NO_TILT, noTiltPane);
+		innerTabbedPane.addTab(TILT_UP, tiltUpPane);
+		innerTabbedPane.addTab(TILT_DOWN, tiltDownPane);
+		innerTabbedPane.addTab(TILT_LEFT, tiltLeftPane);
+		innerTabbedPane.addTab(TILT_RIGHT, tiltRightPane);
 	}
 
 	/*
@@ -406,15 +463,18 @@ public class ServerUI extends JFrame {
 	 * ArrayList<String>(); for(String key: defaultKeyboardControls) {
 	 * keyboardControlMapping.add(key); } } }
 	 */
-
+	/**
+	 * create file for stroing configurations
+	 * @return
+	 */
 	public File createKeyMapFile() {
-		File dir = new File("SmartController/Data");
+		File dir = new File(SMART_CONTROLLER_DIRECTORY);
 		dir.mkdirs();
-		File file = new File(dir, "keyMappings.txt");
+		File file = new File(dir, KEY_MAPPINGS_FILE);
 		System.out.println("File created: " + file.getAbsolutePath());
 		try {
 			if (!file.isFile() && !file.createNewFile()) {
-				throw new IOException("Error creating new file: "
+				throw new IOException(ERROR_CREATING_NEW_FILE
 						+ file.getAbsolutePath());
 			}
 		} catch (IOException e) {
@@ -424,6 +484,11 @@ public class ServerUI extends JFrame {
 		return file;
 	}
 
+	/**
+	 * add mouse control, gif and direction key dropdown in key settings tab
+	 * @param layout
+	 * @param mouseElement
+	 */
 	public void buildComponentsInKeySettings(JPanel layout, String mouseElement) {
 		JLabel dirControl = new JLabel("Direction Keys");
 		layout.add(dirControl);
@@ -455,19 +520,22 @@ public class ServerUI extends JFrame {
 		comboBoxMouse.setSize(1, 1);
 		layout.add(comboBoxMouse);
 	}
-
+	
+	/**
+	 * add elements to general tab
+	 */
 	private void createGeneralTab() {
 		// TODO Auto-generated method stub
 		generalPane = new JPanel(new BorderLayout());
 		generalPane.setLayout(new GridLayout(10, 1));
 		generalPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-		JLabel heading = new JLabel(" Server Configuration ");
+		JLabel heading = new JLabel(SERVER_CONFIGURATION);
 		heading.setFont(new Font(heading.getName(), Font.BOLD, 20));
 		generalPane.add(heading);
 
 		JLabel connectionMode = new JLabel(
-				" Choose your preferred connection type: ");
+				CHOOSE_YOUR_PREFERRED_CONNECTION_TYPE);
 		generalPane.add(connectionMode);
 
 		JRadioButton wifiButton = new JRadioButton("Wifi");
@@ -488,7 +556,7 @@ public class ServerUI extends JFrame {
 								"Connect now?", JOptionPane.YES_NO_OPTION);
 
 				if (reply == JOptionPane.YES_OPTION) {
-					connect.setText("Choice confirmed");
+					connect.setText(CHOICE_CONFIRMED);
 					userChoice = getConnectionType();
 					connect.setEnabled(false);
 				}
@@ -539,7 +607,6 @@ public class ServerUI extends JFrame {
 					InetAddress i = (InetAddress) ee.nextElement();
 					if (i.isSiteLocalAddress()) {
 						ip += i.getHostName()+": "+i.getHostAddress() + " \n";
-						// System.out.println(i.getHostAddress());
 					}
 				}
 			}
@@ -548,7 +615,7 @@ public class ServerUI extends JFrame {
 			e1.printStackTrace();
 		}
 
-		JLabel ipConfig = new JLabel(" IP Address: " + ip);
+		JLabel ipConfig = new JLabel(IP_ADDRESS + ip);
 		generalPane.add(ipConfig);
 
 		JLabel port = new JLabel(" Port: " + PORT);
@@ -559,7 +626,7 @@ public class ServerUI extends JFrame {
 
 		generalPane.add(new JSeparator(SwingConstants.HORIZONTAL));
 
-		JLabel mouseCursor = new JLabel(" Mouse Cursor Sensitivity ");
+		JLabel mouseCursor = new JLabel(MOUSE_CURSOR_SENSITIVITY);
 		mouseCursor.setFont(new Font(mouseCursor.getName(), Font.BOLD, 20));
 		generalPane.add(mouseCursor);
 
@@ -598,6 +665,11 @@ public class ServerUI extends JFrame {
 		}
 	}
 
+	/**
+	 * control mouse cursor sensitivity 
+	 * @author neha01mittal
+	 *
+	 */
 	class SliderListener implements ChangeListener {
 
 		public void stateChanged(ChangeEvent e) {

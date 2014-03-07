@@ -2,6 +2,11 @@ package com.example.gamecontrollerdatatransfer;
 
 import gc.common_resources.*;
 
+/**
+ * map touch and movement on the pohne screen to keyboard keys
+ * @author neha01mittal
+ *
+ */
 public class MovementTracker {
 	
 	public static CommandType processVector8D(Vector vector) throws InterruptedException {

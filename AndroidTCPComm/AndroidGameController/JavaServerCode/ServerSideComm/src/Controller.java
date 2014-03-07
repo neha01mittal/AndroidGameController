@@ -5,6 +5,10 @@ public class Controller {
 	Vector currentVec;
 	static double start=-1;
 	
+	/**
+	 * process values received from client
+	 * @param data
+	 */
 	public void processData(String data){
 		
 		String[] parts = data.split("||");

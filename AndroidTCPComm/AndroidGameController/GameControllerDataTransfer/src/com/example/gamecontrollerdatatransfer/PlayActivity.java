@@ -23,7 +23,7 @@ import android.widget.Toast;
 public class PlayActivity extends Activity {
 
 	private final Context context = this;
-	
+
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
 	private View commonView;
@@ -37,7 +37,7 @@ public class PlayActivity extends Activity {
 
 	public int tiltState = 0;
 	public float tiltX, tiltY;
-	
+
 	private int bgColor = Color.TRANSPARENT;
 
 	@Override
@@ -79,7 +79,8 @@ public class PlayActivity extends Activity {
 
 				if (isPaused) {
 					// Detection enabled, show the pause button
-					playPauseButton.setBackgroundResource(R.drawable.pausebutton);
+					playPauseButton
+							.setBackgroundResource(R.drawable.pausebutton);
 					Toast.makeText(getApplicationContext(),
 							"Tilt detection enabled", Toast.LENGTH_SHORT)
 							.show();
@@ -87,7 +88,8 @@ public class PlayActivity extends Activity {
 					onResume();
 				} else {
 					// Detection disabled, show the pause button
-					playPauseButton.setBackgroundResource(R.drawable.playbutton);
+					playPauseButton
+							.setBackgroundResource(R.drawable.playbutton);
 					Toast.makeText(getApplicationContext(),
 							"Tilt detection disabled", Toast.LENGTH_SHORT)
 							.show();
@@ -99,6 +101,9 @@ public class PlayActivity extends Activity {
 
 	}
 
+	/**
+	 * register position for accelerometer tilt detection
+	 */
 	public void registerRestPosition() {
 		// record initial coordinates
 
@@ -124,10 +129,10 @@ public class PlayActivity extends Activity {
 		builder.show();
 	}
 
-	public boolean isTiltDetectionOn(){
+	public boolean isTiltDetectionOn() {
 		return !isPaused;
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -156,6 +161,11 @@ public class PlayActivity extends Activity {
 
 	}
 
+	/**
+	 * wrap command to be sent to server
+	 * @param tc
+	 * @param newCommand
+	 */
 	public void updateCoordinates(TouchCoordinates tc, CommandType newCommand) {
 		// We don't keep a set of tc and commandtype in this class anymore
 		// So this function only packs the command with fields and
@@ -217,6 +227,9 @@ public class PlayActivity extends Activity {
 			mSensorManager.unregisterListener(this);
 		}
 
+		/**
+		 * detect tilt based on noise
+		 */
 		public void onSensorChanged(SensorEvent event) {
 
 			ImageView iv = (ImageView) findViewById(R.id.image);
@@ -229,10 +242,6 @@ public class PlayActivity extends Activity {
 			float y = event.values[1];
 			float z = event.values[2];
 
-			/*
-			 * System.out.println("X= " + values[0] + " Y= " + values[1] +
-			 * " Z= " + values[2]);
-			 */
 			if (flag) {
 				if (!isPaused) {
 					if (!isStartPositionRegistered) {
@@ -267,17 +276,8 @@ public class PlayActivity extends Activity {
 						tvZ.setVisibility(View.INVISIBLE);
 
 						iv.setVisibility(View.INVISIBLE);
-						/*
-						 * if (deltaZ > deltaX && deltaZ > deltaY) {
-						 * Toast.makeText(getApplicationContext(),
-						 * "Z axis movement", Toast.LENGTH_SHORT).show();
-						 * iv.setImageResource(R.drawable.ic_launcher); } else {
-						 */
+
 						if (deltaX > deltaY) {
-							/*
-							 * Toast.makeText(getApplicationContext(),
-							 * "X axis movement", Toast.LENGTH_SHORT) .show();
-							 */
 							iv.setImageResource(R.drawable.horizontal);
 
 							if ((startX - x) < 0) {
@@ -293,14 +293,9 @@ public class PlayActivity extends Activity {
 									+ " Delta 2=" + (startY - y));
 
 						} else if (deltaX < deltaY) {
-							/*
-							 * Toast.makeText(getApplicationContext(),
-							 * "Y axis movement", Toast.LENGTH_SHORT) .show();
-							 */
 							iv.setImageResource(R.drawable.vertical);
 
 							if ((startY - y) < 0) {
-								// down tilt
 								bgColor = Color.parseColor("#ff6E6699");
 								tiltState = 3; // TILT LEFT
 							} else {
@@ -317,8 +312,8 @@ public class PlayActivity extends Activity {
 							bgColor = Color.TRANSPARENT;
 							tiltState = 0; // NO TILT
 						}
-					commonView.setBackgroundColor(bgColor);
-					commonView.invalidate();
+						commonView.setBackgroundColor(bgColor);
+						commonView.invalidate();
 					}
 				} else {
 					// Don't detect tilt
