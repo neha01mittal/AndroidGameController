@@ -90,16 +90,32 @@ public class ServerUI extends JFrame {
 	private String defaultKeyboardControls[] = { "-None-", "A", "B", "C", "D",
 			"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
 			"R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4",
-			"5", "6", "7", "8", "9", "0", "SPACEBAR", "CTRL", "ALT", "SHIFT",
+			"5", "6", "7", "8", "9", "0", "F1", "F2", "F3", "F4", "F5", "F6", 
+			"F7", "F8", "F9", "F10", "F11", "F12", "SPACEBAR", "CTRL", "ALT", "SHIFT",
 			"TAB", "ENTER", "BACKSPACE", "CAPSLOCK", "LEFT-MOUSE-BUTTON",
 			"RIGHT-MOUSE-BUTTON" }; // TODO-add more?
-	private Object[][] defaultData = { { "Tap", "Z" },
-			{ "Swipe Up", "SPACEBAR" }, { "Swipe Down", "D" },
-			{ "Swipe Left", "A" }, { "Swipe Right", "X" } };
-
-	private Object[][] emptyData = { { "Tap", "-None-" },
-			{ "Swipe Up", "-None-" }, { "Swipe Down", "-None-" },
-			{ "Swipe Left", "-None-" }, { "Swipe Right", "-None-" } };
+	private static Object[][][] defaultData = {
+		//No Tilt
+		{ { "Tap", "" },
+		{ "Swipe Up", "" }, { "Swipe Down", "" },
+		{ "Swipe Left", "" }, { "Swipe Right", "" } },
+		//Tilt Up
+		{ { "Tap", "" },
+		{ "Swipe Up", "" }, { "Swipe Down", "" },
+		{ "Swipe Left", "" }, { "Swipe Right", "" } },
+			//Tilt Down
+			{ { "Tap", "" },
+			{ "Swipe Up", "" }, { "Swipe Down", "" },
+			{ "Swipe Left", "" }, { "Swipe Right", "" } },
+				//Tilt Left
+				{ { "Tap", "" },
+				{ "Swipe Up", "" }, { "Swipe Down", "" },
+				{ "Swipe Left", "" }, { "Swipe Right", "" } },
+					//Tilt Right
+					{ { "Tap", "Z" },
+					{ "Swipe Up", "" }, { "Swipe Down", "" },
+					{ "Swipe Left", "" }, { "Swipe Right", "" } },
+					};
 
 	private String[] columnNames = { "Touch Controls", "PC Controls" };
 	private static ArrayList<String> keyboardControlMapping = new ArrayList<String>();
@@ -187,11 +203,8 @@ public class ServerUI extends JFrame {
 				resetOriginalValues();
 				JPanel[] panels = new JPanel[5];
 				for (int i = 0; i < 5; i++) {
-					if (i == 0)
-						panels[i] = createTiltTab(defaultData, tables, i);
-					else
-						panels[i] = createTiltTab(emptyData, tables, i);
-				}
+					panels[i] = createTiltTab(defaultData[i], tables, i);
+			}
 				assignPanels(panels);
 				populateTabs(innerTabbedPane);
 
@@ -245,11 +258,9 @@ public class ServerUI extends JFrame {
 				{ "Swipe Up", "SPACEBAR" }, { "Swipe Down", "D" },
 				{ "Swipe Left", "A" }, { "Swipe Right", "X" } };
 
-		Object[][] originalEmptyData = { { "Tap", "-None-" },
-				{ "Swipe Up", "-None-" }, { "Swipe Down", "-None-" },
-				{ "Swipe Left", "-None-" }, { "Swipe Right", "-None-" } };
-		defaultData = originalDefaultData;
-		emptyData = originalEmptyData;
+		for(int i = 0; i < 5; i++)
+			for(int j = 0; j < 5; j++)
+				defaultData[i][j][1] = originalDefaultData[j][1];
 	}
 
 	/**
@@ -318,35 +329,19 @@ public class ServerUI extends JFrame {
 				System.out
 						.println(CORRUPT_FILE_ERROR);
 				for (int i = 0; i < 5; i++) {
-					if (i == 0) {
-						panels[i] = createTiltTab(defaultData, tables, i);
-						for (int j = 0; j < 5; j++)
-							temp.add((String) defaultData[j][1]);
-					} else {
-						panels[i] = createTiltTab(emptyData, tables, i);
-						for (int j = 0; j < 5; j++)
-							temp.add((String) emptyData[j][1]);
-					}
-				}
+					panels[i] = createTiltTab(defaultData[i], tables, i);
+					for (int j = 0; j < 5; j++)
+						temp.add((String) defaultData[i][j][1]);
+			}
 			} else {
 				br = new BufferedReader(new FileReader(file));
 				while ((sCurrentLine = br.readLine()) != null) {
 					String[] tokens = sCurrentLine.split("\\s+");
 					for (int i = 0; i < tokens.length; i++) {
-						if (count == 0)
-							defaultData[i][1] = tokens[i];
-						else
-							emptyData[i][1] = tokens[i];
+						defaultData[count][i][1] = tokens[i];
+						temp.add((String) defaultData[count][i][1]);
 					}
-					if (count == 0) {
-						panels[0] = createTiltTab(defaultData, tables, 0);
-						for (int j = 0; j < 5; j++)
-							temp.add((String) defaultData[j][1]);
-					} else {
-						panels[count] = createTiltTab(emptyData, tables, count);
-						for (int j = 0; j < 5; j++)
-							temp.add((String) emptyData[j][1]);
-					}
+					panels[count] = createTiltTab(defaultData[count], tables, count);
 					count++;
 				}
 			}

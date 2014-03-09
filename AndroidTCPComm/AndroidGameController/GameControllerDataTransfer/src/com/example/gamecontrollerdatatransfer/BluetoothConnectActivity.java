@@ -41,6 +41,8 @@ public class BluetoothConnectActivity extends Activity implements
 
 	private IntentFilter btFilter;
 	private BroadcastReceiver btReceiver;
+	
+	private static String connDeviceName = "";
 
 	/** Called when the activity is first created. */
 	@Override
@@ -150,6 +152,13 @@ public class BluetoothConnectActivity extends Activity implements
 						.equals(action)) {
 					Toast.makeText(getApplicationContext(), "Bluetooth discovery ended", Toast.LENGTH_SHORT).show();
 					
+				}else if (BluetoothDevice.ACTION_ACL_CONNECTED
+						.equals(action)) {
+					//Toast.makeText(getApplicationContext(), "Connected successfully with "+ connDeviceName, Toast.LENGTH_SHORT);
+
+					Intent k = new Intent(BluetoothConnectActivity.this, PlayActivity.class);
+					k.putExtra("connectType", "bluetooth");
+					startActivity(k);
 				}
 			}
 		};
@@ -161,6 +170,8 @@ public class BluetoothConnectActivity extends Activity implements
 		btFilter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
 		registerReceiver(btReceiver, btFilter);
 		btFilter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+		registerReceiver(btReceiver, btFilter);
+		btFilter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
 		registerReceiver(btReceiver, btFilter);
 	}
 
@@ -230,15 +241,12 @@ public class BluetoothConnectActivity extends Activity implements
 			BluetoothDevice device = deviceListPaired.get(arg2);
 			
 			Toast.makeText( getApplicationContext(),
-					"Clicked device " + device.getName() + "\n" + device.getAddress(),
-					Toast.LENGTH_SHORT).show();
+					"Attempting to connect to " + device.getName() + "...",
+					Toast.LENGTH_LONG).show();
 			
 			SingletonBluetooth.getInstance().connectToDevice(deviceListPaired.get(arg2));
 			
-
-			Intent k = new Intent(BluetoothConnectActivity.this, PlayActivity.class);
-			k.putExtra("connectType", "bluetooth");
-			startActivity(k);
+			connDeviceName = device.getName();
 		}
 		
 		if(arg0.getId() == lvDiscovered.getId()) {

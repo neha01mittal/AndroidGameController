@@ -193,6 +193,10 @@ public class PlayActivity extends Activity {
 		// Ideally a game should implement onResume() and onPause()
 		// to take appropriate action when the activity looses focus
 		super.onResume();
+
+		commonView = findViewById(R.id.playActivity);
+		commonView.setBackgroundColor(bgColor);
+		commonView.invalidate();
 		mRenderer.start();
 	}
 
@@ -201,8 +205,12 @@ public class PlayActivity extends Activity {
 		// Ideally a game should implement onResume() and onPause()
 		// to take appropriate action when the activity looses focus
 		super.onPause();
-		commonView.setBackgroundColor(Color.TRANSPARENT);
+		bgColor = Color.TRANSPARENT;
+		
 		System.out.println("Setting background");
+		commonView = findViewById(R.id.playActivity);
+		commonView.setBackgroundColor(bgColor);
+		commonView.invalidate();
 		mRenderer.stop();
 	}
 
