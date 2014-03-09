@@ -1,5 +1,5 @@
-Z SPACEBAR LEFT-MOUSE-BUTTON D X 
--None- F D -None- E 
--None- F D -None- E 
--None- F D -None- E 
--None- F D -None- E 
+LEFT-MOUSE-BUTTON SPACEBAR D A X 
+ENTER -None- -None- -None- -None- 
+ENTER -None- -None- -None- -None- 
+ENTER -None- -None- -None- -None- 
+ENTER -None- -None- -None- -None- 

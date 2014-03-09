@@ -129,9 +129,8 @@ public class TutorialActivity extends FragmentActivity {
 		iAmReady.setOnClickListener(iAmReadyButton);
 		Button faq = (Button) findViewById(R.id.faq);
 		faq.setOnClickListener(faqButton);
-
 		Button demoVideo = (Button) findViewById(R.id.demovideo);
-		faq.setOnClickListener(demoVideoButton);
+		demoVideo.setOnClickListener(demoVideoButton);
 
 		// Retrieve and cache the system's default "short" animation time.
 		mShortAnimationDuration = getResources().getInteger(
@@ -329,7 +328,7 @@ public class TutorialActivity extends FragmentActivity {
 		@Override
 		public void onClick(View v) {
 			// build this page
-			Uri uri = Uri.parse("http://www.google.com");
+			Uri uri = Uri.parse("https://www.facebook.com/smartcontroller?ref=br_tf");
 			 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 			 startActivity(intent);
 		}
