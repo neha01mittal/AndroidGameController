@@ -42,7 +42,8 @@ public class BluetoothConnectActivity extends Activity implements
 	private IntentFilter btFilter;
 	private BroadcastReceiver btReceiver;
 	
-	private static String connDeviceName = "";
+	private static BluetoothDevice connDevice;
+	private static boolean bConnecting = false, bConnected = false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -154,7 +155,8 @@ public class BluetoothConnectActivity extends Activity implements
 					
 				}else if (BluetoothDevice.ACTION_ACL_CONNECTED
 						.equals(action)) {
-					//Toast.makeText(getApplicationContext(), "Connected successfully with "+ connDeviceName, Toast.LENGTH_SHORT);
+					
+					bConnected = true;
 
 					Intent k = new Intent(BluetoothConnectActivity.this, PlayActivity.class);
 					k.putExtra("connectType", "bluetooth");
@@ -238,15 +240,13 @@ public class BluetoothConnectActivity extends Activity implements
 		
 		// The item clicked is from paired device listview
 		if(arg0.getId() == lvPaired.getId()) {
-			BluetoothDevice device = deviceListPaired.get(arg2);
+			connDevice = deviceListPaired.get(arg2);
 			
-			Toast.makeText( getApplicationContext(),
-					"Attempting to connect to " + device.getName() + "...",
-					Toast.LENGTH_LONG).show();
+			bConnecting = false;
+			bConnected = false;
 			
-			SingletonBluetooth.getInstance().connectToDevice(deviceListPaired.get(arg2));
-			
-			connDeviceName = device.getName();
+			btConnectingHandler.removeCallbacks(mConnectTask);
+			btConnectingHandler.postDelayed(mConnectTask, 100);
 		}
 		
 		if(arg0.getId() == lvDiscovered.getId()) {
@@ -256,6 +256,41 @@ public class BluetoothConnectActivity extends Activity implements
 					Toast.LENGTH_SHORT).show();
 		}
 	}
+	
+	private Runnable mConnectTask = new Runnable() {
+		public void run() {
+			//This task will initiate the connection to the BT device
+			//selected by the user and verify that the connection is successful
+
+			//If bConnecting is true, we have already attempted to 
+			//connect to the BT device, therefore now we need to verify
+			//that the connection is successful
+			if (bConnecting) {
+				if(!bConnected){
+					//Failed to connect to the device
+					Toast.makeText( context,
+							"Failed to connect to " + connDevice.getName() + ".",
+							Toast.LENGTH_LONG).show();
+				}		
+				bConnecting = false;
+				bConnected = false;
+			} else {				
+				//bConnecting is false, now attempting to connect to the
+				//BT device
+				if(connDevice != null){
+					bConnecting = true;
+					Toast.makeText( context,
+							"Attempting to connect to " + connDevice.getName() + "...",
+							Toast.LENGTH_LONG).show();
+					
+					SingletonBluetooth.getInstance().connectToDevice(connDevice);
+					
+					//Run this task again later to verify the connection
+					btConnectingHandler.postDelayed(this, 7000);
+				}			
+			}
+		}
+	};
 	
 	public void showInstructions() {
 		// record initial coordinates

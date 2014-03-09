@@ -44,6 +44,8 @@ public class WifiConnectActivity extends ListActivity {
 	private ArrayAdapter<String> adapter;
 	private ListView lv = null;
 
+	private boolean bAskedToEnableWifi = false;
+
 	public String getIpAddress() {
 
 		return ipAddress;
@@ -111,14 +113,28 @@ public class WifiConnectActivity extends ListActivity {
 		//Check if wifi is enabled
 		WifiManager wifi = (WifiManager)getSystemService(Context.WIFI_SERVICE);
 		if (!wifi.isWifiEnabled()){
-			//wifi is not enabled, enable it
-			wifi.setWifiEnabled(true);
 			
-			Intent enableWifiIntent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-			startActivity(enableWifiIntent);
-
-			Toast.makeText(getApplicationContext(),
-					"Ensure that your device is connected to the same Wifi network as your computer.", Toast.LENGTH_LONG).show();
+			//Already asked user to enable wifi, but it is still not enabled
+			//Assume that user don't want to use wifi
+			if(bAskedToEnableWifi){
+				Toast.makeText(getApplicationContext(),
+					"Wifi must be enabled to continue.", Toast.LENGTH_LONG).show();
+			
+				super.onBackPressed();
+			}else{			
+				//enable wifi
+				wifi.setWifiEnabled(true);
+				
+				Intent enableWifiIntent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+				startActivity(enableWifiIntent);
+	
+				Toast.makeText(getApplicationContext(),
+						"Ensure that your device is connected to the same Wifi network as your computer.", Toast.LENGTH_LONG).show();
+			}
+			bAskedToEnableWifi = !bAskedToEnableWifi;
+		} else {
+			//Wifi already turned on, don't ask user anything
+			bAskedToEnableWifi = false;
 		}
 	}
 	
