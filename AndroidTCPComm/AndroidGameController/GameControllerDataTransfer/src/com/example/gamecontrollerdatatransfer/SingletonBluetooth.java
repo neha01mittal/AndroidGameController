@@ -96,7 +96,6 @@ public class SingletonBluetooth {
         
     private class ConnectBTThread extends Thread {
         private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-    	//private final UUID MY_UUID = UUID.fromString("1101");
     	private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
     	public CommandType commandToSend = null;
@@ -173,6 +172,7 @@ public class SingletonBluetooth {
 						BTOOStream.writeObject(commandToSend);
 						BTOOStream.writeFloat(commandToSend.getX());
 						BTOOStream.writeFloat(commandToSend.getY());
+						BTOOStream.flush();
 					} catch (Exception e) {
 						Log.e("BluetoothManagement", "S: Error", e);
 					}

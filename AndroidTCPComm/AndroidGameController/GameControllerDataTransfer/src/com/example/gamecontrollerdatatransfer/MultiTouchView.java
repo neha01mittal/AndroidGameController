@@ -562,7 +562,7 @@ public class MultiTouchView extends View {
 				//glowPaint: Draw Ring
 				glowPaint.setStrokeJoin(Paint.Join.BEVEL);
 				glowPaint.setStrokeCap(Paint.Cap.SQUARE);
-				glowPaint.setMaskFilter(new BlurMaskFilter(3, BlurMaskFilter.Blur.NORMAL));
+				glowPaint.setMaskFilter(new BlurMaskFilter(2, BlurMaskFilter.Blur.NORMAL));
 				glowPaint.setStyle(Paint.Style.STROKE);
 				glowPaint.setStrokeWidth(10f);
 				canvas.drawLine(SCREENCENTREX - tiltCircleLineStart.x, SCREENCENTREY - tiltCircleLineStart.y, SCREENCENTREX - tiltCircleLineEnd.x, SCREENCENTREY - tiltCircleLineEnd.y, glowPaint);
