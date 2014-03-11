@@ -133,6 +133,10 @@ public class PlayActivity extends Activity {
 		return !isPaused;
 	}
 
+	public int getTiltState() {
+		return tiltState;
+	}
+
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -290,10 +294,10 @@ public class PlayActivity extends Activity {
 
 							if ((startX - x) < 0) {
 								// down tilt
-								bgColor = Color.parseColor("#ff669966");
+								//bgColor = Color.parseColor("#ff669966");
 								tiltState = 1; // TILT UP
 							} else {
-								bgColor = Color.parseColor("#ff668899");
+								//bgColor = Color.parseColor("#ff668899");
 								tiltState = 2; // TILT DOWN
 							}
 
@@ -304,10 +308,10 @@ public class PlayActivity extends Activity {
 							iv.setImageResource(R.drawable.vertical);
 
 							if ((startY - y) < 0) {
-								bgColor = Color.parseColor("#ff6E6699");
+							//	bgColor = Color.parseColor("#ff6E6699");
 								tiltState = 3; // TILT LEFT
 							} else {
-								bgColor = Color.parseColor("#ff886699");
+								//bgColor = Color.parseColor("#ff886699");
 								tiltState = 4; // TILT RIGHT
 							}
 
@@ -317,10 +321,10 @@ public class PlayActivity extends Activity {
 						} else {
 							// NOP
 							iv.setVisibility(View.INVISIBLE);
-							bgColor = Color.TRANSPARENT;
+							//bgColor = Color.TRANSPARENT;
 							tiltState = 0; // NO TILT
 						}
-						commonView.setBackgroundColor(bgColor);
+						//commonView.setBackgroundColor(bgColor);
 						commonView.invalidate();
 					}
 				} else {
@@ -328,12 +332,10 @@ public class PlayActivity extends Activity {
 					tiltState = 0; // NO TILT
 				}
 			}
-
 		}
 
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		}
 
 	}
-
 }

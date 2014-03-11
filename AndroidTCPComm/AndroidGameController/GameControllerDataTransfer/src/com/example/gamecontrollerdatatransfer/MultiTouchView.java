@@ -25,9 +25,9 @@ public class MultiTouchView extends View {
 
 	private static final int THRESHOLD = 70, TILTTHRESHOLD = 120;
 	private static final int MINDRAGTIMETHRESHOLD = 170;
-	private final int SIZE, TILTSIZE;
+	private final int SIZE, DIRECTIONSIZE, TILTSIZE;
 	private final int SCREENCENTREX, SCREENCENTREY, SCREENWIDTH, SCREENHEIGHT;
-	private long prevLeftTime = 0, prevRightTime = 0, prevDragTime = 0;
+	private static long prevLeftTime = 0, prevRightTime = 0, prevDragTime = 0;
 	private Context m_context;
 
 	private boolean leftTouchRegistered = false;
@@ -52,19 +52,7 @@ public class MultiTouchView extends View {
 
 	private Paint mPaint, glowPaint, textPaint;
 	private int[] colors = { Color.BLUE, Color.YELLOW, Color.GREEN, Color.CYAN, Color.RED, Color.GRAY, Color.DKGRAY,
-			Color.LTGRAY, Color.YELLOW,
-			Color.BLACK };
-
-	private int[] bigColors = { Color.LTGRAY, Color.WHITE, Color.GRAY,
-			Color.RED, Color.DKGRAY, Color.YELLOW, Color.BLUE, Color.GREEN,
-			Color.GREEN, Color.CYAN };
-
-	protected Bitmap mBitmap;
-	protected Canvas currentCanvas;
-	protected Paint p;
-
-	protected int canvasWidth;
-	protected int canvasHeight;
+			Color.LTGRAY, Color.YELLOW, Color.BLACK };
 
 	public MultiTouchView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -84,7 +72,8 @@ public class MultiTouchView extends View {
 		
 		SCREENCENTREX = SCREENWIDTH / 2;
 		SCREENCENTREY = SCREENHEIGHT / 2;
-		SIZE = SCREENWIDTH / 40;
+		SIZE = SCREENWIDTH / 20;
+		DIRECTIONSIZE = SIZE / 2;
 		TILTSIZE = SCREENWIDTH / 80;
 		
 		tiltCircleRect = new RectF(SCREENCENTREX - TILTTHRESHOLD, SCREENCENTREY - TILTTHRESHOLD, SCREENCENTREX + TILTTHRESHOLD, SCREENCENTREY + TILTTHRESHOLD);
@@ -93,9 +82,7 @@ public class MultiTouchView extends View {
 		tiltCircleDotStart = new PointF((float)Math.cos(Math.toRadians(45)) * (TILTTHRESHOLD + 8), (float)Math.sin(Math.toRadians(45)) * (TILTTHRESHOLD + 8));
 		tiltCircleDotEnd = new PointF((float)Math.cos(Math.toRadians(45)) * (TILTTHRESHOLD + 12), (float)Math.sin(Math.toRadians(45)) * (TILTTHRESHOLD + 12));
 		
-		// Init Arrays
-		for (int i = 0; i < 2; i++)
-			initView();
+		initView();
 	}
 
 	private void initView() {
@@ -110,20 +97,13 @@ public class MultiTouchView extends View {
 		// Set Painter properties
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPaint.setDither(true);
-		//mPaint.setColor(Color.BLUE);
-		mPaint.setColor(Color.WHITE);
 		mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-		mPaint.setStrokeJoin(Paint.Join.ROUND);
-		mPaint.setStrokeCap(Paint.Cap.ROUND);
-		mPaint.setMaskFilter(new BlurMaskFilter(1, BlurMaskFilter.Blur.NORMAL));
-		
-		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		textPaint.setTextSize(20);
-		
+
 		glowPaint = new Paint();
 		glowPaint.set(mPaint);
-		glowPaint.setColor(Color.argb(235, 74, 138, 255));
-		glowPaint.setMaskFilter(new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL));
+		
+		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		textPaint.setTextSize(20);		
 	}
 
 	@Override
@@ -148,7 +128,10 @@ public class MultiTouchView extends View {
 			point.y = event.getY(pointerIndex);
 
 			if (isLeftScreen(point.y)) {
+				//On the left side of the screen, we should only keep track of one pointer. 
+				//So check if this pointer has already been registered 
 				if (!leftTouchRegistered) {
+					//No previously registered pointer. Register this pointer
 					mActivePointers.put(pointerId, point);
 					startPointerX.put(pointerId, new Float(point.x));
 					startPointerY.put(pointerId, new Float(point.y));
@@ -163,25 +146,14 @@ public class MultiTouchView extends View {
 
 					leftScreenHandler.removeCallbacks(mUpdateTask);
 					leftScreenHandler.postDelayed(mUpdateTask, 100);
-				} else {
-					leftTouchRegistered = leftTouchRegistered;
-				}
+				} 
+				//Otherwise, ignore this pointer
 			} else {
-
+				//On the right side of the screen
+				//Register the pointer
 				mActivePointers.put(pointerId, point);
 				startPointerX.put(pointerId, new Float(point.x));
 				startPointerY.put(pointerId, new Float(point.y));
-				/*
-				 * if(!mouseRegistered) { mActivePointers.put(pointerId, point);
-				 * updateMouse(point.x, point.y, pointerId, 0);
-				 * Log.d("MultiTouch"," mousePointer: "+mousePointer); }else {
-				 * if(leftMouseLifted || rightMouseLifted) {
-				 * Log.d("MultiTouch","Sending mouse click");
-				 * doRightScreenProcess(0, 0, 2); mActivePointers.put(pointerId,
-				 * point); updateMouse(point.x, point.y, pointerId, 0); }else
-				 * Log.d("MultiTouch","Registered! Mouse Down mousePointer: "+
-				 * mousePointer); }
-				 */
 			}
 
 			break;
@@ -189,11 +161,11 @@ public class MultiTouchView extends View {
 
 		case MotionEvent.ACTION_MOVE: { // a pointer was moved
 
-			// Ensure that the pointer is registered in mActivePointers array
-
+			// Ensure that the pointer has been registered in mActivePointers array
 			for (int i = 0; i < mActivePointers.size(); i++) {
 				int pId = event.getPointerId(i);
 				PointF point = mActivePointers.get(pId);
+				
 				if (point != null) {
 
 					float displacementX, displacementY;
@@ -207,9 +179,15 @@ public class MultiTouchView extends View {
 					if (isLeftScreen(startPoint.y)) {
 						processDirectionalMovement(point, startPoint);
 					} else { // isRightScreen
+						//In here we are only interested in checking if this pointer is a drag pointer or not.
+	
+						//The procedure of registering a drag pointer :
+						//1.) Track pointer if its displacement from startpoint is more than THRESHOLD
+						//2.) Register the tracked pointer as a drag pointer if it is not removed
+						//    within the MINDRAGTIMETHRESHOLD time
 						Long time = pointerStartDragTime.get(pId);
 
-						// If this pointer's drag time has not been tracked yet
+						// This pointer's drag time has not been tracked yet
 						if (time == null) {
 
 							displacementX = point.x - startPoint.x;
@@ -219,8 +197,8 @@ public class MultiTouchView extends View {
 									displacementX, 2)
 									+ Math.pow(displacementY, 2));
 
-							// Only start tracking this pointer if the pointer
-							// has moved outside of the threshold
+							// This pointer has moved further than the threshold distance
+							// Start tracking this pointer
 							if (netMovement > THRESHOLD)
 								pointerStartDragTime.put(pId,
 										new Long(System.currentTimeMillis()));
@@ -233,16 +211,14 @@ public class MultiTouchView extends View {
 							if (durationHasPassed(time,
 									System.currentTimeMillis(),
 									MINDRAGTIMETHRESHOLD)) {
-								// This pointer is dragging
-								Boolean bDragPoint = registeredDragPointer
-										.get(pId);
+								
+								Boolean bDragPoint = registeredDragPointer.get(pId);
 
-								// If this pointer has not been registered as a
-								// drag pointer
+								// If this pointer has not been registered as a drag pointer
 								if (bDragPoint == null) {
 									// Register it
-									processDragPoint(point, startPoint, pId);
-
+									
+									//processDragPoint(point, startPoint, pId);
 									registeredDragPointer.put(pId, true);
 									lastSentPointerX.put(pId, point.x);
 									lastSentPointerY.put(pId, point.y);
@@ -253,13 +229,8 @@ public class MultiTouchView extends View {
 
 									processDragPoint(point, lastSentPoint, pId);
 								}
-
 							}
 						}
-						/*
-						 * if(mouseRegistered) updateMouse(point.x, point.y,
-						 * pId, 2);
-						 */
 					}
 				}
 			}
@@ -286,62 +257,57 @@ public class MultiTouchView extends View {
 					leftDrawPoint = new TouchCoordinates(0, 0, pointerId);
 					leftScreenHandler.removeCallbacks(mUpdateTask);
 				} else {// isRightScreen
+					
+					//In here we are interested in checking if this point is a tap or swipe
+					Boolean bDragPoint = registeredDragPointer.get(pointerId);
 
-					Long time = pointerStartDragTime.get(pointerId);
-					// Check if it is a drag
-					if (time != null
-							&& durationHasPassed(time,
-									System.currentTimeMillis(),
-									MINDRAGTIMETHRESHOLD)) {
-						// This action is a drag
-						pointerStartDragTime.remove(pointerId);
-
-						registeredDragPointer.remove(pointerId);
-						lastSentPointerX.remove(pointerId);
-						lastSentPointerY.remove(pointerId);
-
-					} else {
-						// Get the displacement of the pointer from its
-						// startpoint
+					// Check if this pointer is a drag
+					if (bDragPoint == null) {
+						//This is not a drag pointer
+						//Verify if this is a tap or swipe by checking
+						//its displacement from this startpoint against the THRESHOLD
+						
 						displacementX = point.x - startPoint.x;
 						displacementY = point.y - startPoint.y;
 
 						double netMovement = Math.sqrt(Math.pow(displacementX,
 								2) + Math.pow(displacementY, 2));
 
-						// Package the values to be sent to the server
 						if (netMovement > THRESHOLD) {
-							// This action is a swipe
+							// This pointer is a swipe
 							processTapSwipe(displacementX, displacementY,
 									point, 1);
-							;
 						} else {
-							// This action is a tap
+							// This pointer is a tap
 							processTapSwipe(displacementX, displacementY,
 									point, 0);
 						}
+					} else {
+						// This pointer is a drag pointer
+						// Remove the pointer from the following sparse arrays
+						pointerStartDragTime.remove(pointerId);
+
+						registeredDragPointer.remove(pointerId);
+						lastSentPointerX.remove(pointerId);
+						lastSentPointerY.remove(pointerId);
 					}
 
+					Long time = pointerStartDragTime.get(pointerId);
+					
 					// If this pointer's drag time is being tracked
 					if (time != null) {
 						// Remove the track
 						pointerStartDragTime.remove(pointerId);
 					}
-
 				}
-
 				mActivePointers.remove(pointerId);
 				startPointerX.remove(pointerId);
 				startPointerY.remove(pointerId);
 			}
-
-			// Log.d("Multi-Touch",
-			// "ID of Pointer: "+pointerId+" No. of Active Pointers: "+mActivePointers.size());
 			break;
 		}
 		}
 		invalidate();
-
 		return true;
 	}
 
@@ -357,7 +323,7 @@ public class MultiTouchView extends View {
 					// Prompts a check to see if the leftscreen touch
 					// displacement needs to be sent to the
 					// server. This circumstance is usually triggered when the
-					// lefttouch is registered but
+					// left touch is registered but
 					// has not moved enough to trigger a touch move event
 					PointF point = new PointF(
 							mActivePointers.get(leftScreenPointerId).x,
@@ -368,30 +334,32 @@ public class MultiTouchView extends View {
 
 					processDirectionalMovement(point, startPoint);
 				}
+				// Repeat this task after 90mseconds
 				leftScreenHandler.postDelayed(this, 90);
 			}
 		}
 	};
 
 	public boolean isLeftScreen(float pointX) {
-
 		if (pointX > SCREENCENTREY)
 			return true;
 		else
 			return false;
 	}
 
-	public boolean durationHasPassed(long prevTime, long currTime,
+	public boolean durationHasPassed(long startTime, long endTime,
 			double duration) {
-		if ((currTime - prevTime) > duration) {
-			Log.d("Timer", "Duration: " + (currTime - prevTime));
+		if ((endTime - startTime) > duration) {
+			Log.d("Timer", "Duration: " + (endTime - startTime));
 			return true;
 		} else
 			return false;
 	}
 
 	public void processDirectionalMovement(PointF point, PointF startPoint) {
-
+		// In here, we process the pointer based on its x and y position
+		// We will only send commands to the server if the pointer's displacement
+		// from its startpoint is more than THRESHOLD
 		float displacementX, displacementY;
 
 		// Get the displacement of the pointer from its startpoint
@@ -403,13 +371,12 @@ public class MultiTouchView extends View {
 
 		if (netMovement > THRESHOLD) {
 			// Update the draw point if the pointer exceeds the threshold
-			// So that it will only appear within the threshold circle
+			// So that it will only be drawn along the threshold circle
 			double multiplier = (double) THRESHOLD / netMovement;
 			leftDrawPoint = new TouchCoordinates(
 					(float) (startPoint.x + multiplier * displacementX),
 					(float) (startPoint.y + multiplier * displacementY), 1);
 
-			// This function will package the values to be sent to the server
 			sendDirectionalCommand(displacementX, displacementY, point, 0);
 		} else
 			leftDrawPoint = new TouchCoordinates(point.x, point.y, 1);
@@ -424,9 +391,11 @@ public class MultiTouchView extends View {
 		// So the commandtypes used are KEYBOARD_UP, KEYBOARD_DOWN,
 		// KEYBOARD_LEFT, KEYBOARD_RIGHT
 
-		// Only send a packet if the last packet sent was >50mseconds ago
+		// Only send a packet if the last packet sent was >70mseconds ago
+		// This is because each simulated key press lasts 70ms
 		if (durationHasPassed(prevLeftTime, System.currentTimeMillis(), 70)) {
 
+			//Update the last packet sent time
 			prevLeftTime = System.currentTimeMillis();
 
 			Vector vec = new Vector(displacementX, displacementY);
@@ -434,9 +403,11 @@ public class MultiTouchView extends View {
 			CommandType touchCommand = CommandType.DEFAULT; // Init as DEFAULT
 
 			try {
+				//Vibration indicates a command is sent to the server
+				v.vibrate(100);
+				
 				// This function is used to determine the UP, DOWN, LEFT, RIGHT
 				// direction of displacement
-				v.vibrate(100);
 				touchCommand = MovementTracker.processVector8D(vec);
 				wrapCoordinates(point.x, point.y, operation, touchCommand);
 
@@ -449,15 +420,18 @@ public class MultiTouchView extends View {
 
 	public void processDragPoint(PointF point, PointF lastSentPoint, int pId) {
 		float displacementX, displacementY;
-
-		// Get the displacement of the pointer from its startpoint
+		// In here, we process the pointer based on its x and y position
+		// As we are only interested in its latest displacement,
+		// we will only send the displacement of the drag pointer from its last sent pointer
+		
+		// Get the displacement of the pointer from its last sent point
 		displacementX = point.x - lastSentPoint.x;
 		displacementY = point.y - lastSentPoint.y;
 
 		double netMovement = Math.sqrt(Math.pow(displacementX, 2)
 				+ Math.pow(displacementY, 2));
 
-		// This function will package the values to be sent to the server
+		// If this pointer is successfully sent to the server, update its last sent pointer
 		if (sendDragCommand(displacementX, displacementY))
 			updateLastSentDragPoint(point.x, point.y, pId);
 	}
@@ -466,6 +440,7 @@ public class MultiTouchView extends View {
 		if (durationHasPassed(prevDragTime, System.currentTimeMillis(), 20)) {
 			prevDragTime = System.currentTimeMillis();
 
+			//Vibration indicates a command is sent to the server
 			v.vibrate(100);
 			wrapCoordinates(displacementX, displacementY, 1, CommandType.VIEW);
 			Log.d("Dragpointer", "Sent Dragpoint: " + displacementX + " : "
@@ -481,10 +456,15 @@ public class MultiTouchView extends View {
 	}
 
 	public void processTapSwipe(float x, float y, PointF point, int operation) {
-
+		// In here, we process the pointer based on its x and y position displacement
+		// from its startpoint x and y position in order to determine whether it
+		// is a tap or swipe up, down left or right
+		// Although both displacement and the command are sent to the server, we are only
+		// we are only interested in knowing what type of command is sent
+		
 		CommandType touchCommand = CommandType.DEFAULT; // Init as DEFAULT
-		if (System.currentTimeMillis() - prevRightTime > 20) {
-
+		if (durationHasPassed(prevRightTime, System.currentTimeMillis(), 20)) {
+			
 			prevRightTime = System.currentTimeMillis();
 
 			if (m_context instanceof PlayActivity) {
@@ -492,21 +472,16 @@ public class MultiTouchView extends View {
 				PlayActivity activity = (PlayActivity) m_context;
 
 				switch (operation) {
-				case 0:
-					// This action is a tap
+				case 0: // This action is a tap
 					v.vibrate(100);
 					touchCommand = MovementTracker.processTilt(
 							activity.tiltState, CommandType.TAP_NOTILT);
 
 					wrapCoordinates(point.x, point.y, operation, touchCommand);
 					break;
-				case 1:
-					// This action is a swipe
+				case 1: // This action is a swipe
 					Vector vec = new Vector(x, y);
 					vec.normalise();
-
-					// This function is used to determine the UP, DOWN, LEFT,
-					// RIGHT direction of displacement
 
 					try {
 						// This function is used to determine the UP, DOWN,
@@ -517,11 +492,9 @@ public class MultiTouchView extends View {
 								MovementTracker.processVector4D(vec));
 						wrapCoordinates(point.x, point.y, operation,
 								touchCommand);
-
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-
 					}
 					break;
 				}
@@ -545,8 +518,21 @@ public class MultiTouchView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);		
+		
+		// We draw the following in order:
+		// 1a.) The accelerator circle and point in the middle of the screen
+		//		The accelerator tilt depending on whether it is tilt up, down left or right
+		// 1b.) If accelerator is off, a line in the middle of the screen
+		//  3.) Left screen. Consists of one ring of radius THRESHOLD and one point 
+		//      whose coordinates depend on leftdrawpoint
+		//  4.) Right screen. Consists of all the pointers detected to be on the right screen
+		
+		// To create a 'glow', 'laser' sort of effect mPaint and glowPaint are used to draw
+		// mPaint constitutes the center of a point or ring and the glowpaint constitutes the border around it
+		// All glowpaint portions of a component are drawn first, followed by the mpaint
+		// portions to prevent glowpaint from overlapping mpaint
 
-		//If Tilt Detection is on, draw the Accelerometer
+
 		if (m_context instanceof PlayActivity) {
 			
 			PlayActivity activity = (PlayActivity) m_context;
@@ -559,7 +545,7 @@ public class MultiTouchView extends View {
 				glowPaint.setColor(Color.argb(150, 124, 188, 255));
 				mPaint.setColor(Color.argb(150, 255, 255, 255));
 				
-				//glowPaint: Draw Ring
+				//glowPaint: Draw Accelerator Ring
 				glowPaint.setStrokeJoin(Paint.Join.BEVEL);
 				glowPaint.setStrokeCap(Paint.Cap.SQUARE);
 				glowPaint.setMaskFilter(new BlurMaskFilter(2, BlurMaskFilter.Blur.NORMAL));
@@ -588,18 +574,36 @@ public class MultiTouchView extends View {
 				canvas.drawArc(tiltCircleRect, (float)240, (float)60, false, glowPaint);
 				canvas.drawArc(tiltCircleRect, (float)330, (float)60, false, glowPaint);
 	
-				//glowPaint: Draw Point
-				glowPaint.setMaskFilter(new BlurMaskFilter(3, BlurMaskFilter.Blur.NORMAL));
+				//glowPaint: Draw Accelerator Point
+				glowPaint.setMaskFilter(new BlurMaskFilter(2, BlurMaskFilter.Blur.NORMAL));
 				glowPaint.setStyle(Paint.Style.FILL);	
 				canvas.drawLine(tiltDrawPoint.x - TILTSIZE, tiltDrawPoint.y, tiltDrawPoint.x - 5, tiltDrawPoint.y, glowPaint);
 				canvas.drawLine(tiltDrawPoint.x + 5, tiltDrawPoint.y, tiltDrawPoint.x + TILTSIZE, tiltDrawPoint.y, glowPaint);
 				canvas.drawLine(tiltDrawPoint.x, tiltDrawPoint.y - TILTSIZE, tiltDrawPoint.x, tiltDrawPoint.y - 5, glowPaint);
 				canvas.drawLine(tiltDrawPoint.x, tiltDrawPoint.y + 5, tiltDrawPoint.x, tiltDrawPoint.y + TILTSIZE, glowPaint);				
-				
-				Log.d("Drawing","TiltX: " + activity.tiltX + " " + tiltDrawPoint.x + "  TiltY: " + activity.tiltY + "" + tiltDrawPoint.y );
 			
+				//glowPaint: Draw tilt glows
+				glowPaint.setMaskFilter(new BlurMaskFilter(200, BlurMaskFilter.Blur.NORMAL));
+				glowPaint.setColor(Color.argb(50, 124, 188, 255));
+				glowPaint.setStyle(Paint.Style.STROKE);
+				glowPaint.setStrokeWidth(200f);
+				switch(activity.getTiltState()){
+					case 1: //Tilt UP			
+						canvas.drawLine(3, 0, 3, SCREENHEIGHT, glowPaint);	
+						break;
+					case 2: //Tilt DOWN
+						canvas.drawLine(SCREENWIDTH-3, 0, SCREENWIDTH-3, SCREENHEIGHT, glowPaint);	
+						break;
+					case 3: //Tilt LEFT
+						canvas.drawLine(0, SCREENHEIGHT-3, SCREENWIDTH, SCREENHEIGHT-3, glowPaint);
+						break;
+					case 4: //Tilt RIGHT
+						canvas.drawLine(0, 3, SCREENWIDTH, 3, glowPaint);
+						break;
+				}
 			} else {
-				//Otherwise draw a line to divide the two screens into halves
+				//Tilt detection not on, draw a line to divide the two screens into halves
+				
 				// Set paint colours and visibility for line here
 				glowPaint.setColor(Color.argb(150, 114, 178, 255));
 				glowPaint.setStrokeJoin(Paint.Join.BEVEL);
@@ -631,25 +635,25 @@ public class MultiTouchView extends View {
 					glowPaint.setMaskFilter(new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL));
 					mPaint.setColor(Color.argb(255, 255, 255, 255));
 					
-					//glowPaint: Draw Ring
+					//glowPaint: Draw leftScreen Ring
 					glowPaint.setStyle(Paint.Style.STROKE);
 					glowPaint.setStrokeWidth(15f);
 					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, glowPaint);
 
-					//glowPaint: Draw Point
+					//glowPaint: Draw leftSceen Point
 					glowPaint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE+2, glowPaint);	
+					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), DIRECTIONSIZE+2, glowPaint);	
 
-					//mPaint: Draw Ring
+					//mPaint: Draw leftScreen Ring
 					mPaint.setStyle(Paint.Style.STROKE);
 					mPaint.setStrokeWidth(8f);
 					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD, mPaint);
 
-					//mPaint: Draw Point				
+					//mPaint: Draw leftScreen Point				
 					mPaint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), SIZE-3, mPaint);
+					canvas.drawCircle(leftDrawPoint.getX(), leftDrawPoint.getY(), DIRECTIONSIZE-3, mPaint);
 				}
-			} else { // isRightScreen
+			} else { // Draw the RightScreen components here
 
 				// Set paint colours and visibility for pointers here				
 				glowPaint.setColor(colors[i % 9]);	
@@ -659,19 +663,21 @@ public class MultiTouchView extends View {
 				glowPaint.setMaskFilter(new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL));
 				mPaint.setColor(Color.argb(255, 255, 255, 255));
 				
-				//glowPaint: Draw Point
+				//glowPaint: Draw rightScreen Point
 				glowPaint.setStyle(Paint.Style.FILL);
-				canvas.drawCircle(point.x, point.y, SIZE+7, glowPaint);	
+				canvas.drawCircle(point.x, point.y, SIZE, glowPaint);	
 				
-				//mPaint: Draw Point				
+				//mPaint: Draw rightScreen Point				
 				mPaint.setStyle(Paint.Style.FILL);
-				canvas.drawCircle(point.x, point.y, SIZE, mPaint);
+				canvas.drawCircle(point.x, point.y, SIZE-12, mPaint);
 			}
 		}				
 	}
 
 	public void wrapCoordinates(float x, float y, int operation,
 			CommandType touchCommand) {
+		// This method informs playActvity of the command that needs to be sent to the server
+		
 		TouchCoordinates tc = new TouchCoordinates(x, y, operation);
 
 		if (m_context instanceof PlayActivity) {
@@ -680,5 +686,4 @@ public class MultiTouchView extends View {
 			// Then call the method in the activity.
 		}
 	}
-
 }
