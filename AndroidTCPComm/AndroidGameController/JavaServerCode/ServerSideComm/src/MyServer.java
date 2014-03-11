@@ -29,10 +29,10 @@ public class MyServer {
 	private final UUID BTUUID = new UUID("1101", true);
 	private final String BTconnectionString = "btspp://localhost:" + BTUUID +";name=Sample SPP Server";
 
-	LocalDevice BTlocal = null;
-    StreamConnectionNotifier BTserver = null;
-    StreamConnection BTconn = null;
-
+	private LocalDevice BTlocal = null;
+	private StreamConnectionNotifier BTserver = null;
+	private StreamConnection BTconn = null;
+    
 	KeyTouch keyTouch = null;
 	
 	public static void main(String[] args) throws UnknownHostException {
@@ -186,6 +186,11 @@ public class MyServer {
 						 }catch (Exception  e) {
 							 System.out.println("Exception Occured: " + e.toString());
 						 }
+					try{
+						BTserver.close();
+					}catch (Exception  e) {
+						 System.out.println("Exception Occured: " + e.toString());
+					 }
 					
 					break;
 				case 0:	//connectionType not selected yet
