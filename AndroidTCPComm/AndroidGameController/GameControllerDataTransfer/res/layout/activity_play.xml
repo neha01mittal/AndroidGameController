@@ -94,4 +94,14 @@
         android:contentDescription="@string/buttonreset"
         android:background="@drawable/resetbutton" />
 
+      <ImageButton
+        android:id="@+id/imageButton1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/holdatrest"
+        android:layout_marginTop="90dip"
+        android:visibility="visible" 
+        android:background="@null"
+        android:gravity="center_horizontal|center_vertical" 
+        />
 </FrameLayout>

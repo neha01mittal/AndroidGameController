@@ -5,36 +5,36 @@
     android:background="@drawable/background3"
     android:gravity="center_vertical"
     android:orientation="vertical" >
-<!-- 
+
     <TextView
         android:id="@+id/TextHeaderDiscovered"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:text="@string/discovereddevices"
-        android:textAppearance="?android:attr/textAppearanceMedium" /> -->
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:visibility="invisible" />
 
-  <ListView
+    <ListView
         android:id="@+id/listBTDiscovered"
         android:layout_width="match_parent"
-        android:layout_height="239dp" >
-  </ListView>
+        android:layout_height="239dp"
+        android:visibility="invisible" >
+    </ListView>
 
-  <TextView
-      android:id="@+id/textHeaderPaired"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center_horizontal"
-      android:text="@string/paireddevices"
-      android:textAppearance="?android:attr/textAppearanceLarge" />
+    <TextView
+        android:id="@+id/textHeaderPaired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/paireddevices"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ListView
         android:id="@+id/listBTPaired"
         android:layout_width="match_parent"
         android:layout_height="204dp"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:background="@drawable/background" >
-
+        android:layout_margin="@dimen/activity_horizontal_margin" >
     </ListView>
 
 </LinearLayout>
