@@ -447,19 +447,8 @@ public class ServerUI extends JFrame {
 		innerTabbedPane.addTab(TILT_RIGHT, tiltRightPane);
 	}
 
-	/*
-	 * public void setKeyMapping() { File f = new
-	 * File("SmartController/Data/keyMappings.txt");
-	 * 
-	 * if(f.exists()){ //There is an existing keyMap file, read it for keyMap
-	 * settings keyboardControlMapping = new
-	 * ArrayList<String>(readKeyMapFile()); }else{ //No existing keyMap file,
-	 * read from default setting keyboardControlMapping = new
-	 * ArrayList<String>(); for(String key: defaultKeyboardControls) {
-	 * keyboardControlMapping.add(key); } } }
-	 */
 	/**
-	 * create file for stroing configurations
+	 * create file for storing configurations
 	 * @return
 	 */
 	public File createKeyMapFile() {
@@ -498,7 +487,7 @@ public class ServerUI extends JFrame {
 		// add the image label
 		// TODO get better GIF
 		JLabel imageLabel = new JLabel();
-		ImageIcon ii = new ImageIcon("src/Images/phoneswipe.gif");
+		ImageIcon ii = new ImageIcon(getClass().getResource("/Images/phoneswipe.gif"));
 		imageLabel.setIcon(ii);
 		layout.add(imageLabel, java.awt.BorderLayout.CENTER);
 		// show it

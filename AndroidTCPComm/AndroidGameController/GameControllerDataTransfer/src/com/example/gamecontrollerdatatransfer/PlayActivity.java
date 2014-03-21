@@ -2,9 +2,6 @@ package com.example.gamecontrollerdatatransfer;
 
 import gc.common_resources.CommandType;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -12,8 +9,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -21,8 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlayActivity extends Activity {
-
-	private final Context context = this;
 
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
@@ -58,7 +53,7 @@ public class PlayActivity extends Activity {
 			connectType = extras.getString("connectType");
 		}
 
-		registerRestPosition();
+		addListenerOnButton();
 
 		final ImageButton resetButton = (ImageButton) findViewById(R.id.buttonreset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +62,8 @@ public class PlayActivity extends Activity {
 			public void onClick(View v) {
 				flag = false;
 				isStartPositionRegistered = false;
-				registerRestPosition();
+				findViewById(R.id.imageButton1).setVisibility(View.VISIBLE);
+				addListenerOnButton();
 			}
 		});
 
@@ -104,29 +100,26 @@ public class PlayActivity extends Activity {
 	/**
 	 * register position for accelerometer tilt detection
 	 */
-	public void registerRestPosition() {
-		// record initial coordinates
+	public void addListenerOnButton() {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Choose your position");
-		builder.setMessage(R.string.get_rest_position_message)
-				.setPositiveButton(R.string.ok,
-						new DialogInterface.OnClickListener() {
+		final ImageButton imageButton = (ImageButton) findViewById(R.id.imageButton1);
 
-							@Override
-							public void onClick(DialogInterface dialog, int id) { //
-								// User clicked OK, so save the mSelectedItems
-								// results somewhere // or
-								// return them to the component that opened the
-								// dialog
+		imageButton.setOnClickListener(new OnClickListener() {
 
-								System.out.println("Register x and y here");
-								flag = true;
-								System.out.println("START VALUES" + startX
-										+ " " + startY);
-							}
-						});
-		builder.show();
+			@Override
+			public void onClick(View arg0) {
+
+				Toast.makeText(PlayActivity.this, "Rest position recorded",
+						Toast.LENGTH_SHORT).show();
+				imageButton.setVisibility(View.GONE);
+				System.out.println("Register x and y here");
+				flag = true;
+				System.out.println("START VALUES" + startX + " " + startY);
+
+			}
+
+		});
+
 	}
 
 	public boolean isTiltDetectionOn() {
@@ -167,6 +160,7 @@ public class PlayActivity extends Activity {
 
 	/**
 	 * wrap command to be sent to server
+	 * 
 	 * @param tc
 	 * @param newCommand
 	 */
@@ -210,7 +204,7 @@ public class PlayActivity extends Activity {
 		// to take appropriate action when the activity looses focus
 		super.onPause();
 		bgColor = Color.TRANSPARENT;
-		
+
 		System.out.println("Setting background");
 		commonView = findViewById(R.id.playActivity);
 		commonView.setBackgroundColor(bgColor);
@@ -294,10 +288,10 @@ public class PlayActivity extends Activity {
 
 							if ((startX - x) < 0) {
 								// down tilt
-								//bgColor = Color.parseColor("#ff669966");
+								// bgColor = Color.parseColor("#ff669966");
 								tiltState = 1; // TILT UP
 							} else {
-								//bgColor = Color.parseColor("#ff668899");
+								// bgColor = Color.parseColor("#ff668899");
 								tiltState = 2; // TILT DOWN
 							}
 
@@ -308,10 +302,10 @@ public class PlayActivity extends Activity {
 							iv.setImageResource(R.drawable.vertical);
 
 							if ((startY - y) < 0) {
-							//	bgColor = Color.parseColor("#ff6E6699");
+								// bgColor = Color.parseColor("#ff6E6699");
 								tiltState = 3; // TILT LEFT
 							} else {
-								//bgColor = Color.parseColor("#ff886699");
+								// bgColor = Color.parseColor("#ff886699");
 								tiltState = 4; // TILT RIGHT
 							}
 
@@ -321,10 +315,10 @@ public class PlayActivity extends Activity {
 						} else {
 							// NOP
 							iv.setVisibility(View.INVISIBLE);
-							//bgColor = Color.TRANSPARENT;
+							// bgColor = Color.TRANSPARENT;
 							tiltState = 0; // NO TILT
 						}
-						//commonView.setBackgroundColor(bgColor);
+						// commonView.setBackgroundColor(bgColor);
 						commonView.invalidate();
 					}
 				} else {

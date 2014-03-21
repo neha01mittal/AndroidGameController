@@ -1,17 +1,18 @@
 package com.example.gamecontrollerdatatransfer;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.example.gamecontrollerdatatransfer.R.id;
-
-import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,11 +20,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 
 public class BluetoothConnectActivity extends Activity implements
 		OnItemClickListener {
@@ -33,6 +29,7 @@ public class BluetoothConnectActivity extends Activity implements
 	private final static int RESULT_CANCELED = 0;
 
 	private ArrayAdapter<String> adapterPaired;
+	private Handler btConnectingHandler;
 	private ListView lvPaired = null;
 	private ArrayAdapter<String> adapterDiscovered;
 	private ListView lvDiscovered = null;
@@ -41,7 +38,7 @@ public class BluetoothConnectActivity extends Activity implements
 
 	private IntentFilter btFilter;
 	private BroadcastReceiver btReceiver;
-	
+
 	private static BluetoothDevice connDevice;
 	private static boolean bConnecting = false, bConnected = false;
 
@@ -53,9 +50,9 @@ public class BluetoothConnectActivity extends Activity implements
 		setContentView(R.layout.activity_bluetooth);
 
 		initUI();
-		
+
 		deviceListPaired = new ArrayList<BluetoothDevice>();
-		deviceListDiscovered = new ArrayList<BluetoothDevice>();		
+		deviceListDiscovered = new ArrayList<BluetoothDevice>();
 
 		showInstructions();
 		// BT Stuff happening in onResume() below
@@ -63,6 +60,7 @@ public class BluetoothConnectActivity extends Activity implements
 
 	private void initUI() {
 		// init list for paired devices
+		btConnectingHandler = new Handler();
 		adapterPaired = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, 0);
 		lvPaired = (ListView) findViewById(R.id.listBTPaired);
@@ -101,15 +99,17 @@ public class BluetoothConnectActivity extends Activity implements
 
 			adapterPaired.clear();
 			deviceListPaired.clear();
-			
+
 			// Loop through paired devices
 			for (android.bluetooth.BluetoothDevice device : SingletonBluetooth
 					.getInstance().getPairedDevicesList()) {
 				// Add the name and address to an array adapter to show in a
 				// ListView
 				deviceListPaired.add(device);
-				adapterPaired.add(device.getName() + "\n" + device.getAddress());
-				Log.d("BT Paired Device: ", device.getName() + "\n" + device.getAddress()); 
+				adapterPaired
+						.add(device.getName() + "\n" + device.getAddress());
+				Log.d("BT Paired Device: ",
+						device.getName() + "\n" + device.getAddress());
 				// only keys with true value are shown
 			}
 		}
@@ -145,20 +145,24 @@ public class BluetoothConnectActivity extends Activity implements
 					if (!SingletonBluetooth.getInstance().BTisEnabled()) {
 						enableBT();
 					}
-				}else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED
+				} else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED
 						.equals(action)) {
-					Toast.makeText(getApplicationContext(), "Started bluetooth discovery...", Toast.LENGTH_SHORT).show();
-					
-				}else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
+					Toast.makeText(getApplicationContext(),
+							"Started bluetooth discovery...",
+							Toast.LENGTH_SHORT).show();
+
+				} else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
 						.equals(action)) {
-					Toast.makeText(getApplicationContext(), "Bluetooth discovery ended", Toast.LENGTH_SHORT).show();
-					
-				}else if (BluetoothDevice.ACTION_ACL_CONNECTED
-						.equals(action)) {
-					
+					Toast.makeText(getApplicationContext(),
+							"Bluetooth discovery ended", Toast.LENGTH_SHORT)
+							.show();
+
+				} else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+
 					bConnected = true;
 
-					Intent k = new Intent(BluetoothConnectActivity.this, PlayActivity.class);
+					Intent k = new Intent(BluetoothConnectActivity.this,
+							PlayActivity.class);
 					k.putExtra("connectType", "bluetooth");
 					startActivity(k);
 				}
@@ -167,7 +171,8 @@ public class BluetoothConnectActivity extends Activity implements
 		// Register the BroadcastReceiver
 		btFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 		registerReceiver(btReceiver, btFilter);
-		btFilter = new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+		btFilter = new IntentFilter(
+				BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
 		registerReceiver(btReceiver, btFilter);
 		btFilter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
 		registerReceiver(btReceiver, btFilter);
@@ -234,83 +239,83 @@ public class BluetoothConnectActivity extends Activity implements
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
-		
-		if(SingletonBluetooth.getInstance().isDiscovering())
+
+		if (SingletonBluetooth.getInstance().isDiscovering())
 			SingletonBluetooth.getInstance().cancelDiscovery();
-		
+
 		// The item clicked is from paired device listview
-		if(arg0.getId() == lvPaired.getId()) {
+		if (arg0.getId() == lvPaired.getId()) {
 			connDevice = deviceListPaired.get(arg2);
-			
+
 			bConnecting = false;
 			bConnected = false;
-			
+
 			btConnectingHandler.removeCallbacks(mConnectTask);
 			btConnectingHandler.postDelayed(mConnectTask, 100);
 		}
-		
-		if(arg0.getId() == lvDiscovered.getId()) {
-			Toast.makeText(
-					getApplicationContext(),
-					"Clicked a discovered device",
-					Toast.LENGTH_SHORT).show();
+
+		if (arg0.getId() == lvDiscovered.getId()) {
+			Toast.makeText(getApplicationContext(),
+					"Clicked a discovered device", Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	private Runnable mConnectTask = new Runnable() {
 		public void run() {
-			//This task will initiate the connection to the BT device
-			//selected by the user and verify that the connection is successful
+			// This task will initiate the connection to the BT device
+			// selected by the user and verify that the connection is successful
 
-			//If bConnecting is true, we have already attempted to 
-			//connect to the BT device, therefore now we need to verify
-			//that the connection is successful
+			// If bConnecting is true, we have already attempted to
+			// connect to the BT device, therefore now we need to verify
+			// that the connection is successful
 			if (bConnecting) {
-				if(!bConnected){
-					//Failed to connect to the device
-					Toast.makeText( context,
-							"Failed to connect to " + connDevice.getName() + ".",
-							Toast.LENGTH_LONG).show();
-				}		
+				if (!bConnected) {
+					// Failed to connect to the device
+					Toast.makeText(
+							context,
+							"Failed to connect to " + connDevice.getName()
+									+ ".", Toast.LENGTH_LONG).show();
+				}
 				bConnecting = false;
 				bConnected = false;
-			} else {				
-				//bConnecting is false, now attempting to connect to the
-				//BT device
-				if(connDevice != null){
+			} else {
+				// bConnecting is false, now attempting to connect to the
+				// BT device
+				if (connDevice != null) {
 					bConnecting = true;
-					Toast.makeText( context,
-							"Attempting to connect to " + connDevice.getName() + "...",
-							Toast.LENGTH_LONG).show();
-					
-					SingletonBluetooth.getInstance().connectToDevice(connDevice);
-					
-					//Run this task again later to verify the connection
+					Toast.makeText(
+							context,
+							"Attempting to connect to " + connDevice.getName()
+									+ "...", Toast.LENGTH_LONG).show();
+
+					SingletonBluetooth.getInstance()
+							.connectToDevice(connDevice);
+
+					// Run this task again later to verify the connection
 					btConnectingHandler.postDelayed(this, 7000);
-				}			
+				}
 			}
 		}
 	};
-	
+
 	public void showInstructions() {
 		// record initial coordinates
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setTitle("Important!");
-		builder.setMessage(R.string.bluetoothinstructions)
-				.setPositiveButton(R.string.ok,
-						new DialogInterface.OnClickListener() {
+		builder.setMessage(R.string.bluetoothinstructions).setPositiveButton(
+				R.string.ok, new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog, int id) { //
-								// User clicked OK, so save the mSelectedItems
-								// results somewhere // or
-								// return them to the component that opened the
-								// dialog
+					@Override
+					public void onClick(DialogInterface dialog, int id) { //
+						// User clicked OK, so save the mSelectedItems
+						// results somewhere // or
+						// return them to the component that opened the
+						// dialog
 
-								//NOP
-							}
-						});
+						// NOP
+					}
+				});
 		builder.show();
 	}
 

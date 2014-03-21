@@ -9,9 +9,9 @@ public class TouchCoordinates {
 	private float init_x;
 	private float init_y;
 	private float init_z;
-	
+
 	private int pointerCount;
-	
+
 	public TouchCoordinates(float x,float y, int pointerCount){
 		
 		this.x= x;
