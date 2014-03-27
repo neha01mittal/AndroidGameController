@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:visibility="invisible"/>
 
-    <com.example.gamecontrollerdatatransfer.MultiTouchView
+    <com.smartcontroller.clientside.MultiTouchView
         android:id="@+id/multi_touch_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -94,6 +94,32 @@
         android:contentDescription="@string/buttonreset"
         android:background="@drawable/resetbutton" />
 
+     <ImageButton
+         android:id="@+id/fbicon"
+         android:layout_width="40dp"
+         android:layout_height="46dp"
+         android:layout_gravity="bottom|right"
+         android:layout_marginBottom="90dip"
+         android:background="@drawable/fbicon"
+         android:contentDescription="@string/fbshare" />
+      <ImageButton
+         android:id="@+id/twitter"
+         android:layout_width="40dp"
+         android:layout_height="46dp"
+         android:layout_gravity="bottom|right"
+         android:layout_marginBottom="140dip"
+         android:background="@drawable/twitter"
+         android:contentDescription="@string/tweetshare" />
+      
+      <ImageButton
+         android:id="@+id/instagram"
+         android:layout_width="40dp"
+         android:layout_height="46dp"
+         android:layout_gravity="bottom|right"
+         android:layout_marginBottom="190dip"
+         android:background="@drawable/instagram"
+         android:contentDescription="@string/instashare" />
+    
       <ImageButton
         android:id="@+id/imageButton1"
         android:layout_width="fill_parent"

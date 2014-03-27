@@ -26,6 +26,7 @@
 	<string name="demovideo">Demo Video</string>
 	<string name="delete">Delete Selected</string>
 	<string name="ip_list">Past Favourites</string>
+	<string name="fbshare">Share screenshots on fb</string>
 	<string name="paireddevices">Paired Devices</string>
 	<string name="discovereddevices">Discovered Devices</string>
 	<string name="bluetoothinstructions">Please make sure that your device is already paired with your PC</string>
@@ -48,6 +49,8 @@
     <string name="pick_seattle_place">Pick a Seattle Place</string>
     <string name="app_id">577606439013070</string>
     <string name="exception">Exception: %1$s</string>
+    <string name="tweetshare">Share on Twitter</string>
+    <string name="instashare">Share on Instagram</string>
 
 </resources>
 
