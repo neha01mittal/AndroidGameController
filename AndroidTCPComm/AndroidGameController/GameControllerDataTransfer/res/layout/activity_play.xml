@@ -5,10 +5,11 @@
     android:background="@drawable/background1"
     android:gravity="center_horizontal" >
 
-    <TextView android:id="@+id/textView"
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"/>
+        android:visibility="invisible" />
 
     <com.smartcontroller.clientside.MultiTouchView
         android:id="@+id/multi_touch_view"
@@ -21,6 +22,21 @@
         android:stretchColumns="*" >
 
         <TableRow>
+
+            <TextView
+                android:id="@+id/timertext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="10dip"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:id="@+id/stoptimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/stoptimer"
+                android:contentDescription="@string/timer"
+                android:visibility="invisible" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -82,8 +98,8 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="bottom|right"
-        android:contentDescription="@string/buttonplaypause"
-        android:background="@drawable/pausebutton" />
+        android:background="@drawable/pausebutton"
+        android:contentDescription="@string/buttonplaypause" />
 
     <ImageButton
         android:id="@+id/buttonreset"
@@ -91,43 +107,53 @@
         android:layout_height="40dp"
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="50dip"
-        android:contentDescription="@string/buttonreset"
-        android:background="@drawable/resetbutton" />
+        android:background="@drawable/resetbutton"
+        android:contentDescription="@string/buttonreset" />
 
-     <ImageButton
-         android:id="@+id/fbicon"
-         android:layout_width="40dp"
-         android:layout_height="46dp"
-         android:layout_gravity="bottom|right"
-         android:layout_marginBottom="90dip"
-         android:background="@drawable/fbicon"
-         android:contentDescription="@string/fbshare" />
-      <ImageButton
-         android:id="@+id/twitter"
-         android:layout_width="40dp"
-         android:layout_height="46dp"
-         android:layout_gravity="bottom|right"
-         android:layout_marginBottom="140dip"
-         android:background="@drawable/twitter"
-         android:contentDescription="@string/tweetshare" />
-      
-      <ImageButton
-         android:id="@+id/instagram"
-         android:layout_width="40dp"
-         android:layout_height="46dp"
-         android:layout_gravity="bottom|right"
-         android:layout_marginBottom="190dip"
-         android:background="@drawable/instagram"
-         android:contentDescription="@string/instashare" />
-    
-      <ImageButton
+    <ImageButton
+        android:id="@+id/fbicon"
+        android:layout_width="40dp"
+        android:layout_height="46dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="90dip"
+        android:background="@drawable/fbicon"
+        android:contentDescription="@string/fbshare" />
+
+    <ImageButton
+        android:id="@+id/twitter"
+        android:layout_width="40dp"
+        android:layout_height="46dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="140dip"
+        android:background="@drawable/twitter"
+        android:contentDescription="@string/tweetshare" />
+
+    <ImageButton
+        android:id="@+id/instagram"
+        android:layout_width="40dp"
+        android:layout_height="46dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="190dip"
+        android:background="@drawable/instagram"
+        android:contentDescription="@string/instashare" />
+
+    <ImageButton
+        android:id="@+id/timer"
+        android:layout_width="40dp"
+        android:layout_height="46dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="240dip"
+        android:background="@drawable/timer"
+        android:contentDescription="@string/timer" />
+
+    <ImageButton
         android:id="@+id/imageButton1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/holdatrest"
         android:layout_marginTop="90dip"
-        android:visibility="visible" 
         android:background="@null"
-        android:gravity="center_horizontal|center_vertical" 
-        />
+        android:gravity="center_horizontal|center_vertical"
+        android:src="@drawable/holdatrest"
+        android:visibility="visible" />
+
 </FrameLayout>

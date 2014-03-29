@@ -4,7 +4,9 @@ import gc.common_resources.CommandType;
 
 import java.util.List;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -15,18 +17,25 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
-public class PlayActivity extends Activity {
+public class PlayActivity extends FragmentActivity {
 
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
@@ -44,6 +53,13 @@ public class PlayActivity extends Activity {
 
 	private int bgColor = Color.TRANSPARENT;
 
+	// timer
+	private CountDownTimer countDownTimer;
+	private boolean timerHasStarted = false;
+	public TextView text;
+	private long startTime = 0;
+	private final long interval = 1 * 1000;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,59 +72,98 @@ public class PlayActivity extends Activity {
 		isStartPositionRegistered = false;
 		setContentView(R.layout.activity_play);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		
 		/* do this in onCreate */
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			connectType = extras.getString("connectType");
 		}
-
-		addListenerOnButton();
+		
+		try {
+		    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+		    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+		    r.play();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+		
+		addListenerOnTiltDetectionButton();
 
 		final ImageButton twitterButton = (ImageButton) findViewById(R.id.twitter);
 		twitterButton.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-//				Intent sendIntent = new Intent();
-//				sendIntent.setAction(Intent.ACTION_SEND);
-//				sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-//				sendIntent.setType("text/plain");
-//				startActivity(Intent.createChooser(sendIntent, "Share via"));
-				
-				Uri imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.gameplay);
-				 
-				Intent shareIntent = findTwitterClient(); 
-				if(shareIntent!=null) {
-					shareIntent.putExtra(Intent.EXTRA_TEXT, "Enjoying the game play experience! #SmartController http://www.strikingly.com/smartcontroller ");
-					startActivity(Intent.createChooser(shareIntent, "Share via"));
-				}
-                else {
-					Toast.makeText(getApplicationContext(), "Unable to find Twitter", Toast.LENGTH_SHORT).show();
+				Uri imageUri = Uri.parse("android.resource://"
+						+ getPackageName() + "/" + R.drawable.gameplay);
+
+				Intent shareIntent = findTwitterClient();
+				if (shareIntent != null) {
+					shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+					shareIntent
+							.putExtra(
+									Intent.EXTRA_TEXT,
+									"Enjoying the game play experience! #SmartController http://www.strikingly.com/smartcontroller ");
+					startActivity(Intent
+							.createChooser(shareIntent, "Share via"));
+				} else {
+					Toast.makeText(getApplicationContext(),
+							"Unable to find Twitter", Toast.LENGTH_SHORT)
+							.show();
 				}
 			}
 		});
-		
+
 		final ImageButton instaButton = (ImageButton) findViewById(R.id.instagram);
 		instaButton.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				Uri imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.gameplay);
-				 
-				if(verificaInstagram()) {
-				Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
-				shareIntent.setType("image/*");       
-                //shareIntent.putExtra(Intent.EXTRA_TEXT, "Enjoying the game play experience! #SmartController http://www.strikingly.com/smartcontroller ");
-                shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
-                shareIntent.setPackage("com.instagram.android");
-                startActivity(Intent.createChooser(shareIntent, "Share via"));
+				Uri imageUri = Uri.parse("android.resource://"
+						+ getPackageName() + "/" + R.drawable.gameplay);
+
+				if (verificaInstagram()) {
+					Intent shareIntent = new Intent(
+							android.content.Intent.ACTION_SEND);
+					shareIntent.setType("image/*");
+					// shareIntent.putExtra(Intent.EXTRA_TEXT,
+					// "Enjoying the game play experience! #SmartController http://www.strikingly.com/smartcontroller ");
+					shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+					shareIntent.setPackage("com.instagram.android");
+					startActivity(Intent
+							.createChooser(shareIntent, "Share via"));
 				} else {
-					Toast.makeText(getApplicationContext(), "Unable to find Instagram", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),
+							"Unable to find Instagram", Toast.LENGTH_SHORT)
+							.show();
 				}
 			}
 		});
-		
+
+		final ImageButton timerButton = (ImageButton) findViewById(R.id.timer);
+		timerButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				DialogFragment newFragment = new TimePickerFragment();
+				newFragment.show(getSupportFragmentManager(), "timePicker");
+			}
+
+		});
+
+		final ImageButton stoptimerButton = (ImageButton) findViewById(R.id.stoptimer);
+		stoptimerButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				stoptimerButton.setVisibility(View.GONE);
+				text.setVisibility(View.GONE);
+				countDownTimer.cancel();
+			}
+
+		});
+
 		final ImageButton resetButton = (ImageButton) findViewById(R.id.buttonreset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
 
@@ -117,21 +172,22 @@ public class PlayActivity extends Activity {
 				flag = false;
 				isStartPositionRegistered = false;
 				findViewById(R.id.imageButton1).setVisibility(View.VISIBLE);
-				addListenerOnButton();
+				addListenerOnTiltDetectionButton();
 			}
 		});
 
 		final ImageButton fbshare = (ImageButton) findViewById(R.id.fbicon);
 		fbshare.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent k = new Intent(PlayActivity.this, FacebookShareActivity.class);
+				Intent k = new Intent(PlayActivity.this,
+						FacebookShareActivity.class);
 				startActivity(k);
 			}
 		});
-		
+
 		final ImageButton playPauseButton = (ImageButton) findViewById(R.id.buttonplaypause);
 		playPauseButton.setOnClickListener(new View.OnClickListener() {
 
@@ -161,70 +217,50 @@ public class PlayActivity extends Activity {
 		});
 
 	}
-	
+
 	public Intent findTwitterClient() {
-	    final String[] twitterApps = {
-	            // package // name - nb installs (thousands)
-	            "com.twitter.android", // official - 10 000
-	            "com.twidroid", // twidroid - 5 000
-	            "com.handmark.tweetcaster", // Tweecaster - 5 000
-	            "com.thedeck.android" }; // TweetDeck - 5 000 };
-	    Intent tweetIntent = new Intent();
-	    tweetIntent.setType("text/plain");
-	    final PackageManager packageManager = getPackageManager();
-	    List<ResolveInfo> list = packageManager.queryIntentActivities(
-	            tweetIntent, PackageManager.MATCH_DEFAULT_ONLY);
+		final String[] twitterApps = {
+				// package // name - nb installs (thousands)
+				"com.twitter.android", // official - 10 000
+				"com.twidroid", // twidroid - 5 000
+				"com.handmark.tweetcaster", // Tweecaster - 5 000
+				"com.thedeck.android" }; // TweetDeck - 5 000 };
+		Intent tweetIntent = new Intent();
+		tweetIntent.setType("text/plain");
+		final PackageManager packageManager = getPackageManager();
+		List<ResolveInfo> list = packageManager.queryIntentActivities(
+				tweetIntent, PackageManager.MATCH_DEFAULT_ONLY);
 
-	    for (int i = 0; i < twitterApps.length; i++) {
-	        for (ResolveInfo resolveInfo : list) {
-	            String p = resolveInfo.activityInfo.packageName;
-	            if (p != null && p.startsWith(twitterApps[i])) {
-	                tweetIntent.setPackage(p);
-	                return tweetIntent;
-	            }
-	        }
-	    }
-	    return null;
+		for (int i = 0; i < twitterApps.length; i++) {
+			for (ResolveInfo resolveInfo : list) {
+				String p = resolveInfo.activityInfo.packageName;
+				if (p != null && p.startsWith(twitterApps[i])) {
+					tweetIntent.setPackage(p);
+					return tweetIntent;
+				}
+			}
+		}
+		return null;
 
 	}
-	
-	private boolean verificaInstagram(){
-	    boolean instalado = false;
 
-	    try {
-	        ApplicationInfo info = getPackageManager().getApplicationInfo("com.instagram.android", 0);
-	        instalado = true;
-	    } catch (NameNotFoundException e) {
-	        instalado = false;
-	    }
-	        return instalado;
-	    }
+	private boolean verificaInstagram() {
+		boolean instalado = false;
 
-	public Intent findInstaClient() {
-		 final String[] instaApps = {
-		            // package // name - nb installs (thousands)
-		            "com.instagram.android"};
-		    Intent instaIntent = new Intent();
-		    instaIntent.setType("text/plain");
-		    final PackageManager packageManager = getPackageManager();
-		    List<ResolveInfo> list = packageManager.queryIntentActivities(
-		    		instaIntent, PackageManager.MATCH_DEFAULT_ONLY);
-
-		    for (int i = 0; i < instaApps.length; i++) {
-		        for (ResolveInfo resolveInfo : list) {
-		            String p = resolveInfo.activityInfo.packageName;
-		            if (p != null && p.startsWith(instaApps[i])) {
-		            	instaIntent.setPackage(p);
-		                return instaIntent;
-		            }
-		        }
-		    }
-		    return null;
+		try {
+			ApplicationInfo info = getPackageManager().getApplicationInfo(
+					"com.instagram.android", 0);
+			instalado = true;
+		} catch (NameNotFoundException e) {
+			instalado = false;
+		}
+		return instalado;
 	}
+
 	/**
 	 * register position for accelerometer tilt detection
 	 */
-	public void addListenerOnButton() {
+	public void addListenerOnTiltDetectionButton() {
 
 		final ImageButton imageButton = (ImageButton) findViewById(R.id.imageButton1);
 
@@ -375,9 +411,7 @@ public class PlayActivity extends Activity {
 			if (flag) {
 				if (!isPaused) {
 					if (!isStartPositionRegistered) {
-						tvX.setText("0.0");
-						tvY.setText("0.0");
-						tvZ.setText("0.0");
+
 						startX = x;
 						startY = y;
 						startZ = z;
@@ -397,9 +431,6 @@ public class PlayActivity extends Activity {
 						if (deltaZ < NOISE)
 							deltaZ = (float) 0.0;
 
-						tvX.setText(Float.toString(deltaX));
-						tvY.setText(Float.toString(deltaY));
-						tvZ.setText(Float.toString(deltaZ));
 						// change to visible for testing/ debugging
 						tvX.setVisibility(View.INVISIBLE);
 						tvY.setVisibility(View.INVISIBLE);
@@ -453,6 +484,66 @@ public class PlayActivity extends Activity {
 		}
 
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		}
+	}
+
+	// timer class
+	public class MyCountDownTimer extends CountDownTimer {
+		public MyCountDownTimer(long startTime, long interval) {
+			super(startTime, interval);
+		}
+
+		@Override
+		public void onFinish() {
+			text.setText("Time's up! Disconnecting ...");
+			onBackPressed();
+			onBackPressed();
+		}
+
+		@Override
+		public void onTick(long millisUntilFinished) {
+			text.setText("Seconds Left: " + millisUntilFinished / 1000);
+		}
+	}
+
+	@SuppressLint("ValidFragment")
+	public class TimePickerFragment extends DialogFragment implements
+			TimePickerDialog.OnTimeSetListener {
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			// Use the current time as the default values for the picker
+			int hour = 0; // c.get(Calendar.HOUR_OF_DAY);
+			int minute = 0; // c.get(Calendar.MINUTE);
+
+			TimePickerDialog timePicker = new TimePickerDialog(getActivity(),
+					this, hour, minute,
+					DateFormat.is24HourFormat(getActivity()));
+			timePicker.setTitle("Control your play time! Set a timer!");
+			timePicker.setMessage("Enter in hh/mm format");
+			// Create a new instance of TimePickerDialog and return it
+			return timePicker;
+		}
+
+		@Override
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			// Do something with the time chosen by the user
+
+			startTime = (hourOfDay * 3600 + minute * 60) * 1000;
+			text = (TextView) findViewById(R.id.timertext);
+
+			if (countDownTimer != null) {
+				countDownTimer.cancel();
+			}
+			countDownTimer = new MyCountDownTimer(startTime, interval);
+			text.setText(text.getText() + "Seconds left: "
+					+ String.valueOf(startTime / 1000));
+			text.setVisibility(View.VISIBLE);
+			((ImageButton) findViewById(R.id.stoptimer))
+					.setVisibility(View.VISIBLE);
+			countDownTimer.start();
+			Toast.makeText(getApplicationContext(), "Timer started!",
+					Toast.LENGTH_SHORT).show();
 		}
 	}
 }

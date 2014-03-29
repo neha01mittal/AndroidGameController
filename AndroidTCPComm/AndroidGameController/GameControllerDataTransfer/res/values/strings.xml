@@ -4,37 +4,37 @@
     <string name="app_name"> SmartController</string>
     <string name="action_settings">Settings</string>
     <string name="hello">Hello world!</string>
-    <string name= "iamready">I am ready!</string>
+    <string name="iamready">I am ready!</string>
     <string name="send">Send</string>
-	<string name="enter_ipaddress">Enter PC\'s IP Address:</string>
-	<string name="play">Play!</string>
-	<string name="ok">OK</string>
-	<string name="cancel">Cancel</string>
-	<string name="addToFavourites">Add To Favourites</string>
-	<string name="clearList">Clear All</string>
-	<string name="IPV4">IPV4</string>
-	<string name="faq">FAQ Page</string>
-	<string name="gototutorials">View tutorials</string>
-	<string name="tutorial_page">Tutorials: Touch a page to expand it (Touch to close)</string>
-	<string name="repeatTutorials">Repeat Tutorials</string>
-	<string name="buttonreset">Rest Tilt Position</string>
-	<string name="buttonplaypause">Stop/ Resume Tilt Detection</string>
-	<string name="xaxis">X-Axis</string>
-	<string name="yaxis">Y-Axis</string>
-	<string name="zaxis">Z-Axis</string>
-	<string name="game_controller">SmartController</string>
-	<string name="demovideo">Demo Video</string>
-	<string name="delete">Delete Selected</string>
-	<string name="ip_list">Past Favourites</string>
-	<string name="fbshare">Share screenshots on fb</string>
-	<string name="paireddevices">Paired Devices</string>
-	<string name="discovereddevices">Discovered Devices</string>
-	<string name="bluetoothinstructions">Please make sure that your device is already paired with your PC</string>
-	<string name="instructions">1. Please make sure that your PC/ MAC server is running.\n\n2. Confirm your preferred connection on PC/ MAC server before starting a connection on this device.\n\n3. Don\'t forget to map your key settings under Key Settings tab on the desktop server. </string>
-	<string name="confirm_clear_list">Are you sure you want to delete all the IP addresses? </string>
-	<string name="get_rest_position_message">Hold your phone horizontally at a comfortable angle.\n Press OK while holding the phone in that position.</string>
+    <string name="enter_ipaddress">Enter PC\'s IP Address:</string>
+    <string name="play">Play!</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="addToFavourites">Add To Favourites</string>
+    <string name="clearList">Clear All</string>
+    <string name="IPV4">IPV4</string>
+    <string name="faq">FAQ Page</string>
+    <string name="gototutorials">View tutorials</string>
+    <string name="tutorial_page">Tutorials: Touch a page to expand it (Touch to close)</string>
+    <string name="repeatTutorials">Repeat Tutorials</string>
+    <string name="buttonreset">Rest Tilt Position</string>
+    <string name="buttonplaypause">Stop/ Resume Tilt Detection</string>
+    <string name="xaxis">X-Axis</string>
+    <string name="yaxis">Y-Axis</string>
+    <string name="zaxis">Z-Axis</string>
+    <string name="game_controller">SmartController</string>
+    <string name="demovideo">Demo Video</string>
+    <string name="delete">Delete Selected</string>
+    <string name="ip_list">Past Favourites</string>
+    <string name="fbshare">Share screenshots on fb</string>
+    <string name="paireddevices">Paired Devices</string>
+    <string name="discovereddevices">Discovered Devices</string>
+    <string name="bluetoothinstructions">Please make sure that your device is already paired with your PC</string>
+    <string name="instructions">1. Please make sure that your PC/ MAC server is running.\n\n2. Confirm your preferred connection on PC/ MAC server before starting a connection on this device.\n\n3. Don\'t forget to map your key settings under Key Settings tab on the desktop server. </string>
+    <string name="confirm_clear_list">Are you sure you want to delete all the IP addresses? </string>
+    <string name="get_rest_position_message">Hold your phone horizontally at a comfortable angle.\n Press OK while holding the phone in that position.</string>
 
-<!-- 	fb share -->
+    <!-- fb share -->
     <string name="cancelled">Cancelled</string>
     <string name="permission_not_granted">Unable to perform selected action because permissions were not granted.</string>
     <string name="hello_user">Hello %1$s!</string>
@@ -51,6 +51,6 @@
     <string name="exception">Exception: %1$s</string>
     <string name="tweetshare">Share on Twitter</string>
     <string name="instashare">Share on Instagram</string>
+    <string name="timer">Set timer</string>
 
 </resources>
-
