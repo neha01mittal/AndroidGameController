@@ -2,11 +2,14 @@ package com.smartcontroller.clientside;
 
 import gc.common_resources.CommandType;
 
+import java.util.HashMap;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -17,8 +20,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.media.SoundPool.OnLoadCompleteListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -26,8 +30,11 @@ import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.DateFormat;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -35,13 +42,16 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-public class PlayActivity extends FragmentActivity {
+public class PlayActivity extends FragmentActivity implements OnTouchListener {
 
 	private SensorManager mSensorManager;
 	private MyRenderer mRenderer;
 	private View commonView;
 	private boolean doubleBackToExitPressedOnce = false;
 	private String connectType;
+	private SoundPool soundPool;
+	private int soundID;
+	boolean loaded = false;
 
 	private final float NOISE = (float) 2.0;
 	private float startX = 0, startY = 0, startZ = 0;
@@ -52,10 +62,23 @@ public class PlayActivity extends FragmentActivity {
 	public float tiltX, tiltY;
 
 	private int bgColor = Color.TRANSPARENT;
+	private HashMap<Integer, Integer> soundTracks = new HashMap<Integer, Integer>() {
+		{
+			put(0, R.raw.gunshot);
+			put(1, R.raw.bigwave);
+			put(2, R.raw.chargedlightning);
+			put(3, R.raw.chargedsonicboom);
+			put(4, R.raw.drainmagic);
+			put(5, R.raw.funkyzap);
+			put(6, R.raw.stormmagic);
+			put(7, R.raw.thundermagic);
+		}
+	};
+	
+	final String[] items = {"Gun Shot","Big Wave","Charged Lightning","Charged Sonic Boom","Drain Magic","Funky Zap","Storm Magic","Thunder Magic"};
 
 	// timer
 	private CountDownTimer countDownTimer;
-	private boolean timerHasStarted = false;
 	public TextView text;
 	private long startTime = 0;
 	private final long interval = 1 * 1000;
@@ -65,28 +88,35 @@ public class PlayActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
+		
 		// Create our Preview view and set it as the content of our
 		// Activity
 		mRenderer = new MyRenderer();
 		isStartPositionRegistered = false;
 		setContentView(R.layout.activity_play);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		
+
+		// sound
+		(findViewById(R.id.multi_touch_view)).setOnTouchListener(this);
+		// Set the hardware buttons to control the music
+		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		// Load the sound
+		soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+		soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener() {
+			@Override
+			public void onLoadComplete(SoundPool soundPool, int sampleId,
+					int status) {
+				loaded = true;
+			}
+		});
+		soundID = soundPool.load(this, R.raw.gunshot, 1);
+
 		/* do this in onCreate */
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			connectType = extras.getString("connectType");
 		}
-		
-		try {
-		    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-		    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-		    r.play();
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-		
+
 		addListenerOnTiltDetectionButton();
 
 		final ImageButton twitterButton = (ImageButton) findViewById(R.id.twitter);
@@ -150,6 +180,30 @@ public class PlayActivity extends FragmentActivity {
 				newFragment.show(getSupportFragmentManager(), "timePicker");
 			}
 
+		});
+
+		final ImageButton soundButton = (ImageButton) findViewById(R.id.sound);
+		soundButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(PlayActivity.this);
+
+				builder.setTitle("Choose sound track")
+		           .setItems(items, new DialogInterface.OnClickListener() {
+		               public void onClick(DialogInterface dialog, int which) {
+		               // The 'which' argument contains the index position
+		               // of the selected item
+		            	   Toast.makeText(PlayActivity.this,
+									"You Clicked : " + soundTracks.get(which),
+									Toast.LENGTH_SHORT).show();
+							soundID = soundPool.load(getApplicationContext(),
+									soundTracks.get(which), 1);
+		           }
+		    });
+				AlertDialog dialog = builder.create();
+				dialog.show();
+			}
 		});
 
 		final ImageButton stoptimerButton = (ImageButton) findViewById(R.id.stoptimer);
@@ -216,6 +270,28 @@ public class PlayActivity extends FragmentActivity {
 			}
 		});
 
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			// Getting the user sound settings
+			float x= event.getX();
+			float y= event.getY();
+			System.out.println("coordinates "+x+" "+y);
+			AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+			float actualVolume = (float) audioManager
+					.getStreamVolume(AudioManager.STREAM_MUSIC);
+			float maxVolume = (float) audioManager
+					.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+			float volume = actualVolume / maxVolume;
+			// Is the sound loaded already?
+			if (loaded) {
+				soundPool.play(soundID, volume, volume, 1, 0, 1f);
+				Log.e("Test", "Played sound");
+			}
+		}
+		return false;
 	}
 
 	public Intent findTwitterClient() {
@@ -365,7 +441,6 @@ public class PlayActivity extends FragmentActivity {
 		super.onPause();
 		bgColor = Color.TRANSPARENT;
 
-		System.out.println("Setting background");
 		commonView = findViewById(R.id.playActivity);
 		commonView.setBackgroundColor(bgColor);
 		commonView.invalidate();
@@ -450,8 +525,8 @@ public class PlayActivity extends FragmentActivity {
 								tiltState = 2; // TILT DOWN
 							}
 
-							System.out.println("Delta 1=" + (startX - x)
-									+ " Delta 2=" + (startY - y));
+//							System.out.println("Delta 1=" + (startX - x)
+//									+ " Delta 2=" + (startY - y));
 
 						} else if (deltaX < deltaY) {
 							iv.setImageResource(R.drawable.vertical);
@@ -464,8 +539,8 @@ public class PlayActivity extends FragmentActivity {
 								tiltState = 4; // TILT RIGHT
 							}
 
-							System.out.println("Delta 1=" + (startX - x)
-									+ " Delta 2=" + (startY - y));
+//							System.out.println("Delta 1=" + (startX - x)
+//									+ " Delta 2=" + (startY - y));
 
 						} else {
 							// NOP

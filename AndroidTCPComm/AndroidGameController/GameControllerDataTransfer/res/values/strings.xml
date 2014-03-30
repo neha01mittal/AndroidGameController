@@ -52,5 +52,6 @@
     <string name="tweetshare">Share on Twitter</string>
     <string name="instashare">Share on Instagram</string>
     <string name="timer">Set timer</string>
+    <string name="sound">Set background sound</string>
 
 </resources>

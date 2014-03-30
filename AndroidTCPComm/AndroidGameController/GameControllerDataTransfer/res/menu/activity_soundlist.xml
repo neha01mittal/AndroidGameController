@@ -1,0 +1,34 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >  
+    <item  
+        android:id="@+id/one"  
+        android:title="Gun Shot"/>  
+      
+    <item  
+        android:id="@+id/two"  
+        android:title="Big Wave"/>  
+        
+    <item  
+        android:id="@+id/three"  
+        android:title="Charged Lightning"/>  
+        
+   <item  
+        android:id="@+id/four"  
+        android:title="Charged Sonic Boom"/>  
+      
+    <item  
+        android:id="@+id/five"  
+        android:title="Drain Magic"/>  
+        
+    <item  
+        android:id="@+id/six"  
+        android:title="Funky Zap"/> 
+        
+    <item  
+        android:id="@+id/seven"  
+        android:title="Storm Magic"/>  
+      
+    <item  
+        android:id="@+id/eight"  
+        android:title="Thunder Magic"/>  
+
+</menu>  
