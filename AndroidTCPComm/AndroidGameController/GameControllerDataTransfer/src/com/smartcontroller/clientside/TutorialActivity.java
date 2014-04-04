@@ -1,9 +1,5 @@
 package com.smartcontroller.clientside;
 
-import java.io.File;
-
-import com.smartcontroller.clientside.R;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;

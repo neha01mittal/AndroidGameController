@@ -42,6 +42,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.sec.chaton.clientapi.ChatONAPI;
+import com.sec.chaton.clientapi.MessageAPI;
+
 public class PlayActivity extends FragmentActivity implements OnTouchListener {
 
 	private SensorManager mSensorManager;
@@ -218,6 +221,17 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 
 		});
 
+		final ImageButton chatOnButton = (ImageButton) findViewById(R.id.chaton);
+		chatOnButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent k = new Intent(PlayActivity.this,SendTextMessageWithURLActivity.class);
+				startActivity(k);
+			}
+
+		});
+
+		
 		final ImageButton resetButton = (ImageButton) findViewById(R.id.buttonreset);
 		resetButton.setOnClickListener(new View.OnClickListener() {
 

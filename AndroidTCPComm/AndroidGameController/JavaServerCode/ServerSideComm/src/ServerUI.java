@@ -13,14 +13,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -86,7 +83,7 @@ public class ServerUI extends JFrame {
 	private static int userChoice = 0;
 	private static final int FPS_INIT = 15; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
-	private String directionKeys[] = { "^ v < >", "W A S D" };
+	private String directionKeys[] = { "^ v < >"};
 	private String defaultKeyboardControls[] = { "-None-", "A", "B", "C", "D",
 			"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
 			"R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4",
@@ -587,7 +584,7 @@ public class ServerUI extends JFrame {
 				while (ee.hasMoreElements()) {
 					InetAddress i = (InetAddress) ee.nextElement();
 					if (i.isSiteLocalAddress()) {
-						ip += i.getHostName()+": "+i.getHostAddress() + " \n";
+						ip += "Neha's Macbook Air"+": "+i.getHostAddress() + " \n";
 					}
 				}
 			}
