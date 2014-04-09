@@ -163,6 +163,15 @@
         android:background="@drawable/chaton"
         android:contentDescription="@string/chaton" 
         />
+    <ImageButton
+        android:id="@+id/multiwindow"
+        android:layout_width="40dp"
+        android:layout_height="46dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="390dip"
+        android:background="@drawable/multiwindow"
+        android:contentDescription="@string/multiwindow" 
+        />
     
     <ImageButton
         android:id="@+id/imageButton1"

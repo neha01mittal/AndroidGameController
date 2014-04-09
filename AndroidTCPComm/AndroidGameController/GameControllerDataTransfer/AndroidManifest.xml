@@ -16,6 +16,19 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <meta-data
+        android:name="com.samsung.android.sdk.multiwindow.enable"
+        android:value="true" />
+    <meta-data
+        android:name="com.samsung.android.sdk.multiwindow.multiinstance.enable"
+        android:value="true" />
+    <meta-data
+        android:name="com.sec.android.multiwindow.STYLE"
+        android:value="fixedRatio" />
+    <meta-data
+        android:name="com.sec.android.support.multiwindow"
+        android:value="true" />
+
     <application
         android:allowBackup="true"
         android:hardwareAccelerated="false"
@@ -23,6 +36,14 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/AppTheme" >
+        <uses-library android:required="false" android:name="com.sec.android.app.multiwindow" />
+        <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
+<meta-data android:name="com.sec.android.multiwindow.DEFAULT_SIZE_W" android:value="632.0dip" />
+<meta-data android:name="com.sec.android.multiwindow.DEFAULT_SIZE_H" android:value="598.0dip" />
+<meta-data android:name="com.sec.android.multiwindow.MINIMUM_SIZE_W" android:value="632.0dip" />
+<meta-data android:name="com.sec.android.multiwindow.MINIMUM_SIZE_H" android:value="598.0dip" />
+
+        
         <activity
             android:name="com.smartcontroller.clientside.WifiConnectActivity"
             android:label="@string/app_name"
@@ -33,6 +54,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
         </activity>
         <activity
             android:name="com.smartcontroller.clientside.BluetoothConnectActivity"
@@ -54,12 +76,11 @@
             android:name="com.smartcontroller.clientside.FacebookShareActivity"
             android:label="@string/app_name" >
         </activity>
-
         <activity
             android:name="com.smartcontroller.clientside.SendTextMessageWithURLActivity"
             android:label="@string/app_name" >
         </activity>
-        
+     
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />

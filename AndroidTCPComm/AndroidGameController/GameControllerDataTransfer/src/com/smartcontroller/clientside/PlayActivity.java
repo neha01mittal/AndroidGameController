@@ -2,6 +2,9 @@ package com.smartcontroller.clientside;
 
 import gc.common_resources.CommandType;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,12 +12,15 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.ComponentInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -42,8 +48,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.sec.chaton.clientapi.ChatONAPI;
-import com.sec.chaton.clientapi.MessageAPI;
+import com.samsung.android.sdk.multiwindow.SMultiWindow;
+import com.samsung.android.sdk.multiwindow.SMultiWindowActivity;
 
 public class PlayActivity extends FragmentActivity implements OnTouchListener {
 
@@ -86,6 +92,11 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 	private long startTime = 0;
 	private final long interval = 1 * 1000;
 
+	private static final int MENU_SET_STATE_CHANGE_LISTENER = 6;
+	
+	private SMultiWindow mMultiWindow = null;
+	private SMultiWindowActivity mMultiWindowActivity = null;
+	private List<ResolveInfo> mMultiWindowAppList = null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -227,6 +238,16 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 			public void onClick(View v) {
 				Intent k = new Intent(PlayActivity.this,SendTextMessageWithURLActivity.class);
 				startActivity(k);
+			}
+
+		});
+
+		final ImageButton multiWindowButton = (ImageButton) findViewById(R.id.multiwindow);
+		multiWindowButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				multiWindowInit();
 			}
 
 		});
@@ -635,4 +656,92 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 					Toast.LENGTH_SHORT).show();
 		}
 	}
+	
+    private void displayAppList(int position) {
+    	ArrayList<String> appListLabels = new ArrayList<String>();
+    	if (mMultiWindowAppList != null) {
+    		int appListCount = mMultiWindowAppList.size();
+    		for (int i = 0 ; i < appListCount ; i++) {
+    			appListLabels.add((String) mMultiWindowAppList.get(i).loadLabel(getPackageManager()));
+    		}
+    	}
+    	
+    	String[] listItems = new String[0]; 
+    	listItems = appListLabels.toArray(listItems);
+    	AlertDialog.Builder appListDialog = new AlertDialog.Builder(this);
+    	appListDialog.setTitle("Is Multi Window")
+    	.setItems(listItems, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				displayLaunchType(which);
+			}
+		}).show();
+    }
+    
+    public void multiWindowInit() {
+        mMultiWindow = new SMultiWindow();
+        mMultiWindowActivity = new SMultiWindowActivity(this);
+        
+ 		mMultiWindowAppList = new ArrayList<ResolveInfo>();
+ 		Intent intent = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+ 		List<ResolveInfo> resolveInfos = getPackageManager().queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER|PackageManager.GET_META_DATA);
+ 		
+ 		for (ResolveInfo r : resolveInfos) {
+ 			if (r.activityInfo != null && r.activityInfo.applicationInfo.metaData != null) {
+ 				if (r.activityInfo.applicationInfo.metaData.getBoolean("com.sec.android.support.multiwindow")
+ 						|| r.activityInfo.applicationInfo.metaData.getBoolean("com.samsung.android.sdk.multiwindow.enable")) {
+ 					boolean bUnSupportedMultiWinodw = false; 
+ 					if (r.activityInfo.metaData != null) {
+ 						String activityWindowStyle = r.activityInfo.metaData.getString("com.sec.android.multiwindow.activity.STYLE");
+ 		            	if (activityWindowStyle != null) {
+ 		            		ArrayList<String> activityWindowStyles = new ArrayList<String>(Arrays.asList(activityWindowStyle.split("\\|")));
+ 		            		if (!activityWindowStyles.isEmpty()) {
+	 		                    if (activityWindowStyles.contains("fullscreenOnly")) {
+	 		                    	bUnSupportedMultiWinodw = true;
+	 		                    }
+ 		            		}
+ 		                }
+ 		            }
+
+ 		            if (!bUnSupportedMultiWinodw) {
+ 		            	mMultiWindowAppList.add(r);
+ 		            }
+ 				}
+ 			}
+ 		}
+		displayAppList(MENU_SET_STATE_CHANGE_LISTENER);
+    }
+    private void displayLaunchType(int appPosition) {
+    	final ArrayList<String> launchTypes = new ArrayList<String>();
+    	final int selectedApp = appPosition;
+    	launchTypes.add("Zone A");
+	    launchTypes.add("Zone B");
+    	
+    	String[] listItems = new String[0]; 
+    	listItems = launchTypes.toArray(listItems);
+    	AlertDialog.Builder launchTypeDialog = new AlertDialog.Builder(this);
+    	launchTypeDialog.setTitle("Select Launch Type")
+    	.setItems(listItems, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				String launchType = launchTypes.get(which);
+				ResolveInfo selectApp = mMultiWindowAppList.get(selectedApp);
+				ComponentInfo selectAppInfo = selectApp.activityInfo != null ? selectApp.activityInfo : selectApp.serviceInfo;
+				Intent intent = new Intent(Intent.ACTION_MAIN);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.setComponent(new ComponentName(selectAppInfo.packageName, selectAppInfo.name));
+				if ("Zone A".equals(launchType)) {
+					SMultiWindowActivity.makeMultiWindowIntent(intent, SMultiWindowActivity.ZONE_A);
+				} else if("Zone B".equals(launchType)) {
+					SMultiWindowActivity.makeMultiWindowIntent(intent, SMultiWindowActivity.ZONE_B);
+				} else {
+					return;
+				}
+
+				startActivity(intent);
+			}
+		}).show();
+    }
 }

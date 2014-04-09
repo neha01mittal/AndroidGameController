@@ -54,5 +54,6 @@
     <string name="timer">Set timer</string>
     <string name="sound">Set background sound</string>
     <string name="chaton">Send chaton message</string>
+    <string name="multiwindow">Multi Window</string>
 
 </resources>
