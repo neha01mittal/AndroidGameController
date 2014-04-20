@@ -7,6 +7,5 @@
 	<classpathentry kind="lib" path="/ChatONClientAPIDemoActivity/libs/ChatON_ClientAPI_20130306_2302_1.2.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ChatONClientAPIDemoActivity"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry exported="true" kind="lib" path="libs/visualview-v1.0.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

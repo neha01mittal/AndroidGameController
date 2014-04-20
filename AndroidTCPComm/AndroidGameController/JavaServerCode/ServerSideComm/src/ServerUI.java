@@ -44,10 +44,12 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
+
 /**
- * This class builds a GUI for server handler that runs on the PC. 
- * The server handler is used for connecting the PC to the android device via Wifi or bluetooth
- * It consists of two tabs- General Settings (for ip address and port display) and Key Settings (for setting key configrations)
+ * This class builds a GUI for server handler that runs on the PC. The server
+ * handler is used for connecting the PC to the android device via Wifi or
+ * bluetooth It consists of two tabs- General Settings (for ip address and port
+ * display) and Key Settings (for setting key configrations)
  */
 public class ServerUI extends JFrame {
 
@@ -83,36 +85,30 @@ public class ServerUI extends JFrame {
 	private static int userChoice = 0;
 	private static final int FPS_INIT = 15; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
-	private String directionKeys[] = { "^ v < >"};
+	private String directionKeys[] = { "^ v < >" };
 	private String defaultKeyboardControls[] = { "-None-", "A", "B", "C", "D",
 			"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
 			"R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4",
-			"5", "6", "7", "8", "9", "0", "F1", "F2", "F3", "F4", "F5", "F6", 
-			"F7", "F8", "F9", "F10", "F11", "F12", "SPACEBAR", "CTRL", "ALT", "SHIFT",
-			"TAB", "ENTER", "BACKSPACE", "CAPSLOCK", "LEFT-MOUSE-BUTTON",
-			"RIGHT-MOUSE-BUTTON" }; // TODO-add more?
+			"5", "6", "7", "8", "9", "0", "F1", "F2", "F3", "F4", "F5", "F6",
+			"F7", "F8", "F9", "F10", "F11", "F12", "SPACEBAR", "CTRL", "ALT",
+			"SHIFT", "TAB", "ENTER", "BACKSPACE", "CAPSLOCK",
+			"LEFT-MOUSE-BUTTON", "RIGHT-MOUSE-BUTTON" }; // TODO-add more?
 	private static Object[][][] defaultData = {
-		//No Tilt
-		{ { "Tap", "" },
-		{ "Swipe Up", "" }, { "Swipe Down", "" },
-		{ "Swipe Left", "" }, { "Swipe Right", "" } },
-		//Tilt Up
-		{ { "Tap", "" },
-		{ "Swipe Up", "" }, { "Swipe Down", "" },
-		{ "Swipe Left", "" }, { "Swipe Right", "" } },
-			//Tilt Down
-			{ { "Tap", "" },
-			{ "Swipe Up", "" }, { "Swipe Down", "" },
-			{ "Swipe Left", "" }, { "Swipe Right", "" } },
-				//Tilt Left
-				{ { "Tap", "" },
-				{ "Swipe Up", "" }, { "Swipe Down", "" },
-				{ "Swipe Left", "" }, { "Swipe Right", "" } },
-					//Tilt Right
-					{ { "Tap", "Z" },
-					{ "Swipe Up", "" }, { "Swipe Down", "" },
+			// No Tilt
+			{ { "Tap", "" }, { "Swipe Up", "" }, { "Swipe Down", "" },
 					{ "Swipe Left", "" }, { "Swipe Right", "" } },
-					};
+			// Tilt Up
+			{ { "Tap", "" }, { "Swipe Up", "" }, { "Swipe Down", "" },
+					{ "Swipe Left", "" }, { "Swipe Right", "" } },
+			// Tilt Down
+			{ { "Tap", "" }, { "Swipe Up", "" }, { "Swipe Down", "" },
+					{ "Swipe Left", "" }, { "Swipe Right", "" } },
+			// Tilt Left
+			{ { "Tap", "" }, { "Swipe Up", "" }, { "Swipe Down", "" },
+					{ "Swipe Left", "" }, { "Swipe Right", "" } },
+			// Tilt Right
+			{ { "Tap", "Z" }, { "Swipe Up", "" }, { "Swipe Down", "" },
+					{ "Swipe Left", "" }, { "Swipe Right", "" } }, };
 
 	private String[] columnNames = { "Touch Controls", "PC Controls" };
 	private static ArrayList<String> keyboardControlMapping = new ArrayList<String>();
@@ -137,15 +133,44 @@ public class ServerUI extends JFrame {
 	public void createServerUI() throws UnknownHostException {
 		ServerUI sui = new ServerUI();
 		status = new JLabel(" Connection Status: Disconnected");
+		addInitialMappings();
 		sui.createBasicUI();
 		sui.setVisible(true);
+	}
+
+	public void addInitialMappings() {
+
+		File dataFile = new File(SMART_CONTROLLER_DIRECTORY, KEY_MAPPINGS_FILE);
+		if (!dataFile.isFile()) {
+			dataFile = createKeyMapFile();
+			PrintWriter writer;
+			try {
+				String[] defStorage = { "LEFT-MOUSE-BUTTON CTRL SPACEBAR A Z",
+						"RIGHT-MOUSE-BUTTON CTRL SPACEBAR A Z",
+						"ENTER CTRL SPACEBAR A Z", "SHIFT CTRL SPACEBAR A Z",
+						"Q CTRL SPACEBAR A Z" };
+				writer = new PrintWriter(dataFile, "UTF-8");
+				for (int i = 0; i < 5; i++) {
+					String pcControl = defStorage[i];
+					writer.println(pcControl);
+				}
+				writer.close();
+				setDefaultSettings();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	private void createBasicUI() throws UnknownHostException {
 		// TODO Auto-generated method stub
 		setTitle(GAME_CONTROLLER_SERVER);
 		setSize(750, 500);
-
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
 		getContentPane().add(topPanel);
@@ -158,15 +183,13 @@ public class ServerUI extends JFrame {
 		tabbedPane.addTab("Key Settings", keySettingsPane);
 		topPanel.add(tabbedPane, BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		// Initialize variables
 		mouseRatio = (float) (FPS_INIT * 0.1);
 	}
-	
+
 	/**
 	 * 
-	 * @return
-	 * userChoice-1- Wifi 2- Bluetooth
+	 * @return userChoice-1- Wifi 2- Bluetooth
 	 */
 	public int getUserChoice() {
 		return userChoice;
@@ -183,8 +206,7 @@ public class ServerUI extends JFrame {
 
 		buildComponentsInKeySettings(keySettingsPane, "Hold and Drag");
 
-		JLabel msgToUser = new JLabel(
-				PLEASE_MAP_YOUR_BUTTON_CONFIGURATION_HERE);
+		JLabel msgToUser = new JLabel(PLEASE_MAP_YOUR_BUTTON_CONFIGURATION_HERE);
 		msgToUser.setFont(new Font("Serif", Font.ITALIC, 15));
 		keySettingsPane.add(msgToUser);
 
@@ -201,7 +223,7 @@ public class ServerUI extends JFrame {
 				JPanel[] panels = new JPanel[5];
 				for (int i = 0; i < 5; i++) {
 					panels[i] = createTiltTab(defaultData[i], tables, i);
-			}
+				}
 				assignPanels(panels);
 				populateTabs(innerTabbedPane);
 
@@ -232,8 +254,7 @@ public class ServerUI extends JFrame {
 					storeMappings(writer, tables, 4, TILT_RIGHT);
 					writer.close();
 					JOptionPane.showMessageDialog(null, DIRECTION_KEYS
-							+ directionKeys + MOUSE_CONTROL
-							+ mouseControl
+							+ directionKeys + MOUSE_CONTROL + mouseControl
 							+ ALL_CHANGES_SAVED_SUCCESSFULLY);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -255,8 +276,8 @@ public class ServerUI extends JFrame {
 				{ "Swipe Up", "SPACEBAR" }, { "Swipe Down", "D" },
 				{ "Swipe Left", "A" }, { "Swipe Right", "X" } };
 
-		for(int i = 0; i < 5; i++)
-			for(int j = 0; j < 5; j++)
+		for (int i = 0; i < 5; i++)
+			for (int j = 0; j < 5; j++)
 				defaultData[i][j][1] = originalDefaultData[j][1];
 	}
 
@@ -277,7 +298,7 @@ public class ServerUI extends JFrame {
 	}
 
 	/**
-	 * Build tabs (table) for mapping keys to touch 
+	 * Build tabs (table) for mapping keys to touch
 	 */
 	private void buildInnerTabs() {
 		// TODO Auto-generated method stub
@@ -291,6 +312,7 @@ public class ServerUI extends JFrame {
 
 	/**
 	 * count the number of lines in a file
+	 * 
 	 * @param file
 	 * @return
 	 */
@@ -320,16 +342,16 @@ public class ServerUI extends JFrame {
 		try {
 			String sCurrentLine;
 			File file = new File(SMART_CONTROLLER_DIRECTORY, KEY_MAPPINGS_FILE);
+
 			int count = 0;
 			if (!file.isFile() || getNumberOfLines(file) != 5) {
 				// create with default settings
-				System.out
-						.println(CORRUPT_FILE_ERROR);
+				System.out.println(CORRUPT_FILE_ERROR);
 				for (int i = 0; i < 5; i++) {
 					panels[i] = createTiltTab(defaultData[i], tables, i);
 					for (int j = 0; j < 5; j++)
 						temp.add((String) defaultData[i][j][1]);
-			}
+				}
 			} else {
 				br = new BufferedReader(new FileReader(file));
 				while ((sCurrentLine = br.readLine()) != null) {
@@ -338,7 +360,8 @@ public class ServerUI extends JFrame {
 						defaultData[count][i][1] = tokens[i];
 						temp.add((String) defaultData[count][i][1]);
 					}
-					panels[count] = createTiltTab(defaultData[count], tables, count);
+					panels[count] = createTiltTab(defaultData[count], tables,
+							count);
 					count++;
 				}
 			}
@@ -360,7 +383,7 @@ public class ServerUI extends JFrame {
 	}
 
 	/**
-	 * create tabs for each table  
+	 * create tabs for each table
 	 */
 	private JPanel createTiltTab(Object[][] data, final JTable[] tables,
 			final int index) {
@@ -421,7 +444,8 @@ public class ServerUI extends JFrame {
 	}
 
 	/**
-	 * assign panels 
+	 * assign panels
+	 * 
 	 * @param panels
 	 */
 	public void assignPanels(JPanel[] panels) {
@@ -434,6 +458,7 @@ public class ServerUI extends JFrame {
 
 	/**
 	 * put each tab's content in the right pane
+	 * 
 	 * @param innerTabbedPane
 	 */
 	public void populateTabs(JTabbedPane innerTabbedPane) {
@@ -446,6 +471,7 @@ public class ServerUI extends JFrame {
 
 	/**
 	 * create file for storing configurations
+	 * 
 	 * @return
 	 */
 	public File createKeyMapFile() {
@@ -467,6 +493,7 @@ public class ServerUI extends JFrame {
 
 	/**
 	 * add mouse control, gif and direction key dropdown in key settings tab
+	 * 
 	 * @param layout
 	 * @param mouseElement
 	 */
@@ -484,7 +511,8 @@ public class ServerUI extends JFrame {
 		// add the image label
 		// TODO get better GIF
 		JLabel imageLabel = new JLabel();
-		ImageIcon ii = new ImageIcon(getClass().getResource("/Images/phoneswipe.gif"));
+		ImageIcon ii = new ImageIcon(getClass().getResource(
+				"/Images/phoneswipe.gif"));
 		imageLabel.setIcon(ii);
 		layout.add(imageLabel, java.awt.BorderLayout.CENTER);
 		// show it
@@ -501,7 +529,7 @@ public class ServerUI extends JFrame {
 		comboBoxMouse.setSize(1, 1);
 		layout.add(comboBoxMouse);
 	}
-	
+
 	/**
 	 * add elements to general tab
 	 */
@@ -584,7 +612,8 @@ public class ServerUI extends JFrame {
 				while (ee.hasMoreElements()) {
 					InetAddress i = (InetAddress) ee.nextElement();
 					if (i.isSiteLocalAddress()) {
-						ip += "Neha's Macbook Air"+": "+i.getHostAddress() + " \n";
+						ip += "Neha's Macbook Air" + ": " + i.getHostAddress()
+								+ " \n";
 					}
 				}
 			}
@@ -644,9 +673,10 @@ public class ServerUI extends JFrame {
 	}
 
 	/**
-	 * control mouse cursor sensitivity 
+	 * control mouse cursor sensitivity
+	 * 
 	 * @author neha01mittal
-	 *
+	 * 
 	 */
 	class SliderListener implements ChangeListener {
 
