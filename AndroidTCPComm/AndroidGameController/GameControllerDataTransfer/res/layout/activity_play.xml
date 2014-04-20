@@ -7,8 +7,8 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:visibility="invisible" />
 
     <com.smartcontroller.clientside.MultiTouchView
@@ -92,6 +92,13 @@
         android:layout_gravity="center"
         android:paddingTop="10dip"
         android:visibility="invisible" />
+    
+    <ImageView
+        android:id="@+id/imagetapswipehelper"
+        android:layout_width="match_parent"
+        android:layout_height="278dp"
+        android:src="@drawable/tapswipehelper"
+        android:visibility="visible" />
 
     <ImageButton
         android:id="@+id/buttonplaypause"
@@ -172,7 +179,62 @@
         android:background="@drawable/multiwindow"
         android:contentDescription="@string/multiwindow" 
         />
-    
+
+   <TextView
+        android:id="@+id/textSwipeRight"
+		android:textColor="#19D1D1"
+    	android:layout_width="100dip"
+    	android:layout_height="40dip"
+    	android:layout_marginTop="20dip"
+    	android:layout_marginLeft="110dip"
+    	android:gravity="center_horizontal|center_vertical"
+        android:rotation="270"
+        android:text="Right" />
+
+    <TextView
+        android:id="@+id/textSwipeUp"
+		android:textColor="#19D1D1"
+    	android:layout_width="100dip"
+    	android:layout_height="40dip"
+    	android:layout_marginTop="70dip"
+    	android:layout_marginLeft="60dip"
+    	android:gravity="center_horizontal|center_vertical"
+        android:rotation="270"
+        android:text="Up" />
+
+    <TextView
+        android:id="@+id/textTap"
+		android:textColor="#19D1D1"
+    	android:layout_width="100dip"
+    	android:layout_height="40dip"
+    	android:layout_marginTop="115dip"
+    	android:layout_marginLeft="130dip"
+    	android:gravity="center_horizontal|center_vertical"
+        android:rotation="270"
+        android:text="Tap" />
+
+    <TextView
+        android:id="@+id/textSwipeDown"
+		android:textColor="#19D1D1"
+    	android:layout_width="100dip"
+    	android:layout_height="40dip"
+    	android:layout_marginTop="140dip"
+    	android:layout_marginLeft="220dip"
+    	android:gravity="center_horizontal|center_vertical"
+        android:rotation="270"
+        android:text="Down" />
+
+    <TextView
+        android:id="@+id/textSwipeLeft"
+		android:textColor="#19D1D1"
+    	android:layout_width="100dip"
+    	android:layout_height="40dip"
+    	android:layout_marginTop="190dip"
+    	android:layout_marginLeft="110dip"
+    	android:gravity="center_horizontal|center_vertical"
+        android:rotation="270"
+        android:text="Left" />
+
     <ImageButton
         android:id="@+id/imageButton1"
         android:layout_width="fill_parent"
@@ -182,5 +244,5 @@
         android:gravity="center_horizontal|center_vertical"
         android:src="@drawable/holdatrest"
         android:visibility="visible" />
-
+    
 </FrameLayout>

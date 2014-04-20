@@ -2,7 +2,6 @@ package com.smartcontroller.clientside;
 
 import gc.common_resources.CommandType;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,7 +19,6 @@ import android.content.pm.ComponentInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -42,6 +40,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -65,10 +65,15 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 	private final float NOISE = (float) 2.0;
 	private float startX = 0, startY = 0, startZ = 0;
 	private boolean flag = false, isPaused = false;
-	private boolean isStartPositionRegistered;
+	private boolean isStartPositionRegistered, tiltStateChanged = true;
 
 	public int tiltState = 0;
 	public float tiltX, tiltY;
+	
+	//HelperTextViews
+	//com.smartcontroller.clientside.VerticalTextView textTap, textSwipeUp, textSwipeDown, textSwipeLeft, textSwipeRight;
+	TextView textTap, textSwipeUp, textSwipeDown, textSwipeLeft, textSwipeRight;
+	private ArrayList<String> keyMapList = new ArrayList<String>();
 
 	private int bgColor = Color.TRANSPARENT;
 	private HashMap<Integer, Integer> soundTracks = new HashMap<Integer, Integer>() {
@@ -112,8 +117,10 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 
 		// sound
 		(findViewById(R.id.multi_touch_view)).setOnTouchListener(this);
+		
 		// Set the hardware buttons to control the music
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		
 		// Load the sound
 		soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 		soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener() {
@@ -400,6 +407,28 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 	public int getTiltState() {
 		return tiltState;
 	}
+	
+	public void initKeyConfig() {
+		//This function sends a request to the server to request for keymapping configuration
+		if (connectType.equals("wifi")) {
+			SingletonWifi.getInstance().setPlayActivityObj(this);
+		} else if (connectType.equals("bluetooth")) {
+			SingletonBluetooth.getInstance().setPlayActivityObj(this);
+		}
+		sendPacketToServer(CommandType.CONFIG);
+	}
+	
+	public synchronized void updateKeyMapList(ArrayList<String> keyMapping) {
+		int listSize = keyMapping.size();		
+		keyMapList.clear();
+		
+		for(int i = 0; i < listSize; i++)
+			keyMapList.add(keyMapping.get(i));		
+	}
+	
+	public synchronized ArrayList<String> getKeyMapList(){
+		return keyMapList;
+	}
 
 	@Override
 	protected void onStop() {
@@ -456,6 +485,72 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 			SingletonBluetooth.getInstance().sendToDevice(updateCommand);
 		}
 	}
+	
+	public void updateHelperTexts() {
+		int tiltOffset = 0;
+		
+		switch (getTiltState()) {
+		case 1: // Tilt UP
+			tiltOffset = 5;
+			break;
+		case 2: // Tilt DOWN
+			tiltOffset = 10;
+			break;
+		case 3: // Tilt LEFT
+			tiltOffset = 15;
+			break;
+		case 4: // Tilt RIGHT
+			tiltOffset = 20;
+			break;
+		}
+		textTap = (TextView) findViewById(R.id.textTap);
+		textSwipeUp = (TextView) findViewById(R.id.textSwipeUp);
+		textSwipeDown = (TextView) findViewById(R.id.textSwipeDown);
+		textSwipeLeft = (TextView) findViewById(R.id.textSwipeLeft);
+		textSwipeRight = (TextView) findViewById(R.id.textSwipeRight);
+		
+		synchronized(this) {
+			textTap.setText(keyMapList.get(tiltOffset));
+			textSwipeUp.setText(keyMapList.get(tiltOffset+1));
+			textSwipeDown.setText(keyMapList.get(tiltOffset+2));
+			textSwipeLeft.setText(keyMapList.get(tiltOffset+3));
+			textSwipeRight.setText(keyMapList.get(tiltOffset+4));
+		}
+		tiltStateChanged = false;
+	}
+	
+	public void showImageHelper(boolean showHelper){
+		ImageView iv = (ImageView) findViewById(R.id.imagetapswipehelper);
+		textTap = (TextView) findViewById(R.id.textTap);	
+		textSwipeUp = (TextView) findViewById(R.id.textSwipeUp);
+		textSwipeDown = (TextView) findViewById(R.id.textSwipeDown);
+		textSwipeLeft = (TextView) findViewById(R.id.textSwipeLeft);
+		textSwipeRight = (TextView) findViewById(R.id.textSwipeRight);	
+		
+		if(showHelper){
+			iv.setVisibility(View.VISIBLE);
+
+			if(!keyMapList.isEmpty()) {
+			
+				if(tiltStateChanged)
+				updateHelperTexts();			
+			
+				//textTap = (com.smartcontroller.clientside.VerticalTextView) findViewById(R.id.textTap);
+				textTap.setVisibility(View.VISIBLE);	
+				textSwipeUp.setVisibility(View.VISIBLE);	
+				textSwipeDown.setVisibility(View.VISIBLE);	
+				textSwipeLeft.setVisibility(View.VISIBLE);	
+				textSwipeRight.setVisibility(View.VISIBLE);	
+			}
+		}else {
+			iv.setVisibility(View.INVISIBLE);	
+			textTap.setVisibility(View.INVISIBLE);	
+			textSwipeUp.setVisibility(View.INVISIBLE);	
+			textSwipeDown.setVisibility(View.INVISIBLE);	
+			textSwipeLeft.setVisibility(View.INVISIBLE);	
+			textSwipeRight.setVisibility(View.INVISIBLE);		
+		}		
+	}
 
 	@Override
 	protected void onResume() {
@@ -463,6 +558,9 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 		// to take appropriate action when the activity looses focus
 		super.onResume();
 
+		initKeyConfig();
+		showImageHelper(true);
+		
 		commonView = findViewById(R.id.playActivity);
 		commonView.setBackgroundColor(bgColor);
 		commonView.invalidate();
@@ -554,9 +652,14 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 							if ((startX - x) < 0) {
 								// down tilt
 								// bgColor = Color.parseColor("#ff669966");
+								if(tiltState != 1) 
+									tiltStateChanged = true;
+								
 								tiltState = 1; // TILT UP
 							} else {
 								// bgColor = Color.parseColor("#ff668899");
+								if(tiltState != 2) 
+									tiltStateChanged = true;
 								tiltState = 2; // TILT DOWN
 							}
 
@@ -568,9 +671,13 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 
 							if ((startY - y) < 0) {
 								// bgColor = Color.parseColor("#ff6E6699");
+								if(tiltState != 3) 
+									tiltStateChanged = true;
 								tiltState = 3; // TILT LEFT
 							} else {
 								// bgColor = Color.parseColor("#ff886699");
+								if(tiltState != 4) 
+									tiltStateChanged = true;
 								tiltState = 4; // TILT RIGHT
 							}
 
@@ -581,6 +688,8 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 							// NOP
 							iv.setVisibility(View.INVISIBLE);
 							// bgColor = Color.TRANSPARENT;
+							if(tiltState != 0) 
+								tiltStateChanged = true;
 							tiltState = 0; // NO TILT
 						}
 						// commonView.setBackgroundColor(bgColor);
