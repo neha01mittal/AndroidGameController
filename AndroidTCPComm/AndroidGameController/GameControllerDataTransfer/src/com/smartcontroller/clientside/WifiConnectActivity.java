@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.smartcontroller.clientside.R;
-
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +26,6 @@ import android.widget.Toast;
 
 public class WifiConnectActivity extends ListActivity {
 
-	private String ipAddress;
 	private EditText userInput;
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor editor;
@@ -37,15 +34,6 @@ public class WifiConnectActivity extends ListActivity {
 	private ListView lv = null;
 
 	private boolean bAskedToEnableWifi = false;
-
-	public String getIpAddress() {
-
-		return ipAddress;
-	}
-
-	public void setIpAddress(String ipAddress) {
-		this.ipAddress = ipAddress;
-	}
 
 	/** Called when the activity is first created. */
 	@Override
@@ -162,7 +150,7 @@ public class WifiConnectActivity extends ListActivity {
 			IPAddressFormatValidator iadfv = new IPAddressFormatValidator();
 			if (iadfv.validate(userInput.getText().toString())) {
 			// Start the Wifi Singleton with this ipAddress
-				SingletonWifi.getInstance().setIPAddress(userInput.getText().toString());
+				SingletonWifi.getInstance().connectToIP(userInput.getText().toString());
 				
 				//Go to PlayActivity
 				Intent k = new Intent(WifiConnectActivity.this, PlayActivity.class);				

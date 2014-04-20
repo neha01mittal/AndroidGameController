@@ -5,6 +5,9 @@ import gc.common_resources.CommandType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,18 +19,20 @@ import android.util.Log;
 public class SingletonBluetooth {
 
 	private static SingletonBluetooth mInstance = null;
-	private static ConnectBTThread mThread = null;
+	private static ConnectBTThread mSThread = null;
 
 	private BluetoothAdapter mBluetoothAdapter = null;
 	private BluetoothDevice deviceToConnect;
 	private Set<BluetoothDevice> pairedDevices;
 	private Set<BluetoothDevice> discoveredDevices;
 
+	private PlayActivity playActivity = null;
+	
 	private SingletonBluetooth() {
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 	}
 
-	public static SingletonBluetooth getInstance() {
+	public static synchronized SingletonBluetooth getInstance() {
 		if (mInstance == null) {
 			mInstance = new SingletonBluetooth();
 		}
@@ -73,25 +78,30 @@ public class SingletonBluetooth {
 		deviceToConnect = device;
 
 		// If there is an existing thread, tell it to stop
-		if (mThread != null) {
-			Log.d("BTManagement", "I set bRun false");
-			mThread.bRun = false;
+		if (mSThread != null) {
+			mSThread.stopThread();
 		}
 
 		// Initiate a new thread
-		mThread = new ConnectBTThread(deviceToConnect);
-		mThread.start();
+		mSThread = new ConnectBTThread(deviceToConnect, playActivity);
+		mSThread.start();
 	}
 
 	public void sendToDevice(CommandType commandToSend) {
-		// synchronized (mThread.commandToSend) {
-		mThread.commandToSend = commandToSend;
-		// }
+		if(mSThread != null)
+			mSThread.commandToSend = commandToSend;
+	}
+
+	public void setPlayActivityObj(PlayActivity playactivity) {
+		playActivity = playactivity;
+		
+		if(mSThread != null)
+			mSThread.setPlayActivityObj(playactivity);
 	}
 
 	public void closeConnection() {
-		Log.d("BTManagement", "I set bRun false");
-		mThread.bRun = false;
+		if(mSThread != null)
+			mSThread.stopThread();
 	}
 
 	private class ConnectBTThread extends Thread {
@@ -100,15 +110,22 @@ public class SingletonBluetooth {
 		private final BluetoothSocket mmSocket;
 		private final BluetoothDevice mmDevice;
 		public CommandType commandToSend = null;
-		public boolean bRun = true;
+		private boolean bRun = true;
 
 		private ObjectOutputStream BTOOStream;
 		private ObjectInputStream BTOIStream;
+		
+		private ReceiveBTThread mRThread = null;
+		
+		private PlayActivity playActivity = null;
 
-		public ConnectBTThread(BluetoothDevice device) {
+		public ConnectBTThread(BluetoothDevice device, PlayActivity playactivity) {
+			
+			setPlayActivityObj(playactivity);
 			// Use a temporary object that is later assigned to mmSocket,
 			// because mmSocket is final
 			BluetoothSocket tmp = null;
+						
 			mmDevice = device;
 
 			// Get a BluetoothSocket to connect with the given BluetoothDevice
@@ -133,19 +150,24 @@ public class SingletonBluetooth {
 						+ mmDevice.getName());
 				mmSocket.connect();
 
+				//Connection successful. Init IO streams here
 				BTOOStream = new ObjectOutputStream(mmSocket.getOutputStream());
 				BTOOStream.flush();
 				BTOIStream = new ObjectInputStream(mmSocket.getInputStream());
+				
+				//Init receive thread here
+				startSocketListeningThread(BTOIStream, playActivity);
 
-				// Do work to manage the connection (in a separate thread)
+				// Do work to manage the sending thread
 				while (bRun) {
 					// Log.d("BTManagement", "Connected with" +
 					// mmDevice.getName());
 					manageConnection();
 				}
 
-				// Close outputstream and socket
+				// Close IO streams and socket
 				BTOOStream.close();
+				BTOIStream.close();
 				cancel();
 
 			} catch (IOException connectException) {
@@ -157,6 +179,16 @@ public class SingletonBluetooth {
 				return;
 			}
 
+		}
+		
+		public void stopThread(){
+			bRun = false;
+		}
+
+		public void setPlayActivityObj(PlayActivity playactivity) {
+			playActivity = playactivity;
+			if(mRThread != null)
+				mRThread.setPlayActivityObj(playactivity);
 		}
 
 		private void manageConnection() {
@@ -188,6 +220,17 @@ public class SingletonBluetooth {
 				commandToSend = null;
 			}
 		}
+		
+		private void startSocketListeningThread(ObjectInputStream objInputStream, PlayActivity playactivity) {
+			// If there is an existing thread, tell it to stop
+			if (mRThread != null) {
+				mRThread.stopThread();
+			}
+
+			// Initiate a new thread
+			mRThread = new ReceiveBTThread(objInputStream, playactivity);
+			mRThread.start();
+		}
 
 		/** Will cancel an in-progress connection, and close the socket */
 		public void cancel() {
@@ -196,5 +239,71 @@ public class SingletonBluetooth {
 			} catch (IOException e) {
 			}
 		}
+	}
+	
+	public class ReceiveBTThread extends Thread {
+
+		private CommandType commandReceived = CommandType.DEFAULT;
+		
+		private ObjectInputStream objInputStream;
+		private PlayActivity playActivity = null;
+		
+		private boolean bRun = true;
+		private boolean bReceivedMessage = false;
+
+		public ReceiveBTThread(ObjectInputStream btObjInputStream, PlayActivity playactivity) {
+			objInputStream = btObjInputStream;
+			setPlayActivityObj(playactivity);
+		}
+
+		/**
+		 * listen for commands from server to client over socket connection
+		 */
+		public void run() {
+			
+			try {
+				while(bRun) {					
+					commandReceived = (CommandType) objInputStream.readObject();	
+					
+					Log.d("SingletonBT", "Received Command: "+ commandReceived.toString());
+					
+					switch(commandReceived) {
+					case CONFIG:  
+						
+						ArrayList<String> configList = (ArrayList<String>) objInputStream.readObject();
+						
+						if(playActivity != null) {
+							//Going to receive keymap details here
+							playActivity.updateKeyMapList(new ArrayList<String>(configList));
+		
+						}
+						break;
+					default:
+						break;
+					}						
+				}
+				// Close inputstream
+				objInputStream.close();
+
+			} catch (Exception e) {
+				Log.e("SingletonBT", "C: Error at listening thread", e);
+			}
+		}
+		
+		public CommandType getBTCommand(){
+			return commandReceived;
+		}
+		
+		public boolean receivedBTCommand(){
+			return bReceivedMessage;
+		}
+		
+		public void stopThread(){
+			bRun = false;
+		}
+		
+		public void setPlayActivityObj(PlayActivity playactivity) {
+			playActivity = playactivity;
+		}		
 	}
 }

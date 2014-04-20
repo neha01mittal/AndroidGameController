@@ -19,6 +19,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 public class MultiTouchView extends View {
 
@@ -563,7 +564,7 @@ public class MultiTouchView extends View {
 		// All glowpaint portions of a component are drawn first, followed by
 		// the mpaint
 		// portions to prevent glowpaint from overlapping mpaint
-
+		
 		if (m_context instanceof PlayActivity) {
 
 			PlayActivity activity = (PlayActivity) m_context;
@@ -664,7 +665,7 @@ public class MultiTouchView extends View {
 				// glowPaint: Draw tilt glows
 				glowPaint.setMaskFilter(new BlurMaskFilter(200,
 						BlurMaskFilter.Blur.NORMAL));
-				glowPaint.setColor(Color.argb(50, 124, 188, 255));
+				glowPaint.setColor(Color.argb(100, 124, 188, 255));
 				glowPaint.setStyle(Paint.Style.STROKE);
 				glowPaint.setStrokeWidth(200f);
 				switch (activity.getTiltState()) {
@@ -702,64 +703,80 @@ public class MultiTouchView extends View {
 		}
 
 		// Draw all Pointers on the left and right screen
-		for (int size = mActivePointers.size(), i = 0; i < size; i++) {
+		if(mActivePointers.size() == 0) {
 
-			PointF point = mActivePointers.valueAt(i);
-			PointF startPoint = new PointF(startPointerX.valueAt(i),
-					startPointerY.valueAt(i));
+			if (m_context instanceof PlayActivity) {
+				PlayActivity activity = (PlayActivity) m_context;
+				
+				((PlayActivity) m_context).showImageHelper(true);	
+			}
+			
+		} else {
+			for (int size = mActivePointers.size(), i = 0; i < size; i++) {
 
-			if (isLeftScreen(startPoint.y)) {
-				if (point != null) {
-					// Set paint colours and visibility for pointers and rings
-					// here
-					glowPaint.setColor(Color.argb(255, 144, 208, 255));
+				if (m_context instanceof PlayActivity) {
+					PlayActivity activity = (PlayActivity) m_context;
+
+					((PlayActivity) m_context).showImageHelper(false);	
+				}
+
+				PointF point = mActivePointers.valueAt(i);
+				PointF startPoint = new PointF(startPointerX.valueAt(i),
+						startPointerY.valueAt(i));
+	
+				if (isLeftScreen(startPoint.y)) {
+					if (point != null) {
+						// Set paint colours and visibility for pointers and rings
+						// here
+						glowPaint.setColor(Color.argb(255, 144, 208, 255));
+						glowPaint.setAlpha(255);
+						glowPaint.setStrokeJoin(Paint.Join.ROUND);
+						glowPaint.setStrokeCap(Paint.Cap.ROUND);
+						glowPaint.setMaskFilter(new BlurMaskFilter(5,
+								BlurMaskFilter.Blur.NORMAL));
+						mPaint.setColor(Color.argb(255, 255, 255, 255));
+	
+						// glowPaint: Draw leftScreen Ring
+						glowPaint.setStyle(Paint.Style.STROKE);
+						glowPaint.setStrokeWidth(15f);
+						canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD,
+								glowPaint);
+	
+						// glowPaint: Draw leftSceen Point
+						glowPaint.setStyle(Paint.Style.FILL);
+						canvas.drawCircle(leftDrawPoint.getX(),
+								leftDrawPoint.getY(), DIRECTIONSIZE + 2, glowPaint);
+	
+						// mPaint: Draw leftScreen Ring
+						mPaint.setStyle(Paint.Style.STROKE);
+						mPaint.setStrokeWidth(8f);
+						canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD,
+								mPaint);
+	
+						// mPaint: Draw leftScreen Point
+						mPaint.setStyle(Paint.Style.FILL);
+						canvas.drawCircle(leftDrawPoint.getX(),
+								leftDrawPoint.getY(), DIRECTIONSIZE - 3, mPaint);
+					}
+				} else { // Draw the RightScreen components here
+	
+					// Set paint colours and visibility for pointers here
+					glowPaint.setColor(colors[i % 9]);
 					glowPaint.setAlpha(255);
 					glowPaint.setStrokeJoin(Paint.Join.ROUND);
 					glowPaint.setStrokeCap(Paint.Cap.ROUND);
 					glowPaint.setMaskFilter(new BlurMaskFilter(5,
 							BlurMaskFilter.Blur.NORMAL));
 					mPaint.setColor(Color.argb(255, 255, 255, 255));
-
-					// glowPaint: Draw leftScreen Ring
-					glowPaint.setStyle(Paint.Style.STROKE);
-					glowPaint.setStrokeWidth(15f);
-					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD,
-							glowPaint);
-
-					// glowPaint: Draw leftSceen Point
+	
+					// glowPaint: Draw rightScreen Point
 					glowPaint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(leftDrawPoint.getX(),
-							leftDrawPoint.getY(), DIRECTIONSIZE + 2, glowPaint);
-
-					// mPaint: Draw leftScreen Ring
-					mPaint.setStyle(Paint.Style.STROKE);
-					mPaint.setStrokeWidth(8f);
-					canvas.drawCircle(startPoint.x, startPoint.y, THRESHOLD,
-							mPaint);
-
-					// mPaint: Draw leftScreen Point
+					canvas.drawCircle(point.x, point.y, SIZE, glowPaint);
+	
+					// mPaint: Draw rightScreen Point
 					mPaint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(leftDrawPoint.getX(),
-							leftDrawPoint.getY(), DIRECTIONSIZE - 3, mPaint);
+					canvas.drawCircle(point.x, point.y, SIZE - 12, mPaint);
 				}
-			} else { // Draw the RightScreen components here
-
-				// Set paint colours and visibility for pointers here
-				glowPaint.setColor(colors[i % 9]);
-				glowPaint.setAlpha(255);
-				glowPaint.setStrokeJoin(Paint.Join.ROUND);
-				glowPaint.setStrokeCap(Paint.Cap.ROUND);
-				glowPaint.setMaskFilter(new BlurMaskFilter(5,
-						BlurMaskFilter.Blur.NORMAL));
-				mPaint.setColor(Color.argb(255, 255, 255, 255));
-
-				// glowPaint: Draw rightScreen Point
-				glowPaint.setStyle(Paint.Style.FILL);
-				canvas.drawCircle(point.x, point.y, SIZE, glowPaint);
-
-				// mPaint: Draw rightScreen Point
-				mPaint.setStyle(Paint.Style.FILL);
-				canvas.drawCircle(point.x, point.y, SIZE - 12, mPaint);
 			}
 		}
 	}
