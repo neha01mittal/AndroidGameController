@@ -98,7 +98,7 @@
         android:layout_width="match_parent"
         android:layout_height="278dp"
         android:src="@drawable/tapswipehelper"
-        android:visibility="visible" />
+        android:visibility="invisible" />
 
     <ImageButton
         android:id="@+id/buttonplaypause"
@@ -189,7 +189,7 @@
     	android:layout_marginLeft="110dip"
     	android:gravity="center_horizontal|center_vertical"
         android:rotation="270"
-        android:text="Right" />
+        android:text="" />
 
     <TextView
         android:id="@+id/textSwipeUp"
@@ -200,7 +200,7 @@
     	android:layout_marginLeft="60dip"
     	android:gravity="center_horizontal|center_vertical"
         android:rotation="270"
-        android:text="Up" />
+        android:text="" />
 
     <TextView
         android:id="@+id/textTap"
@@ -211,7 +211,7 @@
     	android:layout_marginLeft="130dip"
     	android:gravity="center_horizontal|center_vertical"
         android:rotation="270"
-        android:text="Tap" />
+        android:text="" />
 
     <TextView
         android:id="@+id/textSwipeDown"
@@ -222,7 +222,7 @@
     	android:layout_marginLeft="220dip"
     	android:gravity="center_horizontal|center_vertical"
         android:rotation="270"
-        android:text="Down" />
+        android:text="" />
 
     <TextView
         android:id="@+id/textSwipeLeft"
@@ -233,7 +233,7 @@
     	android:layout_marginLeft="110dip"
     	android:gravity="center_horizontal|center_vertical"
         android:rotation="270"
-        android:text="Left" />
+        android:text="" />
 
     <ImageButton
         android:id="@+id/imageButton1"
