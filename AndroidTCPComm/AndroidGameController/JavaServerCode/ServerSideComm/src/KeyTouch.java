@@ -1,13 +1,22 @@
-import gc.common_resources.*;
+import gc.common_resources.CommandType;
+import gc.common_resources.KeyList;
 
 import java.awt.AWTException;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 public class KeyTouch {
 
@@ -244,6 +253,19 @@ public class KeyTouch {
 			robot.keyRelease(keyCode2);
 			}
 		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void takeScreenshot() {
+		try {
+			BufferedImage image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+			
+			File file = new File("SmartController/screenshots", "screenshot.png");
+			ImageIO.write(image, "png", file);
+			
+		} catch (IOException | HeadlessException | AWTException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
