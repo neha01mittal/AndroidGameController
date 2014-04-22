@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import android.util.Log;
 
@@ -21,6 +22,7 @@ public class SingletonWifi {
 	private PlayActivity playActivity = null;
 
 	private SingletonWifi() {
+		setIPAddress("");
 	}
 
 	public static synchronized SingletonWifi getInstance() {
@@ -36,6 +38,9 @@ public class SingletonWifi {
 
 	public void setPlayActivityObj(PlayActivity playactivity) {
 		playActivity = playactivity;
+		
+		if(mRThread != null)
+			mRThread.setPlayActivityObj(playactivity);
 	}
 	
 	public void connectToIP(String ipString){
@@ -43,22 +48,31 @@ public class SingletonWifi {
 		setIPAddress(ipString);
 		
 		//Initialise the playactivity object
-		playActivity = null;
-				
-		//Initialise a thread to listen for packets from server
-		//If thread exists, stop it and init a new one
+		playActivity = null;				
+	}
+	
+	public void startListeningSocket(){
+		if(!ipAddress.equals("")) {
+			//Initialise a thread to listen for packets from server
+			//If thread exists, stop it and init a new one
+			if (mRThread != null) {
+				mRThread.stopThread();
+			}
+			// Initiate a new listening thread
+			mRThread = new ClientReceiveSocketThread(ipAddress, WifiPORT, playActivity);
+			mRThread.start();
+		}
+	}
+	
+	public void stopListeningSocket() {
 		if (mRThread != null) {
 			mRThread.stopThread();
 		}
-		// Initiate a new listening thread
-		mRThread = new ClientReceiveSocketThread(ipString, WifiPORT);
-		mRThread.start();
 	}
-	
 
 	public void sendToDevice(CommandType currCommand) {
 		// Initiate a new thread
-		mSThread = new ClientSendSocketThread(currCommand, ipAddress, WifiPORT);
+		mSThread = new ClientSendSocketThread(currCommand, ipAddress, WifiPORT+1);
 		mSThread.start();
 	}
 
@@ -133,9 +147,11 @@ public class SingletonWifi {
 		private boolean bRun = true;
 		private boolean bReceivedMessage = false;
 
-		public ClientReceiveSocketThread(String ipString, int numPort) {
+		public ClientReceiveSocketThread(String ipString, int numPort, PlayActivity playactivity) {
 			ipAddress = new String(ipString);
 			WifiPORT = numPort;
+			
+			setPlayActivityObj(playactivity);
 		}
 
 		/**
@@ -151,11 +167,11 @@ public class SingletonWifi {
 			}
 			
 			try {
-				socket = serverSocket.accept();
-				objInputStream = new ObjectInputStream(
-						socket.getInputStream());
-
 				while(bRun) {
+					socket = serverSocket.accept();
+					objInputStream = new ObjectInputStream(
+							socket.getInputStream());
+					
 					Log.d("SingletonWifi", "Listening to: " + ipAddress);
 					
 					try {	
@@ -163,11 +179,20 @@ public class SingletonWifi {
 						
 						Log.d("SingletonWifi", "Received Command: "+ commandReceived.toString());
 						
-						if(playActivity != null) {
-							//Do something
-							//Going to receive keymap details here
-
-						}
+						switch(commandReceived) {
+						case CONFIG:  
+							
+							ArrayList<String> configList = (ArrayList<String>) objInputStream.readObject();
+							
+							if(playActivity != null) {
+								//Going to receive keymap details here
+								playActivity.updateKeyMapList(new ArrayList<String>(configList));
+			
+							}
+							break;
+						default:
+							break;
+						}				
 						
 					} catch (Exception e) {
 						Log.e("SingletonWifi", "S: Error at listening thread", e);

@@ -1,5 +1,7 @@
 package gc.common_resources;
 
+import java.util.ArrayList;
+
 public enum CommandType {
 
 	DEFAULT, INIT, CONFIG, SCREENSHOT, ACTION, SHOOT, VIEW, VIEW_INIT, ACCELEROMETER, 
@@ -14,6 +16,8 @@ public enum CommandType {
 	private float y;
 	private double z;
 	private double w;
+	
+	private ArrayList<String> arrayList;
 	
 	
 	public float getX(){
@@ -31,6 +35,10 @@ public enum CommandType {
 		return this.w;
 	}
 	
+	public ArrayList<String> getArrayList() {
+		return this.arrayList;
+	}
+	
 	public void setX(float X){
 		this.x = X;
 	}
@@ -45,5 +53,9 @@ public enum CommandType {
 
 	public void setZ(double Z){
 		this.z = Z;
+	}	
+
+	public void setArrayList(ArrayList<String> ArrayList) {
+		this.arrayList = new ArrayList<String>(ArrayList);
 	}
 }

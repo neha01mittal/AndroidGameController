@@ -1,5 +1,6 @@
 import gc.common_resources.CommandType;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -42,7 +43,7 @@ public class MyServer {
 	
 	//private BTSendSocketThread BTSThread = null;
 	private BTReceiveSocketThread BTRThread = null;
-    
+	private WifiReceiveSocketThread WifiRThread = null;
 	KeyTouch keyTouch = null;
 	
 	public static void main(String[] args) throws UnknownHostException {
@@ -67,67 +68,49 @@ public class MyServer {
 			System.out.println(connectionType);
 			switch(connectionType) {
 				case WIFICONNECTION:
-						// Wifi Connection
-						ServerSocket serverSocket = null;
-						Socket socket = null;
-					try {
-						serverSocket = new ServerSocket(WifiPORT);
-						System.out.println("Listening :" + WifiPORT);
-					} catch (IOException e) {
- 		     				// TODO Auto-generated catch block
-					  	e.printStackTrace();
-					}
-
-					KeyTouch keyTouch = new KeyTouch();
+					// Wifi Connection
+					
+					//Start the listening thread here
+					WifiRThread = new WifiReceiveSocketThread(WifiPORT);
+					WifiRThread.start();
+					
+					keyTouch = new KeyTouch();
 					while (connectionType == WIFICONNECTION) {
-						try {
-							//Wait for client to connect
-							socket = serverSocket.accept();
-							ObjectInputStream objInputStream = new ObjectInputStream(
-									socket.getInputStream());
-							serverui.updateStatus(true);
-							
-							//Send keymapping info to client here.
-							sendToDeviceWifi(CommandType.CONFIG);
-
-							System.out.println("ip: " + socket.getInetAddress());
-							clientIPAddress = new String(socket.getInetAddress().toString());
-							
-							CommandType commandFromClient = CommandType.DEFAULT; 
-
-						try {
-							commandFromClient = (CommandType) objInputStream
-									.readObject();
-							System.out.println("Command "+commandFromClient);
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							serverui.updateStatus(false);
-							e.printStackTrace();
+						if(WifiRThread.newClientConnected()) {
+							clientIPAddress = new String(WifiRThread.getClientIP());
 						}
 						
-						processWifiCommand(objInputStream, commandFromClient);
-						
-						System.out.println("Message Received: " + commandFromClient
-								+ "  X: " + commandFromClient.getX() + "  Y: "
-								+ commandFromClient.getY());
+						if(WifiRThread.receivedWifiCommand()) {
 
-						objInputStream.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						serverui.updateStatus(false);
-						e.printStackTrace();
-					} finally {
-						if (socket != null) {
-							try {
-								socket.close();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								serverui.updateStatus(false);
-								e.printStackTrace();
+							CommandType commandFromClient = CommandType.DEFAULT; 
+							
+							commandFromClient = WifiRThread.getWifiCommand();
+							
+							switch(commandFromClient) {
+							case INIT:
+								//First message from the client
+							break;
+							case CONFIG: 
+								//The client is requesting for config info
+								//Send packet to client to notify of keymapping
+								synchronized(this){
+									commandFromClient.setArrayList(new ArrayList<String>(serverui.getKeyMappings()));
+								}
+								
+								WifiSendSocketThread WifiSThread = new WifiSendSocketThread(commandFromClient, clientIPAddress, WifiPORT);
+								WifiSThread.start();
+								break;
+							case SCREENSHOT:
+								break;
+							default:
+								keyTouch.identifyKey(commandFromClient, new ArrayList<String>(serverui.getKeyMappings()), serverui.getMouseRatio());
+				
+							break;				
 							}
+							WifiRThread.currCommandProcessed();
 						}
 					}
-				}//End Wifi connection
+				//End Wifi connection
 			break;
 			case BTCONNECTION:
 					//Bluetooth Connection
@@ -169,6 +152,9 @@ public class MyServer {
 						BTRThread = new BTReceiveSocketThread(BTOIStream);
 						BTRThread.start();				
 						
+						//Test take a screenshot
+						//takeScreenshot();
+						
 						CommandType commandFromClient = CommandType.DEFAULT; 
 
 						while(connectionType == BTCONNECTION && BTRThread.isAlive()) {
@@ -179,18 +165,32 @@ public class MyServer {
 									commandFromClient = BTRThread.getBTCommand();
 									BTRThread.currCommandProcessed();
 									switch(commandFromClient) {
-									case CONFIG:
-										//The client is requesting for config info
-										//Send packet to client to notify of keymapping
-										BTOOStream.writeObject(CommandType.CONFIG);
-										synchronized(this){
-											BTOOStream.writeObject(serverui.getKeyMappings());
-										}
-										BTOOStream.flush();
+										case CONFIG:
+											//The client is requesting for config info
+											//Send packet to client to notify of keymapping
+											BTOOStream.writeObject(CommandType.CONFIG);
+											synchronized(this){
+												BTOOStream.writeObject(serverui.getKeyMappings());
+											}
+											BTOOStream.flush();
+											break;
+										/*case SCREENSHOT:
+											byte[] buffer;
+											FileInputStream fis = new FileInputStream("SmartController\\screenshots\\screenshot.png");
+											synchronized(this){
+												buffer = new byte[fis.available()];
+												fis.read(buffer);
+											}
+											if(buffer.length > 0) {
+												BTOOStream.writeObject(CommandType.SCREENSHOT);
+												BTOOStream.writeObject(buffer);
+												BTOOStream.flush();
+											}
+											fis.close();
+											break;*/
+										default:
+											keyTouch.identifyKey(commandFromClient, serverui.getKeyMappings(), serverui.getMouseRatio());
 										break;
-									default:
-										keyTouch.identifyKey(commandFromClient, serverui.getKeyMappings(), serverui.getMouseRatio());
-									break;
 									}
 								}
 							}
@@ -218,81 +218,11 @@ public class MyServer {
 		wifiSThread = new WifiSendSocketThread(currCommand, clientIPAddress, WifiPORT);
 		wifiSThread.start();
 	}
-	
-	public void processWifiCommand(ObjectInputStream objInputStream, CommandType currCommand) {
-		float X, Y;
-		try {
-			X = objInputStream.readFloat();
-			Y = objInputStream.readFloat();
-			
-			switch(currCommand) {
-				case INIT:
-					//First message from the client
-				break;
-				default:
-					currCommand.setX(X);
-					currCommand.setY(Y);
-					
-					keyTouch.identifyKey(currCommand, new ArrayList<String>(serverui.getKeyMappings()), serverui.getMouseRatio());
-	
-				break;				
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
-	}
-	
-	public class WifiSendSocketThread extends Thread {
-
-		private int WifiPORT = 8888;	
-		private CommandType commandToSend;
-		private Socket socket = null;
-		private ObjectOutputStream objOutputStream;
-		private String ipAddress;
-
-		public WifiSendSocketThread(CommandType currCommand, String ipString, int numPort) {
-			commandToSend = currCommand;
-			ipAddress = new String(ipString);
-			WifiPORT = numPort;
-
-		}
-
-		/**
-		 * wrap and send commands from client to server over socket connection
-		 */
-		public void run() {
-			try {
-				socket = new Socket(ipAddress, WifiPORT);
-				objOutputStream = new ObjectOutputStream(
-						socket.getOutputStream());
-
-				try {
-					// Send the enum(commandToSend) and the fields(X and Y)
-					// separately
-					// as the serializing and deserializing of enum through
-					// ObjectOutputStream
-					// and ObjectInputStream will not save the fields in the
-					// enum
-					objOutputStream.writeObject(commandToSend);
-					System.out.println("Wi-Fi Send: "+ commandToSend.toString());
-					
-					//Going to send keymap table to the client here. Figure out a way to 
-					// simplify the data structure
-					// use enum fields..?
-					
-				} catch (Exception e) {
-					System.out.println("Wi-Fi Send: Error");
-				}
-				// Close outputstream and socket
-				objOutputStream.close();
-				socket.close();
-
-			} catch (Exception e) {
-				System.out.println("Wi-Fi Send: Error");
-			}
-		}
+	public void takeScreenshot() {
+		keyTouch = new KeyTouch();
+		
+		keyTouch.takeScreenshot();
 	}
 	
 	public class BTReceiveSocketThread extends Thread {
@@ -325,19 +255,24 @@ public class MyServer {
 						serverui.updateStatus(false);
 						e.printStackTrace();
 					}
-					
-					synchronized(this) {
-						float X = objInputStream.readFloat();
-						float Y = objInputStream.readFloat();
+					switch(commandReceived) {
+						case CONFIG:
+						default:
+							
+							synchronized(this) {
+								float X = objInputStream.readFloat();
+								float Y = objInputStream.readFloat();
+				
+								commandReceived.setX(X);
+								commandReceived.setY(Y);						
 		
-						commandReceived.setX(X);
-						commandReceived.setY(Y);						
-
-						System.out.println("Message Received: " + commandReceived
-								+ "  X: " + commandReceived.getX() + "  Y: "
-								+ commandReceived.getY());
-						
-						bReceivedMessage = true;
+								System.out.println("Message Received: " + commandReceived
+										+ "  X: " + commandReceived.getX() + "  Y: "
+										+ commandReceived.getY());
+								
+								bReceivedMessage = true;
+							}
+							break;
 					}
 											
 				}
@@ -364,5 +299,173 @@ public class MyServer {
 		public void stopThread(){
 			bRun = false;
 		}
+	}
+	
+	
+	public class WifiSendSocketThread extends Thread {
+
+		private int WifiPORT = 8888;	
+		private CommandType commandToSend;
+		private Socket socket = null;
+		private ObjectOutputStream objOutputStream;
+		private String ipAddress;
+
+		public WifiSendSocketThread(CommandType currCommand, String ipString, int numPort) {
+			commandToSend = currCommand;
+			ipAddress = new String(ipString);
+			WifiPORT = numPort;
+
+			System.out.println("MyServer Wi-Fi Send Socket commandToSend: "
+					+ commandToSend + " " + commandToSend.getX() + " "
+					+ commandToSend.getY());
+		}
+		/**
+		 * wrap and send commands from client to server over socket connection
+		 */
+		public void run() {
+			try {
+				socket = new Socket(ipAddress, WifiPORT);
+				objOutputStream = new ObjectOutputStream(
+						socket.getOutputStream());
+
+				try {
+					System.out.println("MyServer Wi-Fi Send Socket Sending: " + commandToSend + " "
+							+ commandToSend.getX() + " " + commandToSend.getY());
+
+					// Send the enum(commandToSend) and the fields(X and Y)
+					// separately
+					// as the serializing and deserializing of enum through
+					// ObjectOutputStream
+					// and ObjectInputStream will not save the fields in the
+					// enum
+					objOutputStream.writeObject(commandToSend);
+					
+					switch(commandToSend) {
+					case CONFIG:
+						objOutputStream.writeObject(new ArrayList <String>(commandToSend.getArrayList()));
+					break;
+					default:
+						objOutputStream.writeFloat(commandToSend.getX());
+						objOutputStream.writeFloat(commandToSend.getY());
+					break;
+				}
+				} catch (Exception e) {
+					System.out.println("MyServer Wi-Fi Send Socket error: "+ e.toString());
+				}
+				// Close outputstream and socket
+				objOutputStream.close();
+				socket.close();
+
+			} catch (Exception e) {
+				System.out.println("MyServer Wi-Fi Send Socket error: "+ e.toString());
+			}
+		}
+	}
+
+	public class WifiReceiveSocketThread extends Thread {
+
+		private int WifiPORT = 8888;		
+		private CommandType commandReceived = CommandType.DEFAULT;
+		private ServerSocket serverSocket = null;
+		private Socket socket = null;
+		private ObjectInputStream objInputStream;
+		private String ipAddress;
+		
+		private boolean bRun = true, bNewClientIP = false, bReceivedMessage = false;
+
+		public WifiReceiveSocketThread(int numPort) {
+			ipAddress = "";
+			WifiPORT = numPort;
+		}
+
+		/**
+		 * listen for commands from server to client over socket connection
+		 */
+		public void run() {
+			try {
+				serverSocket = new ServerSocket(WifiPORT+1);
+				System.out.println("Listening :" + (WifiPORT+1));
+			} catch (IOException e) {
+	     				// TODO Auto-generated catch bl ock
+			  	e.printStackTrace();
+			}
+			
+			try {
+				while(bRun) {
+					socket = serverSocket.accept();
+					objInputStream = new ObjectInputStream(
+							socket.getInputStream());
+
+					if(!ipAddress.equals(socket.getInetAddress().toString().substring(1))) {
+						bNewClientIP = true;
+						ipAddress = new String(socket.getInetAddress().toString().substring(1));						
+					}
+						
+					try {	
+						commandReceived = (CommandType) objInputStream.readObject();	
+						
+						System.out.println("MyServer Wi-Fi Socket Received Command: "+ commandReceived.toString());
+						
+						switch(commandReceived) {
+						case CONFIG:
+						default:
+							
+							synchronized(this) {
+								float X = objInputStream.readFloat();
+								float Y = objInputStream.readFloat();
+				
+								commandReceived.setX(X);
+								commandReceived.setY(Y);						
+		
+								System.out.println("Message Received: " + commandReceived
+										+ "  X: " + commandReceived.getX() + "  Y: "
+										+ commandReceived.getY());
+								
+								bReceivedMessage = true;
+							}
+							break;
+						}
+						
+					} catch (Exception e) {
+						System.out.println("MyServer Wi-Fi Listening Socket error: "+ e.toString());
+					}
+				}
+				// Close inputstream and socket
+				objInputStream.close();
+				socket.close();
+
+			} catch (Exception e) {
+				System.out.println("MyServer Wi-Fi Listening Socket error: "+ e.toString());
+			}
+		}
+		
+		public void stopThread(){
+			bRun = false;
+		}
+		
+		public CommandType getWifiCommand(){
+			return commandReceived;
+		}
+		
+		public boolean receivedWifiCommand(){
+			return bReceivedMessage;
+		}
+		
+		public boolean newClientConnected(){
+			return bNewClientIP;
+		}
+		
+		public void currCommandProcessed() {
+			bReceivedMessage = false;
+		}
+		
+		public void currClientIPObtained() {
+			bNewClientIP = false;
+		}
+		
+		public String getClientIP(){
+			return ipAddress;
+		}
+		
 	}
 }

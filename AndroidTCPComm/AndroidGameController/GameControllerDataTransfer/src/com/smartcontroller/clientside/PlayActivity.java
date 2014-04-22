@@ -551,6 +551,10 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 			textSwipeRight.setVisibility(View.INVISIBLE);		
 		}		
 	}
+	
+	public void showScreenshot() {
+		
+	}
 
 	@Override
 	protected void onResume() {
@@ -560,6 +564,8 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 
 		initKeyConfig();
 		showImageHelper(true);
+		
+		SingletonWifi.getInstance().startListeningSocket();
 		
 		commonView = findViewById(R.id.playActivity);
 		commonView.setBackgroundColor(bgColor);
@@ -573,6 +579,8 @@ public class PlayActivity extends FragmentActivity implements OnTouchListener {
 		// to take appropriate action when the activity looses focus
 		super.onPause();
 		bgColor = Color.TRANSPARENT;
+		
+		SingletonWifi.getInstance().stopListeningSocket();
 
 		commonView = findViewById(R.id.playActivity);
 		commonView.setBackgroundColor(bgColor);
