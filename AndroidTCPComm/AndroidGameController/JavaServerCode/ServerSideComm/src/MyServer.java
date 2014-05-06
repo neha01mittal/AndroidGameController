@@ -93,12 +93,7 @@ public class MyServer {
 							case CONFIG: 
 								//The client is requesting for config info
 								//Send packet to client to notify of keymapping
-								synchronized(this){
-									commandFromClient.setArrayList(new ArrayList<String>(serverui.getKeyMappings()));
-								}
-								
-								WifiSendSocketThread WifiSThread = new WifiSendSocketThread(commandFromClient, clientIPAddress, WifiPORT);
-								WifiSThread.start();
+								sendKeymapListToClient();
 								break;
 							case SCREENSHOT:
 								break;
@@ -108,6 +103,11 @@ public class MyServer {
 							break;				
 							}
 							WifiRThread.currCommandProcessed();
+						} else {
+							if(serverui.isKeyMapUpdated()){
+								sendKeymapListToClient();
+								serverui.setKeyMapNotUpdated();
+							}
 						}
 					}
 				//End Wifi connection
@@ -211,6 +211,16 @@ public class MyServer {
 					break;
 			}			
 		}
+	}
+	
+	public synchronized void sendKeymapListToClient(){
+		
+		CommandType commandToSend = CommandType.CONFIG;
+
+		commandToSend.setArrayList(new ArrayList<String>(serverui.getKeyMappings()));
+
+		WifiSendSocketThread WifiSThread = new WifiSendSocketThread(commandToSend, clientIPAddress, WifiPORT);
+		WifiSThread.start();
 	}
 	
 	public void sendToDeviceWifi(CommandType currCommand) {

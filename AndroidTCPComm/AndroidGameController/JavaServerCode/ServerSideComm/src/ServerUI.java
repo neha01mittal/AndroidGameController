@@ -83,7 +83,7 @@ public class ServerUI extends JFrame {
 	private JComboBox comboBox;
 	private JComboBox comboBoxMouse;
 	private static int userChoice = 0;
-	private static final int FPS_INIT = 15; // initial frames per second
+	private static final int FPS_INIT = 30; // initial frames per second
 	private static final String MESSAGETOUSER = "Please go to the settings tab to map PC controls to android touch controls.";
 
 	private String directionKeys[] = { "^ v < >"};
@@ -116,6 +116,7 @@ public class ServerUI extends JFrame {
 	private static ArrayList<String> keyboardControlMapping = new ArrayList<String>();
 
 	private static float mouseRatio;
+	private static boolean bKeyMapUpdated = false;
 
 	private JTabbedPane tabbedPane;
 	private JPanel generalPane;
@@ -266,7 +267,7 @@ public class ServerUI extends JFrame {
 					e.printStackTrace();
 				}
 				setDefaultSettings();
-				// setKeyMapping();
+				bKeyMapUpdated = true;
 			}
 		});
 		keySettingsPane.add(save);
@@ -662,6 +663,14 @@ public class ServerUI extends JFrame {
 
 	public float getMouseRatio() {
 		return mouseRatio;
+	}
+	
+	public boolean isKeyMapUpdated() {
+		return bKeyMapUpdated;
+	}
+	
+	public void setKeyMapNotUpdated(){
+		bKeyMapUpdated = false;
 	}
 
 	public void updateStatus(boolean value) {
